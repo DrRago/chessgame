@@ -1,0 +1,18 @@
+image: maven:latest
+
+build:
+  stage: build
+  script: mvn compile --batch-mode
+
+test:
+  stage: test
+  script: mvn test --batch-mode
+
+pages:
+  stage: deploy
+  script:
+    - mvn javadoc:javadoc --batch-mode
+    - mv src/main/javadoc public/
+  artifacts:
+    paths:
+      - public
