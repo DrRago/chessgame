@@ -8,6 +8,14 @@ import java.util.List;
  * @author Leonhard Gahr
  */
 public class Rook implements Figure {
+    private final boolean white;
+    private Position position;
+
+    public Rook(boolean white, Position position) {
+        this.white = white;
+        this.position = position;
+    }
+
     /**
      * Move the figure to the given position. Returns true if the move was valid, false if it wasn't
      *
@@ -17,6 +25,16 @@ public class Rook implements Figure {
     @Override
     public boolean moveTo(Position position) {
         return false;
+    }
+
+    /**
+     * Get the position of the figure on the board
+     *
+     * @return where the figure is
+     */
+    @Override
+    public Position getPosition() {
+        return position;
     }
 
     /**
@@ -46,7 +64,7 @@ public class Rook implements Figure {
      */
     @Override
     public boolean isWhite() {
-        return false;
+        return white;
     }
 
     /**

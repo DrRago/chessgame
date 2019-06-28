@@ -18,6 +18,13 @@ public interface Figure {
     boolean moveTo(Position position);
 
     /**
+     * Get the position of the figure on the board. For captured figures, the return value is unreliable
+     *
+     * @return where the figure is
+     */
+    Position getPosition();
+
+    /**
      * Get a list of all possible moves for the figure. Dies not include kill moves
      *
      * @return a list of all possible moves
