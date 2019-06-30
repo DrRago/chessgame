@@ -55,16 +55,6 @@ public class Game {
     }
 
     /**
-     * We don't have a real Player class yet
-     * TODO: Implement the Player class and remove this.
-     */
-    class Player {
-        boolean isSamePlayer(Player other) {
-            return equals(other);
-        }
-    }
-
-    /**
      * We don't have a real History class yet
      * TODO: Implement the History class and remove this.
      */

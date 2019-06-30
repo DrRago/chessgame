@@ -10,11 +10,11 @@ import de.dhbw.tinf18b4.chess.backend.position.Position;
  * for this figure and the current board state.
  */
 class Move {
-    final private Game.Player player;
+    final private Player player;
     final private Position destination;
     final private Figure figure;
 
-    Move(Game.Player player, Position destination, Figure figure) {
+    Move(Player player, Position destination, Figure figure) {
         this.player = player;
         this.destination = destination;
         this.figure = figure;
@@ -25,7 +25,7 @@ class Move {
      *
      * @return the player
      */
-    Game.Player getPlayer() {
+    Player getPlayer() {
         return player;
     }
 
