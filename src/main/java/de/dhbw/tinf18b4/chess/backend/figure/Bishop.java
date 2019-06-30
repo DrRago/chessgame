@@ -25,7 +25,8 @@ public class Bishop implements Figure {
      */
     @Override
     public boolean moveTo(Position position) {
-        return false;
+        this.position = position;
+        return true;
     }
 
     /**
