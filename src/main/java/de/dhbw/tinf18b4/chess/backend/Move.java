@@ -15,6 +15,11 @@ class Move {
     final private Figure figure;
 
     Move(Player player, Position destination, Figure figure) {
+        if (player.isWhite() != figure.isWhite()) {
+            String message = String.format("Player %s can't move figure %s of another player %s", player, figure, player);
+            throw new IllegalArgumentException(message);
+        }
+
         this.player = player;
         this.destination = destination;
         this.figure = figure;
