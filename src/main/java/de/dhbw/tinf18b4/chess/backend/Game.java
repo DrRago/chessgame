@@ -65,22 +65,6 @@ public class Game {
     }
 
     /**
-     * We don't have a real Move class yet
-     * TODO: Implement the Move class and remove this.
-     */
-    class Move {
-        final private Player player;
-
-        Move(Player player) {
-            this.player = player;
-        }
-
-        Player getPlayer() {
-            return player;
-        }
-    }
-
-    /**
      * We don't have a real History class yet
      * TODO: Implement the History class and remove this.
      */
