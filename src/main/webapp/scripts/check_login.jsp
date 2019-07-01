@@ -1,6 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<jsp:useBean id="user" scope="session" class="de.dhbw.tinf18b4.chess.frontend.beans.User"/>
+<jsp:useBean id="user" scope="session" class="de.dhbw.tinf18b4.chess.frontend.user.User"/>
 
 <c:choose>
     <c:when test="${!user.isLoggedIn}">
