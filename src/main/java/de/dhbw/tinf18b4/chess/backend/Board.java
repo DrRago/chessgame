@@ -1,21 +1,21 @@
 package de.dhbw.tinf18b4.chess.backend;
 
-import de.dhbw.tinf18b4.chess.backend.figure.*;
+import de.dhbw.tinf18b4.chess.backend.piece.*;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 
 import java.util.stream.Stream;
 
 class Board {
-    final private Figure[] figures = initialSetup();
+    final private Piece[] pieces = initialSetup();
 
     /**
-     * Create an array with figures at their initial positions
+     * Create an array with pieces at their initial positions
      *
-     * @return the figures
+     * @return the pieces
      */
-    private Figure[] initialSetup() {
-        return new Figure[]{
-                // white figures
+    private Piece[] initialSetup() {
+        return new Piece[]{
+                // white pieces
                 new Pawn(true, new Position('a', 2)),
                 new Pawn(true, new Position('b', 2)),
                 new Pawn(true, new Position('c', 2)),
@@ -32,7 +32,7 @@ class Board {
                 new King(true, new Position('d', 1)),
                 new Queen(true, new Position('e', 1)),
 
-                // black figures
+                // black pieces
                 new Pawn(false, new Position('a', 7)),
                 new Pawn(false, new Position('b', 7)),
                 new Pawn(false, new Position('c', 7)),
@@ -60,12 +60,12 @@ class Board {
      * @return whether is possible to make the move
      */
     boolean checkMove(Move move) {
-        boolean isCaptured = move.getFigure().isCaptured();
-        boolean isAllowedMovement = move.getFigure()
+        boolean isCaptured = move.getPiece().isCaptured();
+        boolean isAllowedMovement = move.getPiece()
                 .getValidMoves()
                 .stream()
                 .anyMatch(position -> position.equals(move.getDestination()));
-        boolean isAllowedCaptureMove = move.getFigure()
+        boolean isAllowedCaptureMove = move.getPiece()
                 .getValidCaptureMoves()
                 .stream()
                 .anyMatch(position -> position.equals(move.getDestination()));
@@ -79,21 +79,21 @@ class Board {
     }
 
     /**
-     * Returns all the figures on this board
+     * Returns all the pieces on this board
      *
-     * @return The figures
+     * @return The pieces
      */
-    Stream<Figure> getFigures() {
-        return Stream.of(figures);
+    Stream<Piece> getPieces() {
+        return Stream.of(pieces);
     }
 
     /**
-     * Returns all the positions which are occupied by a figure on this board
+     * Returns all the positions which are occupied by a piece on this board
      *
      * @return The positions
      */
     Stream<Position> getOccupiedPositions() {
-        return getFigures().map(Figure::getPosition);
+        return getPieces().map(Piece::getPosition);
     }
 
     /**
@@ -102,8 +102,8 @@ class Board {
      * @param move The move
      */
     void applyMove(Move move) {
-        getFigures()
-                .filter(figure -> figure.equals(move.getFigure()))
+        getPieces()
+                .filter(piece -> piece.equals(move.getPiece()))
                 .findFirst()
                 .orElseThrow()
                 .moveTo(move.getDestination());

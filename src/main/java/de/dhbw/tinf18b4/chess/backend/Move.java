@@ -1,28 +1,28 @@
 package de.dhbw.tinf18b4.chess.backend;
 
-import de.dhbw.tinf18b4.chess.backend.figure.Figure;
+import de.dhbw.tinf18b4.chess.backend.piece.Piece;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 
 /**
- * An move made by a player on board. When it is applied onto a board it will move a figure
+ * An move made by a player on board. When it is applied onto a board it will move a piece
  * from its current position on the board to the destination position.
  * To prevent invalid moves, one must first check this move against the game rules
- * for this figure and the current board state.
+ * for this piece and the current board state.
  */
 class Move {
     final private Player player;
     final private Position destination;
-    final private Figure figure;
+    final private Piece piece;
 
-    Move(Player player, Position destination, Figure figure) {
-        if (player.isWhite() != figure.isWhite()) {
-            String message = String.format("Player %s can't move figure %s of another player %s", player, figure, player);
+    Move(Player player, Position destination, Piece piece) {
+        if (player.isWhite() != piece.isWhite()) {
+            String message = String.format("Player %s can't move piece %s of another player %s", player, piece, player);
             throw new IllegalArgumentException(message);
         }
 
         this.player = player;
         this.destination = destination;
-        this.figure = figure;
+        this.piece = piece;
     }
 
     /**
@@ -44,11 +44,11 @@ class Move {
     }
 
     /**
-     * Return the figure associated with this move
+     * Return the piece associated with this move
      *
-     * @return the figure
+     * @return the piece
      */
-    Figure getFigure() {
-        return figure;
+    Piece getPiece() {
+        return piece;
     }
 }

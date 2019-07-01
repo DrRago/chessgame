@@ -1,4 +1,4 @@
-package de.dhbw.tinf18b4.chess.backend.figure;
+package de.dhbw.tinf18b4.chess.backend.piece;
 
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 
@@ -7,10 +7,10 @@ import java.util.List;
 /**
  * @author Leonhard.Gahr
  */
-public interface Figure {
+public interface Piece {
 
     /**
-     * Move the figure to the given position. Returns true if the move was valid, false if it wasn't
+     * Move the piece to the given position. Returns true if the move was valid, false if it wasn't
      *
      * @param position the destination position
      * @return whether the move was made or not
@@ -18,14 +18,14 @@ public interface Figure {
     boolean moveTo(Position position);
 
     /**
-     * Get the position of the figure on the board. For captured figures, the return value is unreliable
+     * Get the position of the piece on the board. For captured figures, the return value is unreliable
      *
-     * @return where the figure is
+     * @return where the piece is
      */
     Position getPosition();
 
     /**
-     * Get a list of all possible moves for the figure. Dies not include kill moves
+     * Get a list of all possible moves for the piece. Dies not include kill moves
      *
      * @return a list of all possible moves
      */
@@ -39,16 +39,16 @@ public interface Figure {
     List<Position> getValidCaptureMoves();
 
     /**
-     * Get the color of the figure
+     * Get the color of the piece
      *
-     * @return whether the figure is white or not
+     * @return whether the piece is white or not
      */
     boolean isWhite();
 
     /**
-     * Get the capture state of the figure
+     * Get the capture state of the piece
      *
-     * @return whether the figure has been captured or not
+     * @return whether the piece has been captured or not
      */
     boolean isCaptured();
 }

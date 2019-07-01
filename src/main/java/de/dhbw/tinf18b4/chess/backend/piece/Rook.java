@@ -1,4 +1,4 @@
-package de.dhbw.tinf18b4.chess.backend.figure;
+package de.dhbw.tinf18b4.chess.backend.piece;
 
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 
@@ -7,17 +7,17 @@ import java.util.List;
 /**
  * @author Leonhard Gahr
  */
-public class Knight implements Figure {
+public class Rook implements Piece {
     private final boolean white;
     private Position position;
 
-    public Knight(boolean white, Position position) {
+    public Rook(boolean white, Position position) {
         this.white = white;
         this.position = position;
     }
 
     /**
-     * Move the figure to the given position. Returns true if the move was valid, false if it wasn't
+     * Move the piece to the given position. Returns true if the move was valid, false if it wasn't
      *
      * @param position the destination position
      * @return whether the move was made or not
@@ -29,9 +29,9 @@ public class Knight implements Figure {
     }
 
     /**
-     * Get the position of the figure on the board
+     * Get the position of the piece on the board
      *
-     * @return where the figure is
+     * @return where the piece is
      */
     @Override
     public Position getPosition() {
@@ -39,7 +39,7 @@ public class Knight implements Figure {
     }
 
     /**
-     * Get a list of all possible moves for the figure. Dies not include kill moves
+     * Get a list of all possible moves for the piece. Dies not include kill moves
      *
      * @return a list of all possible moves
      */
@@ -59,9 +59,9 @@ public class Knight implements Figure {
     }
 
     /**
-     * Get the color of the figure
+     * Get the color of the piece
      *
-     * @return whether the figure is white or not
+     * @return whether the piece is white or not
      */
     @Override
     public boolean isWhite() {
@@ -69,9 +69,9 @@ public class Knight implements Figure {
     }
 
     /**
-     * Get the capture state of the figure
+     * Get the capture state of the piece
      *
-     * @return whether the figure has been captured or not
+     * @return whether the piece has been captured or not
      */
     @Override
     public boolean isCaptured() {
