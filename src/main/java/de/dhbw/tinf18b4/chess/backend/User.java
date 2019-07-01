@@ -1,4 +1,4 @@
-package de.dhbw.tinf18b4.chess.frontend.user;
+package de.dhbw.tinf18b4.chess.backend;
 
 import de.dhbw.tinf18b4.chess.backend.utility.UserUtility;
 import lombok.Getter;

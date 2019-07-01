@@ -1,20 +1,37 @@
 package de.dhbw.tinf18b4.chess.backend.lobby;
 
-import de.dhbw.tinf18b4.chess.frontend.user.User;
+import de.dhbw.tinf18b4.chess.backend.User;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
- * @author Leonhard Gahr
- *
  * The lobby for a game
- *
+ * <p>
  * it is able to:
- *  - hold two users
- *  - disallow join of a user
- *  - start a game
+ * <ul>
+ * <li>hold two users</li>
+ * <li>disallow join of a user</li>
+ * <li>start a game</li>
+ * </ul>
+ *
+ * @author Leonhard Gahr
  */
 public class Lobby {
-    private String ID;
+
+    /**
+     * Whether the lobby is public
+     */
+    @Getter
+    @Setter
     private boolean publicLobby = false;
 
+    /**
+     * the users in this lobby
+     */
+    @Getter
     private User[] users = new User[2];
+
+    public Lobby(User creator) {
+        this.users[0] = creator;
+    }
 }
