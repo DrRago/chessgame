@@ -1,33 +1,50 @@
 package de.dhbw.tinf18b4.chess.frontend.user;
 
+import de.dhbw.tinf18b4.chess.backend.utility.UserUtility;
+import lombok.Getter;
+import lombok.Setter;
+
 /**
+ * A object holding a user, who wants to login or is logged in
+ *
  * @author Leonhard Gahr
  */
+@Getter
+@Setter
 public class User {
-    private String username;
-    private String password;
-    private final String ID;
+    private String username; // login name
+    private String displayName; // a display name
+    private String password; // login password
+    private final String ID; // session ID
 
     public User(String username, String password, String id) {
         this.username = username;
+        this.displayName = username; // TODO change this
         this.password = password;
         this.ID = id;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    void setPassword(String password) {
-        this.password = password;
+    /**
+     * Override for the equals method for a user
+     * <p>
+     * two users are equal if
+     * - the username is the same
+     * - or if a username is guest, if the session ids are the same
+     *
+     * @param obj the object to compare
+     * @return whether the object is the same as this
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof User) {
+            User user2 = (User) obj;
+            if (user2.username.equalsIgnoreCase("guest") ||
+                    this.username.equalsIgnoreCase("guest")) {
+                return user2.ID.equals(this.ID);
+            }
+            return user2.username.equalsIgnoreCase(this.username);
+        }
+        return false;
     }
 
     /**
@@ -37,8 +54,6 @@ public class User {
      * @return the validity check (true for valid, false for invalid)
      */
     public boolean validateLogin() {
-        // TODO: 01/07/2019 Implement
-        return false;
+        return UserUtility.login(this.username, this.password);
     }
-
 }
