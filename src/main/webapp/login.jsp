@@ -12,6 +12,7 @@
 <body>
 
 <div class="container mt-5 pt-5">
+    <%@include file="parts/errors.jsp"%>
     <div class="card mx-auto border-0">
         <div class="card-header border-bottom-0 bg-transparent">
             <ul class="nav nav-tabs justify-content-center pt-4" id="pills-tab" role="tablist">
@@ -33,7 +34,7 @@
             <div class="tab-content" id="pills-tabContent">
                 <div class="tab-pane fade show active" id="pills-login" role="tabpanel"
                      aria-labelledby="pills-login-tab">
-                    <form>
+                    <form action="${pageContext.request.contextPath}/DoLoginOrRegister" method="post">
                         <div class="form-group">
                             <input type="text" name="username" class="form-control" id="login_username"
                                    placeholder="Username"
@@ -46,13 +47,13 @@
                         </div>
 
                         <div class="text-center pt-4">
-                            <button type="submit" class="btn btn-primary">Login</button>
+                            <button type="submit" class="btn btn-primary" name="function" value="login">Login</button>
                         </div>
                     </form>
                 </div>
 
                 <div class="tab-pane fade" id="pills-register" role="tabpanel" aria-labelledby="pills-register-tab">
-                    <form>
+                    <form action="${pageContext.request.contextPath}/DoLoginOrRegister" method="post">
                         <div class="form-group">
                             <input type="text" name="username" id="name" class="form-control" placeholder="Username"
                                    required autofocus>
@@ -69,7 +70,8 @@
                         </div>
 
                         <div class="text-center pt-2 pb-1">
-                            <button type="submit" class="btn btn-primary">Register</button>
+                            <button type="submit" class="btn btn-primary" name="function" value="register">Register
+                            </button>
                         </div>
                     </form>
                 </div>
