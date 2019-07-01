@@ -29,8 +29,8 @@ class Board {
                 new Knight(true, new Position('g', 1)),
                 new Bishop(true, new Position('c', 1)),
                 new Bishop(true, new Position('f', 1)),
-                new King(true, new Position('d', 1)),
-                new Queen(true, new Position('e', 1)),
+                new King(true, new Position('e', 1)),
+                new Queen(true, new Position('d', 1)),
 
                 // black pieces
                 new Pawn(false, new Position('a', 7)),
@@ -46,8 +46,8 @@ class Board {
                 new Knight(false, new Position('g', 8)),
                 new Bishop(false, new Position('c', 8)),
                 new Bishop(false, new Position('f', 8)),
-                new King(false, new Position('d', 8)),
-                new Queen(false, new Position('e', 8))
+                new King(false, new Position('e', 8)),
+                new Queen(false, new Position('d', 8))
         };
     }
 
