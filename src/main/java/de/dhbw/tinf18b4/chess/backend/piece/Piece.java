@@ -18,7 +18,7 @@ public interface Piece {
     boolean moveTo(Position position);
 
     /**
-     * Get the position of the piece on the board. For captured figures, the return value is unreliable
+     * Get the position of the piece on the board. For captured pieces, the return value is unreliable
      *
      * @return where the piece is
      */
