@@ -42,4 +42,76 @@ public class Position {
     public String toString() {
         return Character.toString(rank) + file;
     }
+
+    public Position leftNeighbor() {
+        try {
+            return new Position(rank, file - 1);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    public Position rightNeighbor() {
+        try {
+            return new Position(rank, file + 1);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    public Position topNeighbor() {
+        try {
+            return new Position((char) (rank + 1), file);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    public Position bottomNeighbor() {
+        try {
+            return new Position((char) (rank - 1), file);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    public Position upperLeftNeighbor() {
+        try {
+            return new Position((char) (rank + 1), file - 1);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    public Position upperRightNeighbor() {
+        try {
+            return new Position((char) (rank + 1), file + 1);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    public Position lowerLeftNeighbor() {
+        try {
+            return new Position((char) (rank - 1), file - 1);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    public Position lowerRightNeighbor() {
+        try {
+            return new Position((char) (rank - 1), file + 1);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    public char getRank() {
+        return rank;
+    }
+
+    public int getFile() {
+        return file;
+    }
 }
