@@ -3,6 +3,8 @@ package de.dhbw.tinf18b4.chess.backend.piece;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Leonhard Gahr
@@ -45,7 +47,14 @@ public class King implements Piece {
      */
     @Override
     public List<Position> getValidMoves() {
-        return null;
+        // TODO: 01.07.2019 Implement castling special move
+        return Stream.of(
+                Stream.ofNullable(position.topNeighbor()),
+                Stream.ofNullable(position.bottomNeighbor()),
+                Stream.ofNullable(position.leftNeighbor()),
+                Stream.ofNullable(position.rightNeighbor()))
+                .flatMap(s -> s)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -55,7 +64,7 @@ public class King implements Piece {
      */
     @Override
     public List<Position> getValidCaptureMoves() {
-        return null;
+        return getValidMoves();
     }
 
     /**

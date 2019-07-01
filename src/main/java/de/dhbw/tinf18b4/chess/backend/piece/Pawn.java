@@ -3,6 +3,9 @@ package de.dhbw.tinf18b4.chess.backend.piece;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Leonhard Gahr
@@ -45,7 +48,19 @@ public class Pawn implements Piece {
      */
     @Override
     public List<Position> getValidMoves() {
-        return null;
+        Position singleMove = position.topNeighbor();
+        Position doubleMove = null;
+
+        // if this pawn has not moved allow moving two fields forward
+        if (white && position.getRank() == 2
+                || !white && position.getRank() == 7) {
+            doubleMove = Optional.ofNullable(singleMove)
+                    .map(Position::topNeighbor)
+                    .orElse(null);
+        }
+
+        return Stream.concat(Stream.ofNullable(singleMove), Stream.ofNullable(doubleMove))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -55,7 +70,22 @@ public class Pawn implements Piece {
      */
     @Override
     public List<Position> getValidCaptureMoves() {
-        return null;
+        // TODO: 01.07.2019 Implement en passant special move
+        Stream<Position> captureLeft;
+        Stream<Position> captureRight;
+
+        // Because white pawns move "up" (towards file 8) and black pawns move "down"
+        // (towards file 1) we need to check for the color of the piece
+        if (white) {
+            captureLeft = Stream.ofNullable(position.upperLeftNeighbor());
+            captureRight = Stream.ofNullable(position.upperRightNeighbor());
+        } else {
+            captureLeft = Stream.ofNullable(position.lowerLeftNeighbor());
+            captureRight = Stream.ofNullable(position.lowerRightNeighbor());
+        }
+
+        return Stream.concat(captureLeft, captureRight)
+                .collect(Collectors.toList());
     }
 
     /**

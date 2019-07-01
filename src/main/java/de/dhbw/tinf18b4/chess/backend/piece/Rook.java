@@ -3,6 +3,9 @@ package de.dhbw.tinf18b4.chess.backend.piece;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Leonhard Gahr
@@ -45,7 +48,22 @@ public class Rook implements Piece {
      */
     @Override
     public List<Position> getValidMoves() {
-        return null;
+        // The bishop can move diagonally as far as he wants but he can't leap over other pieces
+        return Stream.of(
+                Stream.iterate(position, Position::topNeighbor)
+                        .skip(1)
+                        .takeWhile(Objects::nonNull),
+                Stream.iterate(position, Position::bottomNeighbor)
+                        .skip(1)
+                        .takeWhile(Objects::nonNull),
+                Stream.iterate(position, Position::leftNeighbor)
+                        .skip(1)
+                        .takeWhile(Objects::nonNull),
+                Stream.iterate(position, Position::rightNeighbor)
+                        .skip(1)
+                        .takeWhile(Objects::nonNull))
+                .flatMap(s -> s)
+                .collect(Collectors.toList());
     }
 
     /**

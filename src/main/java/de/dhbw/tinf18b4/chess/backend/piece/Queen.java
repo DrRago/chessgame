@@ -2,7 +2,10 @@ package de.dhbw.tinf18b4.chess.backend.piece;
 
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Leonhard Gahr
@@ -45,7 +48,9 @@ public class Queen implements Piece {
      */
     @Override
     public List<Position> getValidMoves() {
-        return null;
+        return Stream.of(new Rook(white, position).getValidMoves(), new Bishop(white, position).getValidMoves())
+                .flatMap(Collection::stream)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -55,7 +60,7 @@ public class Queen implements Piece {
      */
     @Override
     public List<Position> getValidCaptureMoves() {
-        return null;
+        return getValidMoves();
     }
 
     /**
