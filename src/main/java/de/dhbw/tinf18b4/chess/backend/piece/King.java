@@ -1,5 +1,6 @@
 package de.dhbw.tinf18b4.chess.backend.piece;
 
+import de.dhbw.tinf18b4.chess.backend.Board;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 
 import java.util.List;
@@ -44,9 +45,10 @@ public class King implements Piece {
      * Get a list of all possible moves for the piece. Dies not include kill moves
      *
      * @return a list of all possible moves
+     * @param board
      */
     @Override
-    public List<Position> getValidMoves() {
+    public List<Position> getValidMoves(Board board) {
         // TODO: 01.07.2019 Implement castling special move
         return Stream.of(
                 Stream.ofNullable(position.topNeighbor()),
@@ -61,10 +63,11 @@ public class King implements Piece {
      * Get a list of all possible capture options
      *
      * @return all capture options
+     * @param board
      */
     @Override
-    public List<Position> getValidCaptureMoves() {
-        return getValidMoves();
+    public List<Position> getValidCaptureMoves(Board board) {
+        return getValidMoves(board);
     }
 
     /**

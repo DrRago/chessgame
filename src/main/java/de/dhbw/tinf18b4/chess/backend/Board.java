@@ -5,7 +5,7 @@ import de.dhbw.tinf18b4.chess.backend.position.Position;
 
 import java.util.stream.Stream;
 
-class Board {
+public class Board {
     final private Piece[] pieces = initialSetup();
 
     /**
@@ -62,11 +62,11 @@ class Board {
     boolean checkMove(Move move) {
         boolean isCaptured = move.getPiece().isCaptured();
         boolean isAllowedMovement = move.getPiece()
-                .getValidMoves()
+                .getValidMoves(this)
                 .stream()
                 .anyMatch(position -> position.equals(move.getDestination()));
         boolean isAllowedCaptureMove = move.getPiece()
-                .getValidCaptureMoves()
+                .getValidCaptureMoves(this)
                 .stream()
                 .anyMatch(position -> position.equals(move.getDestination()));
         boolean isEmptyField = getOccupiedPositions()

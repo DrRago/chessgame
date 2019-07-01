@@ -1,5 +1,6 @@
 package de.dhbw.tinf18b4.chess.backend.piece;
 
+import de.dhbw.tinf18b4.chess.backend.Board;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 
 import java.util.List;
@@ -27,16 +28,18 @@ public interface Piece {
     /**
      * Get a list of all possible moves for the piece. Dies not include kill moves
      *
+     * @param board the board
      * @return a list of all possible moves
      */
-    List<Position> getValidMoves();
+    List<Position> getValidMoves(Board board);
 
     /**
      * Get a list of all possible capture options
      *
+     * @param board the board
      * @return all capture options
      */
-    List<Position> getValidCaptureMoves();
+    List<Position> getValidCaptureMoves(Board board);
 
     /**
      * Get the color of the piece

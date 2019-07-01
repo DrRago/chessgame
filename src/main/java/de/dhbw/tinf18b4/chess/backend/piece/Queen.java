@@ -1,5 +1,6 @@
 package de.dhbw.tinf18b4.chess.backend.piece;
 
+import de.dhbw.tinf18b4.chess.backend.Board;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 
 import java.util.Collection;
@@ -45,10 +46,11 @@ public class Queen implements Piece {
      * Get a list of all possible moves for the piece. Dies not include kill moves
      *
      * @return a list of all possible moves
+     * @param board
      */
     @Override
-    public List<Position> getValidMoves() {
-        return Stream.of(new Rook(white, position).getValidMoves(), new Bishop(white, position).getValidMoves())
+    public List<Position> getValidMoves(Board board) {
+        return Stream.of(new Rook(white, position).getValidMoves(board), new Bishop(white, position).getValidMoves(board))
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
     }
@@ -57,10 +59,11 @@ public class Queen implements Piece {
      * Get a list of all possible capture options
      *
      * @return all capture options
+     * @param board
      */
     @Override
-    public List<Position> getValidCaptureMoves() {
-        return getValidMoves();
+    public List<Position> getValidCaptureMoves(Board board) {
+        return getValidMoves(board);
     }
 
     /**
