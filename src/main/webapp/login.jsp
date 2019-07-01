@@ -1,4 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+
+<%-- catch if user is already logged in --%>
+<c:if test="${sessionScope.loginUser != null}">
+    <c:redirect url="index.jsp"/>
+</c:if>
+
 
 <html lang="en">
 <head>
@@ -8,11 +15,13 @@
     <link rel="stylesheet" href="assets/css/login.css">
     <%@include file='parts/styles.jsp' %>
     <%@include file='parts/javascript.jsp' %>
+
+    <script src="assets/js/login.js"></script>
 </head>
 <body>
 
 <div class="container mt-5 pt-5">
-    <%@include file="parts/errors.jsp"%>
+    <%@include file="parts/errors.jsp" %>
     <div class="card mx-auto border-0">
         <div class="card-header border-bottom-0 bg-transparent">
             <ul class="nav nav-tabs justify-content-center pt-4" id="pills-tab" role="tablist">
@@ -48,6 +57,11 @@
 
                         <div class="text-center pt-4">
                             <button type="submit" class="btn btn-primary" name="function" value="login">Login</button>
+                        </div>
+                        <div class="text-center pt-4">
+                            <button type="submit" id="guest-login" class="btn btn-primary" name="function" value="guest">
+                                Login as Guest
+                            </button>
                         </div>
                     </form>
                 </div>

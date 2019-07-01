@@ -1,6 +1,7 @@
 package de.dhbw.tinf18b4.chess.frontend.controller;
 
 
+import de.dhbw.tinf18b4.chess.backend.utility.UserUtility;
 import de.dhbw.tinf18b4.chess.frontend.user.User;
 
 import javax.servlet.annotation.WebServlet;
@@ -13,11 +14,17 @@ import java.util.logging.Logger;
 
 
 /**
+ * Controller to perform login and registration actions
+ * it separates the following login actions:
+ * - login: logging in with a username and password
+ * - register: register a user with a username and password
+ * - guest: logging in a user as guest
+ *
  * @author Leonhard Gahr
  */
 @WebServlet("/DoLoginOrRegister")
 public class LoginController extends HttpServlet {
-    Logger logger = Logger.getLogger(LoginController.class.getName());
+    private Logger logger = Logger.getLogger(LoginController.class.getName());
 
     /**
      * Determine whether a login or register request has been made,
@@ -29,6 +36,8 @@ public class LoginController extends HttpServlet {
      */
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        logger.info("Request received from " + req.getRemoteAddr());
+
         final String username = req.getParameter("username");
         final String password = req.getParameter("password");
 
@@ -36,34 +45,71 @@ public class LoginController extends HttpServlet {
 
         // validate the correctness of the request parameters
         // redirect back to the login page and display an error
-        if (!validateParameters(req)) {
-            sendTarget = String.format("login.jsp?username=%s&error=1", username);
+        if (!validateParameters(req) && !req.getParameter("function").equalsIgnoreCase("guest")) {
+            logger.info("action failed due to invalid request parameters");
+
+            sendTarget = String.format("login.jsp?username=%s&error=invalid_request", username);
         } else {
             HttpSession currSession = req.getSession(); // the current session object
 
             // determine function
             switch (req.getParameter("function")) {
                 case "login":
+                    logger.info("Logging in user: " + username);
+
                     User user = new User(username, password, currSession.getId());
                     if (user.validateLogin()) {
+                        logger.info("User authenticated");
+
                         // user exists
-                        currSession.setAttribute("loginUser", user);
+                        currSession.setAttribute("user", user);
                         sendTarget = "index.jsp";
                     } else {
+                        logger.info("user authentication failed");
                         // invalid credentials
-                        sendTarget = String.format("login.jsp?username=%s&error=2", username);
+                        sendTarget = String.format("login.jsp?username=%s&error=login_failed", username);
                     }
                     break;
+
                 case "register":
-                    // TODO: 01/07/2019 do registration
-                    sendTarget = "registered.jsp";
+                    logger.info("Registering new user: " + username);
+                    // perform a register for the user
+                    // check the password confirmation field
+                    if (password.equals(req.getParameter("password-confirm"))) {
+                        logger.info("Registration failed due to password mismatch");
+
+                        sendTarget = String.format("login.jsp?username=%s&error=password_mismatch", username);
+                    } else {
+                        if (UserUtility.createUser(username, password)) {
+                            // user is registered
+                            logger.info("User registered");
+
+                            User registeredUser = new User(username, password, currSession.getId());
+                            currSession.setAttribute("user", registeredUser);
+
+                            sendTarget = "registered.jsp";
+                        } else {
+                            logger.info("Registration failed due to username conflicts");
+
+                            sendTarget = String.format("login.jsp?username=%s&error=username_conflict", username);
+                        }
+                    }
                     break;
+
+                case "guest":
+                    // logging user in as guest
+                    logger.info("Logging in as guest");
+
+                    User guestUser = new User("guest", "", currSession.getId());
+                    currSession.setAttribute("user", guestUser);
+                    sendTarget = "index.jsp";
+                    break;
+
                 default:
-                    sendTarget = String.format("login.jsp?username=%s&error=3", username);
+                    sendTarget = String.format("login.jsp?username=%s&error=invalid_method", username);
                     break;
             }
         }
-
         resp.sendRedirect(sendTarget);
     }
 
