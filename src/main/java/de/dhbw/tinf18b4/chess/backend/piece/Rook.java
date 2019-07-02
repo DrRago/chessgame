@@ -53,7 +53,7 @@ public class Rook implements Piece {
 
     @Override
     public List<Position> getValidCaptureMoves(Board board) {
-        return null;
+        return getValidMoves(board);
     }
 
     @Override
