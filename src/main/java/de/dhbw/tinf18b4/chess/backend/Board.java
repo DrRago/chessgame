@@ -96,6 +96,10 @@ public class Board {
         return getPieces().map(Piece::getPosition);
     }
 
+    public boolean isOccupied(Position position) {
+        return getOccupiedPositions().anyMatch(position::equals);
+    }
+
     /**
      * Apply a move to the board
      *
