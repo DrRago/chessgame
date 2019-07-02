@@ -3,6 +3,7 @@ package de.dhbw.tinf18b4.chess.frontend.controller;
 
 import de.dhbw.tinf18b4.chess.backend.utility.UserUtility;
 import de.dhbw.tinf18b4.chess.backend.user.User;
+import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -17,8 +18,8 @@ import java.util.logging.Logger;
  * Controller to perform login and registration actions
  * it separates the following login actions:
  * - login: logging in with a username and password
- * - register: register a user with a username and password
- * - guest: logging in a user as guest
+ * - register: register a {@link User} with a username and password
+ * - guest: logging in a {@link User} as guest
  *
  * @author Leonhard Gahr
  */
@@ -35,7 +36,7 @@ public class LoginController extends HttpServlet {
      * @param resp the response to send back to the user
      */
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doPost(@NotNull HttpServletRequest req, @NotNull HttpServletResponse resp) throws IOException {
         logger.info("Request received from " + req.getRemoteAddr());
 
         final String username = req.getParameter("username");
@@ -119,7 +120,7 @@ public class LoginController extends HttpServlet {
      * @param req the http request
      * @return whether all parameters exist
      */
-    private boolean validateParameters(HttpServletRequest req) {
+    private boolean validateParameters(@NotNull HttpServletRequest req) {
         final String[] REQUIRED_PARAMS = {"username", "password", "function"};
 
         for (String param : REQUIRED_PARAMS) {

@@ -1,6 +1,7 @@
 package de.dhbw.tinf18b4.chess.backend.lobby;
 
 import de.dhbw.tinf18b4.chess.backend.user.User;
+import org.jetbrains.annotations.NotNull;
 
 import java.nio.charset.Charset;
 import java.util.HashMap;
@@ -33,7 +34,7 @@ public class LobbyManager {
      * @param creator the {@link User} who created the lobby
      * @return the ID of {@link Lobby} that has been created
      */
-    public static String createLobby(User creator) {
+    public static String createLobby(@NotNull User creator) {
         String lobbyID;
 
         // make sure to generate an ID that doesn't exist
@@ -61,7 +62,7 @@ public class LobbyManager {
      *
      * @param ID the ID of the {@link Lobby} to be removed
      */
-    public static void removeLobby(String ID) {
+    public static void removeLobby(@NotNull String ID) {
         lobbies.remove(ID);
     }
 

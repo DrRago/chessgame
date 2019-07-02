@@ -3,6 +3,8 @@ package de.dhbw.tinf18b4.chess.backend.user;
 import de.dhbw.tinf18b4.chess.backend.utility.UserUtility;
 import lombok.Getter;
 import lombok.Setter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * A object holding a user, who wants to login or is logged in
@@ -18,11 +20,11 @@ public class User {
     private final String ID; // session ID
     private Permission permission; // the permission level
 
-    public User(String username, String password, String ID) {
+    public User(@NotNull String username, @NotNull String password, @NotNull String ID) {
         this(username, password, ID, Permission.USER);
     }
 
-    public User(String username, String password, String ID, Permission permission) {
+    public User(@NotNull String username, @NotNull String password, @NotNull String ID, @NotNull Permission permission) {
         this.username = username;
         this.displayName = username; // TODO change this
         this.password = password;
@@ -31,7 +33,7 @@ public class User {
     }
 
     /**
-     * Override for the equals method for a user
+     * Override for the equals method for a {@link User}
      * <p>
      * two users are equal if
      * - the username is the same
@@ -41,7 +43,7 @@ public class User {
      * @return whether the object is the same as this
      */
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (obj instanceof User) {
             User user2 = (User) obj;
             if (user2.username.equalsIgnoreCase("guest") ||
@@ -54,8 +56,8 @@ public class User {
     }
 
     /**
-     * Check whether the user credentials are correct
-     * and the user exists with that password combination
+     * Check whether the {@link User} credentials are correct
+     * and the {@link User} exists with that password combination
      *
      * @return the validity check (true for valid, false for invalid)
      */

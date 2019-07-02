@@ -1,15 +1,19 @@
 package de.dhbw.tinf18b4.chess.backend.utility;
 
+import de.dhbw.tinf18b4.chess.backend.user.User;
+
 /**
+ * Some utility functions for the user
+ *
  * @author Leonhard Gahr
  */
 public class UserUtility {
     /**
-     * Create a user with the given username and password
-     * if the user already exists, return false, otherwise true
+     * Create a {@link User} with the given username and password
+     * if the {@link User} already exists, return false, otherwise true
      *
      * @param username the username to create
-     * @param password the password to create the user with
+     * @param password the password to create the {@link User} with
      * @return whether the registration was successful
      */
     public static boolean createUser(String username, String password) {
