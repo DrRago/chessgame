@@ -10,6 +10,7 @@ public class Player {
 
     public Player(boolean isWhite, User user) {
         this.isWhite = isWhite;
+        this.user = user;
     }
 
     boolean isWhite() {
