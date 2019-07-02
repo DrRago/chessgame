@@ -34,8 +34,8 @@ public class LobbyManagerTest {
         String lobbyID = LobbyManager.createLobby(me);
         Lobby lobby = LobbyManager.lobbies.get(lobbyID);
 
-        assertEquals("Expected list size to be 0", 0, LobbyManager.getPublicLobbies().size());
-        lobby.setPublicLobby(true);
         assertEquals("Expected list size to be 1", 1, LobbyManager.getPublicLobbies().size());
+        lobby.setPublicLobby(false);
+        assertEquals("Expected list size to be 0", 0, LobbyManager.getPublicLobbies().size());
     }
 }
