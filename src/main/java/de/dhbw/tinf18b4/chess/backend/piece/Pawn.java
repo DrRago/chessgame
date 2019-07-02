@@ -33,15 +33,21 @@ public class Pawn implements Piece {
 
     @Override
     public List<Position> getValidMoves(Board board) {
-        Position singleMove = position.topNeighbor();
+        Position singleMove = white ? position.topNeighbor() : position.bottomNeighbor();
         Position doubleMove = null;
 
         // if this pawn has not moved allow moving two fields forward
         if (white && position.getRank() == 2
                 || !white && position.getRank() == 7) {
-            doubleMove = Optional.ofNullable(singleMove)
-                    .map(Position::topNeighbor)
-                    .orElse(null);
+            if (white) {
+                doubleMove = Optional.ofNullable(singleMove)
+                        .map(Position::topNeighbor)
+                        .orElse(null);
+            } else {
+                doubleMove = Optional.ofNullable(singleMove)
+                        .map(Position::bottomNeighbor)
+                        .orElse(null);
+            }
         }
 
         return Stream.concat(Stream.ofNullable(singleMove), Stream.ofNullable(doubleMove))
