@@ -1,6 +1,6 @@
 package de.dhbw.tinf18b4.chess.backend.lobby;
 
-import de.dhbw.tinf18b4.chess.backend.User;
+import de.dhbw.tinf18b4.chess.backend.user.User;
 
 import java.nio.charset.Charset;
 import java.util.HashMap;

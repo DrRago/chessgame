@@ -2,7 +2,7 @@ package de.dhbw.tinf18b4.chess.frontend.controller;
 
 
 import de.dhbw.tinf18b4.chess.backend.utility.UserUtility;
-import de.dhbw.tinf18b4.chess.backend.User;
+import de.dhbw.tinf18b4.chess.backend.user.User;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;

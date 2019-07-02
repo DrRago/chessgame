@@ -1,6 +1,6 @@
 package de.dhbw.tinf18b4.chess.backend.lobby;
 
-import de.dhbw.tinf18b4.chess.backend.User;
+import de.dhbw.tinf18b4.chess.backend.user.User;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -19,9 +19,9 @@ public class LobbyManagerTest {
 
         assertNotNull(lobbyID);
         assertNotNull(lobby);
-        assertEquals("Expected lobby users to be max of 2", 2, lobby.getUsers().length);
-        assertEquals("Expected user 0 to be me", me, lobby.getUsers()[0]);
-        assertNull("Expected user 1 to be null", lobby.getUsers()[1]);
+        assertEquals("Expected lobby users to be max of 2", 2, lobby.getPlayers().length);
+        assertEquals("Expected user 0 to be me", me, lobby.getPlayers()[0].getUser());
+        assertNull("Expected user 1 to be null", lobby.getPlayers()[1]);
 
         LobbyManager.removeLobby(lobbyID);
         assertNull(LobbyManager.lobbies.get(lobbyID));

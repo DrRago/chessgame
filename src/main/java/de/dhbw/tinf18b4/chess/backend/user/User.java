@@ -1,4 +1,4 @@
-package de.dhbw.tinf18b4.chess.backend;
+package de.dhbw.tinf18b4.chess.backend.user;
 
 import de.dhbw.tinf18b4.chess.backend.utility.UserUtility;
 import lombok.Getter;
@@ -16,12 +16,18 @@ public class User {
     private String displayName; // a display name
     private String password; // login password
     private final String ID; // session ID
+    private Permission permission; // the permission level
 
-    public User(String username, String password, String id) {
+    public User(String username, String password, String ID) {
+        this(username, password, ID, Permission.USER);
+    }
+
+    public User(String username, String password, String ID, Permission permission) {
         this.username = username;
         this.displayName = username; // TODO change this
         this.password = password;
-        this.ID = id;
+        this.ID = ID;
+        this.permission = permission;
     }
 
     /**

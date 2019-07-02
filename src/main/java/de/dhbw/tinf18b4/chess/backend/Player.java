@@ -1,9 +1,14 @@
 package de.dhbw.tinf18b4.chess.backend;
 
-class Player {
-    private boolean isWhite;
+import de.dhbw.tinf18b4.chess.backend.user.User;
+import lombok.Getter;
 
-    Player(boolean isWhite) {
+public class Player {
+    private boolean isWhite;
+    @Getter
+    private User user;
+
+    public Player(boolean isWhite, User user) {
         this.isWhite = isWhite;
     }
 
