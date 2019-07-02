@@ -6,6 +6,8 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
+ * Test cases for the {@link LobbyManager} implementation
+ *
  * @author Leonhard Gahr
  */
 public class LobbyManagerTest {
