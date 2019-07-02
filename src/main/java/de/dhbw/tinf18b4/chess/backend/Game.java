@@ -3,9 +3,7 @@ package de.dhbw.tinf18b4.chess.backend;
 
 import de.dhbw.tinf18b4.chess.backend.piece.Piece;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.Getter;
 
 /**
  * @author Leonhard Gahr
@@ -15,6 +13,7 @@ public class Game {
     /**
      * The Board instance modeling the state of the Game
      */
+    @Getter
     private final Board board = new Board();
     private final History history = new History();
     private Player player1;
@@ -77,73 +76,50 @@ public class Game {
         return halfMoveClock;
     }
 
+    /**
+     * convert the {@link Board} to a FEN string <br>
+     * this string only contains information about the {@link Position} of the {@link Piece}
+     *
+     * @return the FEN string
+     * @see <a href='https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation'>FEN Wikipedia</a>
+     */
     public String asFen() {
         StringBuilder stringBuilder = new StringBuilder();
 
-        // FEN: 1. board state
-        List<Piece> b = board.getPieces().sorted((left, right) -> {
-            Position leftPosition = left.getPosition();
-            Position rightPosition = right.getPosition();
+        // build a 8x8 board with pieces as char name
+        char[][] fenBoard = new char[8][8];
+        board.getPieces().forEach(piece -> {
+            int y = piece.getPosition().getFile() - 1;
+            int x = piece.getPosition().getRank() - 'a';
 
-            char rightRank = rightPosition.getRank();
-            char leftRank = leftPosition.getRank();
-            int leftFile = leftPosition.getFile();
-            int rightFile = rightPosition.getFile();
+            fenBoard[y][x] = piece.getFenIdentifier();
+        });
 
-            if (leftRank < rightRank || leftFile < rightFile) {
-                return -1;
-            } else if (leftRank > rightRank || leftFile > rightFile) {
-                return 1;
-            }
-
-            return 0;
-        }).collect(Collectors.toList());
-
-        int rank = 1;
-        int file = 1;
-
-        for (Piece piece : b) {
-            Position position = piece.getPosition();
-            if (rank > position.getRank() || file > position.getFile()) {
-                int skippedRanks = (rank - position.getRank() + 8 * (file - position.getFile())) % 8;
-                int skippedFiles = (rank - position.getRank() + 8 * (file - position.getFile())) / 8;
-
-                if (skippedFiles > 0) {
-                    for (int i = 0; i < skippedFiles; i++) {
-                        stringBuilder.append("/").append(8);
+        // iterate backwards from 8 to 1
+        for (int y = 7; y >= 0; y--) {
+            char[] row = fenBoard[y];
+            int counter = 0; // counter for empty fields
+            for (char c : row) {
+                if (c != 0) {
+                    if (counter != 0) {
+                        // if a row contains empty fields and pieces
+                        stringBuilder.append(counter);
+                        counter = 0;
                     }
-                }
-
-                if (skippedRanks == 0) {
-                    String pieceIdentifier = piece.getClass().getSimpleName().subSequence(0, 1).toString();
-                    stringBuilder.append(piece.isWhite() ? pieceIdentifier : pieceIdentifier.toLowerCase());
+                    stringBuilder.append(c);
                 } else {
-                    stringBuilder.append(skippedRanks);
+                    counter++;
                 }
             }
 
-            file = position.getFile();
-            rank = position.getRank();
+            if (counter != 0) {
+                stringBuilder.append(counter);
+            }
+            stringBuilder.append("/");
         }
 
-
-        stringBuilder.append(" ")
-                // FEN 2. active color
-                .append(history.peekingPop().getPlayer().isWhite() ? "b" : "w")
-                .append(" ")
-                // FEN 3. castling availability
-                // TODO: Replace when castling detection is done
-                .append("-")
-                .append(" ")
-                // FEN 4. en passant target
-                // TODO: Replace when en passant detection is done
-                .append("-")
-                .append(" ")
-                // FEN 5. halfmove clock
-                .append(getHalfMoveClock())
-                .append(" ")
-                // FEN 6. fullmove number
-                .append(getFullMoves());
+        // remove the last "/"
+        stringBuilder.setLength(stringBuilder.length() - 1);
         return stringBuilder.toString();
     }
 

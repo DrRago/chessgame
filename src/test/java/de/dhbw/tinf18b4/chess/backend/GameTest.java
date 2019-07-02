@@ -1,11 +1,8 @@
 package de.dhbw.tinf18b4.chess.backend;
 
-import de.dhbw.tinf18b4.chess.backend.piece.Piece;
 import org.junit.Test;
 
-import java.util.Arrays;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test cases for the {@link Game} implementation
@@ -17,7 +14,6 @@ public class GameTest {
 
     @Test
     public void fenTest() {
-        System.out.println(Arrays.toString(game.getBoard().getPieces().map((Piece t) -> t.getClass().getSimpleName()).toArray()));
-        assertEquals("Initial game FEN should be", "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", game.asFen());
+        assertEquals("Initial game FEN should be", "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR", game.asFen());
     }
 }
