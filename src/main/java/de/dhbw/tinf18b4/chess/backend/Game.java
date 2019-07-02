@@ -89,8 +89,8 @@ public class Game {
         // build a 8x8 board with pieces as char name
         char[][] fenBoard = new char[8][8];
         board.getPieces().forEach(piece -> {
-            int y = piece.getPosition().getFile() - 1;
-            int x = piece.getPosition().getRank() - 'a';
+            int y = piece.getPosition().getRank() - 1;
+            int x = piece.getPosition().getFile() - 'a';
 
             fenBoard[y][x] = piece.getFenIdentifier();
         });
