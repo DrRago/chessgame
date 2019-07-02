@@ -29,7 +29,7 @@ public class Lobby {
      */
     @Getter
     @Setter
-    private boolean publicLobby = false;
+    private boolean publicLobby = true;
 
     /**
      * the players in this {@link Lobby}

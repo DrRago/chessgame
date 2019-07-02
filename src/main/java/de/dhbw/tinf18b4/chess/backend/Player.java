@@ -21,4 +21,9 @@ public class Player {
     boolean isSamePlayer(Player other) {
         return equals(other);
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s (%s)", user.getUsername(), isWhite ? "W" : "B");
+    }
 }

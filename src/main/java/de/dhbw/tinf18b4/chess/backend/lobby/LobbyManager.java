@@ -1,13 +1,11 @@
 package de.dhbw.tinf18b4.chess.backend.lobby;
 
 import de.dhbw.tinf18b4.chess.backend.user.User;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
-import java.nio.charset.Charset;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.security.SecureRandom;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -26,6 +24,7 @@ public class LobbyManager {
     /**
      * A {@link HashMap} with all active lobbies
      */
+    @Getter
     static Map<String, Lobby> lobbies = new HashMap<>();
 
     /**
@@ -49,12 +48,25 @@ public class LobbyManager {
     }
 
     /**
-     * Get a {@link List} of all public lobbies
+     * Get a {@link Map} of all public lobbies
      *
-     * @return the {@link List} of all public lobbies
+     * @return the {@link Map} of all public lobbies
      */
-    public static List<Lobby> getPublicLobbies() {
-        return lobbies.values().stream().filter(Lobby::isPublicLobby).collect(Collectors.toList()); // magic
+    public static Map<String, Lobby> getPublicLobbies() {
+        return lobbies.entrySet().stream()
+                .filter(entry -> entry.getValue().isPublicLobby())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    /**
+     * Get a {@link Map} of all public lobbies that are not full
+     *
+     * @return the {@link Map} of all public lobbies
+     */
+    public static Map<String, Lobby> getPublicNotFullLobbies() {
+        return getPublicLobbies().entrySet().stream()
+                .filter(entry -> Arrays.stream(entry.getValue().getPlayers()).anyMatch(Objects::isNull))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     /**
@@ -72,8 +84,9 @@ public class LobbyManager {
      * @return the random {@link String}
      */
     private static String generateRandomString() {
-        byte[] array = new byte[7]; // fix size of 7
-        new Random().nextBytes(array);
-        return new String(array, Charset.forName("UTF-8"));
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] token = new byte[7];
+        secureRandom.nextBytes(token);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(token); //base64 encoding
     }
 }

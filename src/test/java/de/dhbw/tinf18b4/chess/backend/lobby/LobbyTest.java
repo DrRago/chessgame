@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
  * @author Leonhard Gahr
  */
 public class LobbyTest {
-    User me = new User("me", "123", "123");
+    private User me = new User("me", "123", "123");
 
     @Test
     public void joinLeaveLobbyTest() {

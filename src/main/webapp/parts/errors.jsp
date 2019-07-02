@@ -17,6 +17,15 @@
             </button>
         </div>
     </c:when>
+    <c:when test="${param.error == 'lobby_full'}">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <strong>Holy guacamole!</strong> You tried to join a lobby that is already full. Try another one from the
+            list below
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    </c:when>
     <c:otherwise>
     </c:otherwise>
 </c:choose>

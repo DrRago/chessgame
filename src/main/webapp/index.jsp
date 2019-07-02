@@ -1,6 +1,8 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
+<c:redirect url="/lobby" />
+
 <%-- validate that the user is logged in--%>
 <%@ include file="scripts/check_login.jsp" %>
 
