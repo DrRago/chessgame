@@ -52,4 +52,9 @@ public class Queen implements Piece {
     public boolean isCaptured() {
         return false;
     }
+
+    @Override
+    public char getFenIdentifier() {
+        return white ? 'Q' : 'q';
+    }
 }

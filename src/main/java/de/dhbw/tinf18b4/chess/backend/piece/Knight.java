@@ -89,4 +89,9 @@ public class Knight implements Piece {
     public boolean isCaptured() {
         return false;
     }
+
+    @Override
+    public char getFenIdentifier() {
+        return white ? 'N' : 'n';
+    }
 }

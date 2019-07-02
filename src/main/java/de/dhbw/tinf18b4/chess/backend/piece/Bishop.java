@@ -5,7 +5,6 @@ import de.dhbw.tinf18b4.chess.backend.Board;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 
 import java.util.List;
-import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 /**
@@ -56,5 +55,10 @@ public class Bishop implements Piece {
     @Override
     public boolean isCaptured() {
         return false;
+    }
+
+    @Override
+    public char getFenIdentifier() {
+        return white ? 'B' : 'b';
     }
 }

@@ -55,4 +55,9 @@ public class Rook implements Piece {
     public boolean isCaptured() {
         return false;
     }
+
+    @Override
+    public char getFenIdentifier() {
+        return white ? 'R' : 'r';
+    }
 }

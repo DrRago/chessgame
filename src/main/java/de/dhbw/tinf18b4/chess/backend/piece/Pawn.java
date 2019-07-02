@@ -83,4 +83,9 @@ public class Pawn implements Piece {
     public boolean isCaptured() {
         return false;
     }
+
+    @Override
+    public char getFenIdentifier() {
+        return white ? 'P' : 'p';
+    }
 }

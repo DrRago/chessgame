@@ -54,4 +54,11 @@ public interface Piece {
      * @return whether the piece has been captured or not
      */
     boolean isCaptured();
+
+    /**
+     * Get the FEN identifier of the piece
+     *
+     * @return the FEN identifier
+     */
+    char getFenIdentifier();
 }
