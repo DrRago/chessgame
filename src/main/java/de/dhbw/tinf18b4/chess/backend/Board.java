@@ -3,9 +3,10 @@ package de.dhbw.tinf18b4.chess.backend;
 import de.dhbw.tinf18b4.chess.backend.piece.*;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 
+import java.util.Objects;
 import java.util.stream.Stream;
 
-class Board {
+public class Board {
     final private Piece[] pieces = initialSetup();
 
     /**
@@ -23,6 +24,7 @@ class Board {
                 new Pawn(true, new Position('e', 2)),
                 new Pawn(true, new Position('f', 2)),
                 new Pawn(true, new Position('g', 2)),
+                new Pawn(true, new Position('h', 2)),
                 new Rook(true, new Position('a', 1)),
                 new Rook(true, new Position('h', 1)),
                 new Knight(true, new Position('b', 1)),
@@ -40,8 +42,9 @@ class Board {
                 new Pawn(false, new Position('e', 7)),
                 new Pawn(false, new Position('f', 7)),
                 new Pawn(false, new Position('g', 7)),
-                new Rook(false, new Position('a', 7)),
-                new Rook(false, new Position('h', 7)),
+                new Pawn(false, new Position('h', 7)),
+                new Rook(false, new Position('a', 8)),
+                new Rook(false, new Position('h', 8)),
                 new Knight(false, new Position('b', 8)),
                 new Knight(false, new Position('g', 8)),
                 new Bishop(false, new Position('c', 8)),
@@ -62,11 +65,11 @@ class Board {
     boolean checkMove(Move move) {
         boolean isCaptured = move.getPiece().isCaptured();
         boolean isAllowedMovement = move.getPiece()
-                .getValidMoves()
+                .getValidMoves(this)
                 .stream()
                 .anyMatch(position -> position.equals(move.getDestination()));
         boolean isAllowedCaptureMove = move.getPiece()
-                .getValidCaptureMoves()
+                .getValidCaptureMoves(this)
                 .stream()
                 .anyMatch(position -> position.equals(move.getDestination()));
         boolean isEmptyField = getOccupiedPositions()
@@ -84,7 +87,7 @@ class Board {
      * @return The pieces
      */
     Stream<Piece> getPieces() {
-        return Stream.of(pieces);
+        return Stream.of(pieces).filter(Objects::nonNull);
     }
 
     /**
@@ -94,6 +97,10 @@ class Board {
      */
     Stream<Position> getOccupiedPositions() {
         return getPieces().map(Piece::getPosition);
+    }
+
+    public boolean isOccupied(Position position) {
+        return getOccupiedPositions().anyMatch(position::equals);
     }
 
     /**

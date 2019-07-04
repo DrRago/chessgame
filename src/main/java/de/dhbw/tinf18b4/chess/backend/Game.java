@@ -1,6 +1,10 @@
 package de.dhbw.tinf18b4.chess.backend;
 
 
+import de.dhbw.tinf18b4.chess.backend.piece.Piece;
+import de.dhbw.tinf18b4.chess.backend.position.Position;
+import lombok.Getter;
+
 /**
  * @author Leonhard Gahr
  */
@@ -9,6 +13,7 @@ public class Game {
     /**
      * The Board instance modeling the state of the Game
      */
+    @Getter
     private final Board board = new Board();
     private final History history = new History();
     private Player player1;
@@ -47,11 +52,60 @@ public class Game {
         // and apply the move eventually
         if (board.checkMove(move)) {
             board.applyMove(move);
+
             history.push(move);
+
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * convert the {@link Board} to a FEN string <br>
+     * this string only contains information about the {@link Position} of the {@link Piece}
+     *
+     * @return the FEN string
+     * @see <a href='https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation'>FEN Wikipedia</a>
+     */
+    public String asFen() {
+        StringBuilder stringBuilder = new StringBuilder();
+
+        // build a 8x8 board with pieces as char name
+        char[][] fenBoard = new char[8][8];
+        board.getPieces().forEach(piece -> {
+            int y = piece.getPosition().getRank() - 1;
+            int x = piece.getPosition().getFile() - 'a';
+
+            fenBoard[y][x] = piece.getFenIdentifier();
+        });
+
+        // iterate backwards from 8 to 1
+        for (int y = 7; y >= 0; y--) {
+            char[] row = fenBoard[y];
+            int counter = 0; // counter for empty fields
+            for (char c : row) {
+                if (c != 0) {
+                    if (counter != 0) {
+                        // if a row contains empty fields and pieces
+                        stringBuilder.append(counter);
+                        counter = 0;
+                    }
+                    stringBuilder.append(c);
+                } else {
+                    counter++;
+                }
+            }
+
+            if (counter != 0) {
+                stringBuilder.append(counter);
+            }
+            stringBuilder.append("/");
+        }
+
+        // remove the last "/"
+        stringBuilder.setLength(stringBuilder.length() - 1);
+        return stringBuilder.toString();
     }
 
     /**
