@@ -36,15 +36,15 @@ public class Game {
         // Prevent player from making a move if they ...
 
         // ... don't belong in this game or ...
-        if (player1.isSamePlayer(move.getPlayer())
-                || player2.isSamePlayer(move.getPlayer())) {
+        if (player1.equals(move.getPlayer())
+                || player2.equals(move.getPlayer())) {
             return false;
 
         }
 
         // ... have just made a move
         if (lastMove != null
-                && move.getPlayer().isSamePlayer(lastMove.getPlayer())) {
+                && move.getPlayer().equals(lastMove.getPlayer())) {
             return false;
         }
 

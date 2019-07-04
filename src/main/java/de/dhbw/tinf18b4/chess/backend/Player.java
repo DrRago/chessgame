@@ -4,6 +4,8 @@ import de.dhbw.tinf18b4.chess.backend.user.User;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class Player {
     private boolean isWhite;
     @Getter
@@ -18,8 +20,17 @@ public class Player {
         return isWhite;
     }
 
-    boolean isSamePlayer(Player other) {
-        return equals(other);
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Player player = (Player) o;
+        return user.equals(player.user);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(user);
     }
 
     @Override
