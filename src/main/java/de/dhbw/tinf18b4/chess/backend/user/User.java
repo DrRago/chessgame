@@ -64,4 +64,9 @@ public class User {
     public boolean validateLogin() {
         return UserUtility.login(this.username, this.password);
     }
+
+    @Override
+    public String toString() {
+        return String.format("User '%s' - %s", username, permission);
+    }
 }

@@ -7,6 +7,9 @@
   <component name="HaskellBuildOptions">
     <stackPath>C:\Users\Leonhard.Gahr\Haskell\bin\stack.exe</stackPath>
   </component>
+  <component name="JavaScriptSettings">
+    <option name="languageLevel" value="ES6" />
+  </component>
   <component name="MavenProjectsManager">
     <option name="originalFiles">
       <list>

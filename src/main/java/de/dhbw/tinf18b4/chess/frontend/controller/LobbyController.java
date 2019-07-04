@@ -31,6 +31,7 @@ public class LobbyController extends HttpServlet {
             return;
         }
 
+
         // determine the site the user should see
         String reqPath = req.getPathInfo();
         if (reqPath == null || reqPath.equals("/")) {
@@ -40,6 +41,10 @@ public class LobbyController extends HttpServlet {
             // new lobby and redirect to it
             String lobbyID = LobbyManager.createLobby((User) req.getSession().getAttribute("user"));
             resp.sendRedirect("/lobby/" + lobbyID);
+        } else if(reqPath.matches("/.*/game/?")) {
+            String lobbyID = reqPath.split("/")[1];
+            System.out.println(lobbyID);
+            req.getRequestDispatcher("/game.jsp?id=" + lobbyID).forward(req, resp);
         } else {
             // show a lobby
             String lobbyID = reqPath.substring(1);

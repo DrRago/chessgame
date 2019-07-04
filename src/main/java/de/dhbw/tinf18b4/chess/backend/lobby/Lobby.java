@@ -129,4 +129,9 @@ public class Lobby {
                 .filter(Objects::nonNull)
                 .anyMatch(player -> player.getUser().equals(user));
     }
+
+    @Override
+    public String toString() {
+        return String.format("Lobby (%d/%d) - %s", Arrays.stream(players).filter(Objects::isNull).count(), 2, status);
+    }
 }
