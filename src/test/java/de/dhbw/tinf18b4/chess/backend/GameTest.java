@@ -1,5 +1,6 @@
 package de.dhbw.tinf18b4.chess.backend;
 
+import de.dhbw.tinf18b4.chess.backend.user.User;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -10,7 +11,8 @@ import static org.junit.Assert.assertEquals;
  * @author Leonhard Gahr
  */
 public class GameTest {
-    private Game game = new Game(new Player(false), new Player(true));
+    private User test = new User("", "", "");
+    private Game game = new Game(new Player(false, test), new Player(true, test));
 
     @Test
     public void fenTest() {
