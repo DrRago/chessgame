@@ -14,7 +14,8 @@ public class Game {
      * The Board instance modeling the state of the Game
      */
     @Getter
-    private final Board board = new Board();
+    private final Board board = new Board(this);
+    @Getter
     private final History history = new History();
     private Player player1;
     private Player player2;
@@ -36,8 +37,8 @@ public class Game {
         // Prevent player from making a move if they ...
 
         // ... don't belong in this game or ...
-        if (player1.equals(move.getPlayer())
-                || player2.equals(move.getPlayer())) {
+        if (!(player1.equals(move.getPlayer())
+                || player2.equals(move.getPlayer()))) {
             return false;
 
         }
@@ -112,7 +113,7 @@ public class Game {
      * We don't have a real History class yet
      * TODO: Implement the History class and remove this.
      */
-    class History {
+    public class History {
         /**
          * Add a move to history to make it the most recent move
          *
@@ -127,7 +128,7 @@ public class Game {
          *
          * @return The Move
          */
-        Move peekingPop() {
+        public Move peekingPop() {
             return null;
         }
     }

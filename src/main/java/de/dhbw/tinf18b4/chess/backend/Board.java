@@ -2,12 +2,20 @@ package de.dhbw.tinf18b4.chess.backend;
 
 import de.dhbw.tinf18b4.chess.backend.piece.*;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
+import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.stream.Stream;
 
 public class Board {
     final private Piece[] pieces = initialSetup();
+    @Getter
+    final private Game game;
+
+    public Board(@NotNull Game game) {
+        this.game = game;
+    }
 
     /**
      * Create an array with pieces at their initial positions
@@ -86,7 +94,7 @@ public class Board {
      *
      * @return The pieces
      */
-    Stream<Piece> getPieces() {
+   public Stream<Piece> getPieces() {
         return Stream.of(pieces).filter(Objects::nonNull);
     }
 
