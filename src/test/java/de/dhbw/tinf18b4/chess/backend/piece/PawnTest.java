@@ -23,9 +23,9 @@ public class PawnTest {
     public void enPassantTest() {
         Game game = new Game(white, black);
 
-        Pawn whiteP2a = (Pawn) findPieceByPosition(game, new Position('a', 2));
-        Pawn whiteP2b = (Pawn) findPieceByPosition(game, new Position('b', 2));
-        Pawn blackP7b = (Pawn) findPieceByPosition(game, new Position('b', 7));
+        Pawn whiteP2a = (Pawn) game.getBoard().findPieceByPosition(new Position('a', 2));
+        Pawn whiteP2b = (Pawn) game.getBoard().findPieceByPosition(new Position('b', 2));
+        Pawn blackP7b = (Pawn) game.getBoard().findPieceByPosition(new Position('b', 7));
 
         assertTrue("Could not move P7b", game.makeMove(new Move(black, blackP7b.getPosition().bottomNeighbor().bottomNeighbor(), blackP7b)));
         assertTrue("Could not move p2b", game.makeMove(new Move(white, whiteP2b.getPosition().topNeighbor(), whiteP2b)));
@@ -33,9 +33,5 @@ public class PawnTest {
         assertTrue("Could not move p7b", game.makeMove(new Move(white, whiteP2a.getPosition().topNeighbor().topNeighbor(), whiteP2a)));
 
         assertTrue("En passant not recognized", blackP7b.getValidCaptureMoves(game.getBoard()).contains(new Position('a', 3)));
-    }
-
-    Piece findPieceByPosition(Game game, Position position) {
-        return game.getBoard().getPieces().filter(piece -> piece.getPosition().equals(position)).findFirst().orElseThrow();
     }
 }

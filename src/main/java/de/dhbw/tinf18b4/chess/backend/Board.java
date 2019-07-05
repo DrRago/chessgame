@@ -94,7 +94,7 @@ public class Board {
      *
      * @return The pieces
      */
-   public Stream<Piece> getPieces() {
+    public Stream<Piece> getPieces() {
         return Stream.of(pieces).filter(Objects::nonNull);
     }
 
@@ -107,8 +107,26 @@ public class Board {
         return getPieces().map(Piece::getPosition);
     }
 
+    /**
+     * Determine whether there is a piece on the provided position
+     *
+     * @param position The position to check
+     * @return true if the position is occupied
+     */
     public boolean isOccupied(Position position) {
         return getOccupiedPositions().anyMatch(position::equals);
+    }
+
+    /**
+     * Find the piece on the given position
+     *
+     * @param position The position
+     * @return The found piece or null if there is none
+     */
+    public Piece findPieceByPosition(Position position) {
+        return getPieces().filter(piece -> piece.getPosition().equals(position))
+                .findFirst()
+                .orElse(null);
     }
 
     /**
