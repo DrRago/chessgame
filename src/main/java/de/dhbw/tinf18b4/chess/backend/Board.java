@@ -74,11 +74,9 @@ public class Board {
         boolean isCaptured = move.getPiece().isCaptured();
         boolean isAllowedMovement = move.getPiece()
                 .getValidMoves(this)
-                .stream()
                 .anyMatch(position -> position.equals(move.getDestination()));
         boolean isAllowedCaptureMove = move.getPiece()
                 .getValidCaptureMoves(this)
-                .stream()
                 .anyMatch(position -> position.equals(move.getDestination()));
         boolean isEmptyField = getOccupiedPositions()
                 .noneMatch(position -> position.equals(move.getDestination()));

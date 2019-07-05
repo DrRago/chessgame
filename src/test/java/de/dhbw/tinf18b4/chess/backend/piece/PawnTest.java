@@ -32,6 +32,9 @@ public class PawnTest {
         assertTrue("Could not move P7b", game.makeMove(new Move(black, blackP7b.getPosition().bottomNeighbor(), blackP7b)));
         assertTrue("Could not move p7b", game.makeMove(new Move(white, whiteP2a.getPosition().topNeighbor().topNeighbor(), whiteP2a)));
 
-        assertTrue("En passant not recognized", blackP7b.getValidCaptureMoves(game.getBoard()).contains(new Position('a', 3)));
+
+        Position capturePosition = new Position('a', 3);
+        assertTrue("En passant not recognized", blackP7b.getValidCaptureMoves(game.getBoard())
+                .anyMatch(position -> position.equals(capturePosition)));
     }
 }

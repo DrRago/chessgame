@@ -3,9 +3,7 @@ package de.dhbw.tinf18b4.chess.backend.piece;
 import de.dhbw.tinf18b4.chess.backend.Board;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -32,7 +30,7 @@ public class Knight implements Piece {
     }
 
     @Override
-    public List<Position> getValidMoves(Board board) {
+    public Stream<Position> getValidMoves(Board board) {
         // Knights always move 3 squares. First they 2 vertical or horizontal and then they make a turn.
         // Afterwards they move one square orthogonally.
         Position topTurningPoint = Optional.ofNullable(position.topNeighbor())
@@ -71,12 +69,11 @@ public class Knight implements Piece {
                         .map(Position::topNeighbor),
                 Stream.ofNullable(rightTurningPoint)
                         .map(Position::bottomNeighbor))
-                .flatMap(s -> s)
-                .collect(Collectors.toList());
+                .flatMap(s -> s);
     }
 
     @Override
-    public List<Position> getValidCaptureMoves(Board board) {
+    public Stream<Position> getValidCaptureMoves(Board board) {
         return getValidMoves(board);
     }
 

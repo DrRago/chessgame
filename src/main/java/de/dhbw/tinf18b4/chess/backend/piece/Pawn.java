@@ -4,9 +4,7 @@ import de.dhbw.tinf18b4.chess.backend.Board;
 import de.dhbw.tinf18b4.chess.backend.Move;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -33,7 +31,7 @@ public class Pawn implements Piece {
     }
 
     @Override
-    public List<Position> getValidMoves(Board board) {
+    public Stream<Position> getValidMoves(Board board) {
         Position singleMove = white ? position.topNeighbor() : position.bottomNeighbor();
         Position doubleMove = null;
 
@@ -51,22 +49,20 @@ public class Pawn implements Piece {
             }
         }
 
-        return Stream.concat(Stream.ofNullable(singleMove), Stream.ofNullable(doubleMove))
-                .collect(Collectors.toList());
+        return Stream.concat(Stream.ofNullable(singleMove), Stream.ofNullable(doubleMove));
     }
 
     @Override
-    public List<Position> getValidCaptureMoves(Board board) {
+    public Stream<Position> getValidCaptureMoves(Board board) {
         return getValidCaptureMoves(board, true);
     }
 
 
-    public List<Position> getValidCaptureMoves(Board board, boolean careAboutEnPassant) {
+    public Stream<Position> getValidCaptureMoves(Board board, boolean careAboutEnPassant) {
         if (careAboutEnPassant) {
             Position enPassant = calculateEnPassantPossibility(board);
             if (enPassant != null) {
-                return Stream.of(enPassant)
-                        .collect(Collectors.toList());
+                return Stream.of(enPassant);
             }
         }
 
@@ -83,8 +79,7 @@ public class Pawn implements Piece {
             captureRight = Stream.ofNullable(position.lowerRightNeighbor());
         }
 
-        return Stream.concat(captureLeft, captureRight)
-                .collect(Collectors.toList());
+        return Stream.concat(captureLeft, captureRight);
     }
 
 
@@ -111,7 +106,7 @@ public class Pawn implements Piece {
                 : lastMove.getPiece().getPosition().topNeighbor();
 
         // find if any of the pawns could capture the enemy pawn if it only moved on square
-        boolean enPassantPossible = getValidCaptureMoves(board, false).stream().anyMatch(position -> position == enPassantCapturePosition);
+        boolean enPassantPossible = getValidCaptureMoves(board, false).anyMatch(position -> position == enPassantCapturePosition);
 
         // if all of these predicates are true this pawn can do an en passant move
         // so we return the position where it should move to do the en passant move
