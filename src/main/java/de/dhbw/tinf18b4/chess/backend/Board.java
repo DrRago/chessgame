@@ -2,12 +2,20 @@ package de.dhbw.tinf18b4.chess.backend;
 
 import de.dhbw.tinf18b4.chess.backend.piece.*;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
+import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.stream.Stream;
 
 public class Board {
     final private Piece[] pieces = initialSetup();
+    @Getter
+    final private Game game;
+
+    public Board(@NotNull Game game) {
+        this.game = game;
+    }
 
     /**
      * Create an array with pieces at their initial positions
@@ -62,15 +70,13 @@ public class Board {
      * @param move The move
      * @return whether is possible to make the move
      */
-    boolean checkMove(Move move) {
+    boolean checkMove(@NotNull Move move) {
         boolean isCaptured = move.getPiece().isCaptured();
         boolean isAllowedMovement = move.getPiece()
                 .getValidMoves(this)
-                .stream()
                 .anyMatch(position -> position.equals(move.getDestination()));
         boolean isAllowedCaptureMove = move.getPiece()
                 .getValidCaptureMoves(this)
-                .stream()
                 .anyMatch(position -> position.equals(move.getDestination()));
         boolean isEmptyField = getOccupiedPositions()
                 .noneMatch(position -> position.equals(move.getDestination()));
@@ -86,7 +92,7 @@ public class Board {
      *
      * @return The pieces
      */
-    Stream<Piece> getPieces() {
+    public Stream<Piece> getPieces() {
         return Stream.of(pieces).filter(Objects::nonNull);
     }
 
@@ -99,8 +105,26 @@ public class Board {
         return getPieces().map(Piece::getPosition);
     }
 
-    public boolean isOccupied(Position position) {
+    /**
+     * Determine whether there is a piece on the provided position
+     *
+     * @param position The position to check
+     * @return true if the position is occupied
+     */
+    public boolean isOccupied(@NotNull Position position) {
         return getOccupiedPositions().anyMatch(position::equals);
+    }
+
+    /**
+     * Find the piece on the given position
+     *
+     * @param position The position
+     * @return The found piece or null if there is none
+     */
+    public Piece findPieceByPosition(@NotNull Position position) {
+        return getPieces().filter(piece -> piece.getPosition().equals(position))
+                .findFirst()
+                .orElse(null);
     }
 
     /**
@@ -108,11 +132,11 @@ public class Board {
      *
      * @param move The move
      */
-    void applyMove(Move move) {
+    void applyMove(@NotNull Move move) {
         getPieces()
                 .filter(piece -> piece.equals(move.getPiece()))
                 .findFirst()
                 .orElseThrow()
-                .moveTo(move.getDestination());
+                .setPosition(move.getDestination());
     }
 }

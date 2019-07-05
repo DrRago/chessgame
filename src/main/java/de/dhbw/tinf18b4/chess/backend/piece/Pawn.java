@@ -1,11 +1,11 @@
 package de.dhbw.tinf18b4.chess.backend.piece;
 
 import de.dhbw.tinf18b4.chess.backend.Board;
+import de.dhbw.tinf18b4.chess.backend.Move;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -21,9 +21,8 @@ public class Pawn implements Piece {
     }
 
     @Override
-    public boolean moveTo(Position position) {
+    public void setPosition(Position position) {
         this.position = position;
-        return true;
     }
 
     @Override
@@ -32,7 +31,7 @@ public class Pawn implements Piece {
     }
 
     @Override
-    public List<Position> getValidMoves(Board board) {
+    public Stream<Position> getValidMoves(@NotNull Board board) {
         Position singleMove = white ? position.topNeighbor() : position.bottomNeighbor();
         Position doubleMove = null;
 
@@ -50,13 +49,23 @@ public class Pawn implements Piece {
             }
         }
 
-        return Stream.concat(Stream.ofNullable(singleMove), Stream.ofNullable(doubleMove))
-                .collect(Collectors.toList());
+        return Stream.concat(Stream.ofNullable(singleMove), Stream.ofNullable(doubleMove));
     }
 
     @Override
-    public List<Position> getValidCaptureMoves(Board board) {
-        // TODO: 01.07.2019 Implement en passant special move
+    public Stream<Position> getValidCaptureMoves(@NotNull Board board) {
+        return getValidCaptureMoves(board, true);
+    }
+
+
+    public Stream<Position> getValidCaptureMoves(Board board, boolean careAboutEnPassant) {
+        if (careAboutEnPassant) {
+            Position enPassant = calculateEnPassantPossibility(board);
+            if (enPassant != null) {
+                return Stream.of(enPassant);
+            }
+        }
+
         Stream<Position> captureLeft;
         Stream<Position> captureRight;
 
@@ -70,8 +79,42 @@ public class Pawn implements Piece {
             captureRight = Stream.ofNullable(position.lowerRightNeighbor());
         }
 
-        return Stream.concat(captureLeft, captureRight)
-                .collect(Collectors.toList());
+        return Stream.concat(captureLeft, captureRight);
+    }
+
+
+    private Position calculateEnPassantPossibility(Board board) {
+        Move lastMove = board.getGame().getHistory().peekingPop();
+
+        // If there is no first move en passant is not possible
+        if (lastMove == null) {
+            return null;
+        }
+
+        boolean whiteHasJustPlayed = lastMove
+                .getPlayer()
+                .isWhite();
+
+        boolean enemyPawnMovedFromStartingPoint = lastMove.getPiece().getFenIdentifier() == (whiteHasJustPlayed ? 'P' : 'p');
+        // FIXME: Check origin square
+        boolean enemyPawnMovedTwoSquares = lastMove.getDestination().getRank() == 4;
+
+        // find the intercept position where the en passant capture happens
+        // it's behind the pawn to be captured (which was involved in the last move)
+        Position enPassantCapturePosition = !white
+                ? lastMove.getPiece().getPosition().bottomNeighbor()
+                : lastMove.getPiece().getPosition().topNeighbor();
+
+        // find if any of the pawns could capture the enemy pawn if it only moved on square
+        boolean enPassantPossible = getValidCaptureMoves(board, false).anyMatch(position -> position == enPassantCapturePosition);
+
+        // if all of these predicates are true this pawn can do an en passant move
+        // so we return the position where it should move to do the en passant move
+        return enemyPawnMovedFromStartingPoint
+                && enemyPawnMovedTwoSquares
+                && enPassantPossible
+                ? enPassantCapturePosition
+                : null;
     }
 
     @Override
