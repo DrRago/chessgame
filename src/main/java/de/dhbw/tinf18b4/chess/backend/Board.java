@@ -137,6 +137,6 @@ public class Board {
                 .filter(piece -> piece.equals(move.getPiece()))
                 .findFirst()
                 .orElseThrow()
-                .moveTo(move.getDestination());
+                .setPosition(move.getDestination());
     }
 }

@@ -19,9 +19,8 @@ public class Queen implements Piece {
     }
 
     @Override
-    public boolean moveTo(Position position) {
+    public void setPosition(Position position) {
         this.position = position;
-        return true;
     }
 
     @Override
