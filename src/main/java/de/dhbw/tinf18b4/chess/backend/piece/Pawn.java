@@ -3,6 +3,7 @@ package de.dhbw.tinf18b4.chess.backend.piece;
 import de.dhbw.tinf18b4.chess.backend.Board;
 import de.dhbw.tinf18b4.chess.backend.Move;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -31,7 +32,7 @@ public class Pawn implements Piece {
     }
 
     @Override
-    public Stream<Position> getValidMoves(Board board) {
+    public Stream<Position> getValidMoves(@NotNull Board board) {
         Position singleMove = white ? position.topNeighbor() : position.bottomNeighbor();
         Position doubleMove = null;
 
@@ -53,7 +54,7 @@ public class Pawn implements Piece {
     }
 
     @Override
-    public Stream<Position> getValidCaptureMoves(Board board) {
+    public Stream<Position> getValidCaptureMoves(@NotNull Board board) {
         return getValidCaptureMoves(board, true);
     }
 

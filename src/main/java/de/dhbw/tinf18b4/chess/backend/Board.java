@@ -70,7 +70,7 @@ public class Board {
      * @param move The move
      * @return whether is possible to make the move
      */
-    boolean checkMove(Move move) {
+    boolean checkMove(@NotNull Move move) {
         boolean isCaptured = move.getPiece().isCaptured();
         boolean isAllowedMovement = move.getPiece()
                 .getValidMoves(this)
@@ -111,7 +111,7 @@ public class Board {
      * @param position The position to check
      * @return true if the position is occupied
      */
-    public boolean isOccupied(Position position) {
+    public boolean isOccupied(@NotNull Position position) {
         return getOccupiedPositions().anyMatch(position::equals);
     }
 
@@ -121,7 +121,7 @@ public class Board {
      * @param position The position
      * @return The found piece or null if there is none
      */
-    public Piece findPieceByPosition(Position position) {
+    public Piece findPieceByPosition(@NotNull Position position) {
         return getPieces().filter(piece -> piece.getPosition().equals(position))
                 .findFirst()
                 .orElse(null);
@@ -132,7 +132,7 @@ public class Board {
      *
      * @param move The move
      */
-    void applyMove(Move move) {
+    void applyMove(@NotNull Move move) {
         getPieces()
                 .filter(piece -> piece.equals(move.getPiece()))
                 .findFirst()

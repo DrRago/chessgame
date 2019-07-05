@@ -2,6 +2,7 @@ package de.dhbw.tinf18b4.chess.backend;
 
 import de.dhbw.tinf18b4.chess.backend.piece.Piece;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * An move made by a player on board. When it is applied onto a board it will move a piece
@@ -14,7 +15,7 @@ public class Move {
     final private Position destination;
     final private Piece piece;
 
-    public Move(Player player, Position destination, Piece piece) {
+    public Move(@NotNull Player player, @NotNull Position destination, @NotNull Piece piece) {
         if (player.isWhite() != piece.isWhite()) {
             String message = String.format("Player %s can't move piece %s of another player %s", player, piece, player);
             throw new IllegalArgumentException(message);

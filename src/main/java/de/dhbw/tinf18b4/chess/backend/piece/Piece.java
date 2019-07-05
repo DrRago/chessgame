@@ -2,6 +2,7 @@ package de.dhbw.tinf18b4.chess.backend.piece;
 
 import de.dhbw.tinf18b4.chess.backend.Board;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.Stream;
 
@@ -31,7 +32,7 @@ public interface Piece {
      * @param board the board
      * @return a list of all possible moves
      */
-    Stream<Position> getValidMoves(Board board);
+    Stream<Position> getValidMoves(@NotNull Board board);
 
     /**
      * Get a list of all possible capture options
@@ -39,7 +40,7 @@ public interface Piece {
      * @param board the board
      * @return all capture options
      */
-    Stream<Position> getValidCaptureMoves(Board board);
+    Stream<Position> getValidCaptureMoves(@NotNull Board board);
 
     /**
      * Get the color of the piece

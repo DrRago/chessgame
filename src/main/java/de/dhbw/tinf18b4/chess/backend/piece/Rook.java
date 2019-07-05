@@ -2,6 +2,7 @@ package de.dhbw.tinf18b4.chess.backend.piece;
 
 import de.dhbw.tinf18b4.chess.backend.Board;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.Stream;
 
@@ -29,7 +30,7 @@ public class Rook implements Piece {
     }
 
     @Override
-    public Stream<Position> getValidMoves(Board board) {
+    public Stream<Position> getValidMoves(@NotNull Board board) {
         // The rook can move vertically or horizontally as far as he wants but he can't leap over other pieces.
         // Thus, we iterate over the diagonal positions in each of the 4 possible directions.
         return Utils.directionalIterator(position, board,
@@ -40,7 +41,7 @@ public class Rook implements Piece {
     }
 
     @Override
-    public Stream<Position> getValidCaptureMoves(Board board) {
+    public Stream<Position> getValidCaptureMoves(@NotNull Board board) {
         return getValidMoves(board);
     }
 

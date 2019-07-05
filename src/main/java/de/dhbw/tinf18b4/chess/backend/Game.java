@@ -4,6 +4,7 @@ package de.dhbw.tinf18b4.chess.backend;
 import de.dhbw.tinf18b4.chess.backend.piece.Piece;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Leonhard Gahr
@@ -20,7 +21,7 @@ public class Game {
     private Player player1;
     private Player player2;
 
-    public Game(Player player1, Player player2) {
+    public Game(@NotNull Player player1, @NotNull Player player2) {
         this.player1 = player1;
         this.player2 = player2;
     }
@@ -31,7 +32,7 @@ public class Game {
      * @param move The move
      * @return whether it the move was applied
      */
-    public boolean makeMove(Move move) {
+    public boolean makeMove(@NotNull Move move) {
         Move lastMove = history.peekingPop();
 
         // Prevent player from making a move if they ...
