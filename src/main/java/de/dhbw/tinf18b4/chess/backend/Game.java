@@ -1,6 +1,8 @@
 package de.dhbw.tinf18b4.chess.backend;
 
 
+import lombok.Getter;
+
 /**
  * @author Leonhard Gahr
  */
@@ -9,6 +11,7 @@ public class Game {
     /**
      * The Board instance modeling the state of the Game
      */
+    @Getter
     private final Board board = new Board();
     private final History history = new History();
     private Player player1;

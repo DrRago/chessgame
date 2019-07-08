@@ -3,6 +3,7 @@ package de.dhbw.tinf18b4.chess.frontend.controller;
 import de.dhbw.tinf18b4.chess.backend.Player;
 import de.dhbw.tinf18b4.chess.backend.lobby.Lobby;
 import de.dhbw.tinf18b4.chess.backend.lobby.LobbyManager;
+import de.dhbw.tinf18b4.chess.backend.lobby.LobbyStatus;
 import de.dhbw.tinf18b4.chess.backend.user.User;
 
 import javax.servlet.ServletException;
@@ -43,7 +44,6 @@ public class LobbyController extends HttpServlet {
             resp.sendRedirect("/lobby/" + lobbyID);
         } else if(reqPath.matches("/.*/game/?")) {
             String lobbyID = reqPath.split("/")[1];
-            System.out.println(lobbyID);
             req.getRequestDispatcher("/game.jsp?id=" + lobbyID).forward(req, resp);
         } else {
             // show a lobby
@@ -52,6 +52,11 @@ public class LobbyController extends HttpServlet {
             if (lobby != null) {
                 // lobby exists
                 if (lobby.hasUser(user)) {
+                    // check whether the game has already started and redirect in that case
+                    if (lobby.getStatus() == LobbyStatus.GAME_STARTED ) {
+                        resp.sendRedirect("/lobby" + reqPath + "/game");
+                        return;
+                    }
                     // forward to lobby
                     req.getRequestDispatcher("/lobby.jsp?id=" + lobbyID).forward(req, resp);
                 } else {

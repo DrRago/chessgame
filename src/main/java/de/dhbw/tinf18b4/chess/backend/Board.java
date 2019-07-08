@@ -5,7 +5,7 @@ import de.dhbw.tinf18b4.chess.backend.position.Position;
 
 import java.util.stream.Stream;
 
-class Board {
+public class Board {
     final private Piece[] pieces = initialSetup();
 
     /**

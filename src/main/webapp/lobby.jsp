@@ -1,6 +1,4 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <%-- validate that the user is logged in--%>
 <%@ include file="scripts/check_login.jsp" %>
@@ -8,18 +6,76 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Chess - Lobby</title>
+    <title>Chess - Lobby <c:out value="${param.id}"/></title>
 
     <%@include file='parts/styles.jsp' %>
     <%@include file='parts/javascript.jsp' %>
+
+    <script>
+        const websocketID = `<c:out value="${pageContext.session.id}" />`
+    </script>
+    <script src="${pageContext.request.contextPath}/assets/js/websocket.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/lobby-and-game.js"></script>
+
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/lobby.css">
+
+    <script src="${pageContext.request.contextPath}/assets/js/lobby.js"></script>
 </head>
 <body>
 <div class="container mt-5 pt-5">
-
-    <jsp:useBean id="lobbies" class="de.dhbw.tinf18b4.chess.frontend.beans.LobbyHelper" scope="request"/>
-    This is a lobby called <c:out value="${param.id}"/>
-    <a href="${pageContext.request.contextPath}/lobby/" class="btn btn-outline-success">Back to overview</a>
-    <a href="javascript:location.href=location.href + '/game/'" class="btn btn-outline-success">Play</a>
+    <h2 class="text-center">Lobby</h2>
+    <div class="row">
+        <div class="col">
+            <a href="javascript:leaveLobby()" class="btn btn-outline-danger float-right">Leave</a>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col">
+            <div class="card">
+                <div class="card-header"><h4>Players</h4></div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col">
+                            <ul class="list-group list-group-flush" id="playerList">
+                                <li class="list-group-item">will be removed by javascript</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-9">
+            <div class="card">
+                <div class="card-header"><h4>Current Settings</h4></div>
+                <div class="card-body" id="settings">
+                    <table class="table table-striped" id="settingsTable">
+                        <tbody>
+                        <tr>
+                            <td><input type="checkbox" id="checkbox1"> <label for="checkbox1">Checkbox, check it if you
+                                want</label></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" id="checkbox2"> <label for="checkbox2">Checkbox, check it if you
+                                want</label></td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox" id="checkbox3"> <label for="checkbox3">Checkbox, check it if you
+                                want</label></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="col">
+                            <a href="javascript:startGame()" class="btn btn-outline-success float-right">Start the
+                                game</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 </html>

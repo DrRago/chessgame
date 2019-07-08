@@ -9,7 +9,7 @@ import de.dhbw.tinf18b4.chess.backend.position.Position;
  * To prevent invalid moves, one must first check this move against the game rules
  * for this piece and the current board state.
  */
-class Move {
+public class Move {
     final private Player player;
     final private Position destination;
     final private Piece piece;

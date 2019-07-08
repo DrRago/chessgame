@@ -1,0 +1,15 @@
+#settingsTable tbody tr:first-child > td {
+    border-top: none;
+}
+
+.chess-white i {
+    color: #fff;
+}
+
+.chess-black i {
+    color: #000;
+}
+
+#playerList li i {
+    margin-right: 10px;
+}
