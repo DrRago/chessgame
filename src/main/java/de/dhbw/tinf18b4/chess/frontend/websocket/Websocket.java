@@ -47,7 +47,6 @@ public class Websocket extends HttpServlet {
     @OnClose
     public void onClose(Session session) {
         System.out.println("Close Connection ...");
-        sessionList.remove(session);
     }
 
     @OnMessage
