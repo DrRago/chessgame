@@ -12,11 +12,11 @@
     <meta charset="UTF-8">
     <title>Chess - Login</title>
 
-    <link rel="stylesheet" href="assets/css/login.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/login.css">
     <%@include file='parts/styles.jsp' %>
     <%@include file='parts/javascript.jsp' %>
 
-    <script src="assets/js/login.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/login.js"></script>
 </head>
 <body>
 

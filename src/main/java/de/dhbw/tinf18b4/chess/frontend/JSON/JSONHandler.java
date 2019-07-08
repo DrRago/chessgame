@@ -1,6 +1,8 @@
 package de.dhbw.tinf18b4.chess.frontend.JSON;
 
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * @author Leonhard Gahr
@@ -8,17 +10,7 @@ import org.json.simple.JSONObject;
 public class JSONHandler {
 
     /**
-     * build the template string according to:
-     * <pre>
-     * <code>
-     * {
-     * 'status': {
-     * 'code': 200,
-     * 'message': 'OK'
-     * }
-     * }
-     * </code>
-     * </pre>
+     * build the template string according to
      * The template should be edited before sending
      *
      * @return the JSONObject template
@@ -26,12 +18,23 @@ public class JSONHandler {
     public static JSONObject buildAnswerTemplate() {
         JSONObject template = new JSONObject();
 
-        JSONObject status = new JSONObject();
-        status.put("code", 200);
-        status.put("message", "OK");
-
-        template.put("status", status);
+        template.put("content", "");
+        template.put("value", "");
 
         return template;
+    }
+
+    public static JSONObject buildAnswerTemplate(String content, String value) {
+        JSONObject template = new JSONObject();
+
+        template.put("content", content);
+        template.put("value", value);
+
+        return template;
+    }
+
+    public static JSONObject parseMessage(String message) throws ParseException {
+        JSONParser parser = new JSONParser();
+        return (JSONObject) parser.parse(message);
     }
 }

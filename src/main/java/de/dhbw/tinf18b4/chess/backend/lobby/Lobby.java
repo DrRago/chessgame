@@ -6,6 +6,7 @@ import de.dhbw.tinf18b4.chess.backend.user.User;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.Objects;
@@ -53,7 +54,7 @@ public class Lobby {
         this.players[0] = new Player(true, creator);
     }
 
-    public LobbyStatus startGame() {
+    public @NotNull LobbyStatus startGame() {
         if (Arrays.stream(players).anyMatch(Objects::isNull)) {
             return LobbyStatus.NOT_ENOUGH_PLAYERS;
         }
@@ -86,7 +87,7 @@ public class Lobby {
      * @param user the user (not null)
      * @return the {@link Player} that has been created
      */
-    public Player join(@NotNull User user) {
+    public @Nullable Player join(@NotNull User user) {
         if (players[0] == null) {
             players[0] = new Player(!players[1].isWhite(), user);
             return players[0];
@@ -124,9 +125,25 @@ public class Lobby {
      * @param user the {@link User} to check
      * @return true if the {@link User} is in this {@link Lobby}, false if not
      */
-    public boolean hasUser(User user) {
+    public boolean hasUser(@NotNull User user) {
+        return getPlayerByUser(user) != null;
+    }
+
+    /**
+     * Get the according {@link Player} of a specific {@link User}
+     *
+     * @param user the {@link User} to get the player from
+     * @return the {@link Player} or null, if the user doesn't have one
+     */
+    public @Nullable Player getPlayerByUser(@NotNull User user) {
         return Arrays.stream(players)
                 .filter(Objects::nonNull)
-                .anyMatch(player -> player.getUser().equals(user));
+                .filter(player -> player.getUser().equals(user))
+                .findFirst().orElse(null);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Lobby (%d/%d) - %s", Arrays.stream(players).filter(Objects::isNull).count(), 2, status);
     }
 }

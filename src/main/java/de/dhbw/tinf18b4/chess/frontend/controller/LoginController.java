@@ -3,6 +3,7 @@ package de.dhbw.tinf18b4.chess.frontend.controller;
 
 import de.dhbw.tinf18b4.chess.backend.utility.UserUtility;
 import de.dhbw.tinf18b4.chess.backend.user.User;
+import de.dhbw.tinf18b4.chess.frontend.SessionManager;
 import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.annotation.WebServlet;
@@ -60,10 +61,12 @@ public class LoginController extends HttpServlet {
 
                     User user = new User(username, password, currSession.getId());
                     if (user.validateLogin()) {
+                        // user exists
                         logger.info("User authenticated");
 
-                        // user exists
                         currSession.setAttribute("user", user);
+                        SessionManager.addSession(currSession);
+
                         sendTarget = "index.jsp";
                     } else {
                         logger.info("user authentication failed");

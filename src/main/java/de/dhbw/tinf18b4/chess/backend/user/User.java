@@ -36,8 +36,11 @@ public class User {
      * Override for the equals method for a {@link User}
      * <p>
      * two users are equal if
-     * - the username is the same
-     * - or if a username is guest, if the session ids are the same
+     * <ul>
+     * <li>the username is the same</li>
+     * <li>or if a username is guest, if the session ids are the same</li>
+     * </ul>
+     * if the argument is a {@link String} it is compared with the user ID
      *
      * @param obj the object to compare
      * @return whether the object is the same as this
@@ -51,6 +54,9 @@ public class User {
                 return user2.ID.equals(this.ID);
             }
             return user2.username.equalsIgnoreCase(this.username);
+        } else if (obj instanceof String) {
+            // string comparision on id
+            return this.ID.equals(obj);
         }
         return false;
     }
@@ -63,5 +69,10 @@ public class User {
      */
     public boolean validateLogin() {
         return UserUtility.login(this.username, this.password);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("User '%s' - %s", username, permission);
     }
 }
