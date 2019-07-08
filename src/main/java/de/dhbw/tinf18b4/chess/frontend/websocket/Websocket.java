@@ -219,10 +219,10 @@ public class Websocket extends HttpServlet {
     }
 
     /**
-     * Check if a request is verified: <br />
-     * The passed sessionID must be part of a valid {@link Session}<br />
-     * The {@link Lobby} the {@link User} tries to operate on has to exist<br />
-     * The {@link User} must be part of the {@link Lobby} he tries to operate on<br />
+     * Check if a request is verified: <br>
+     * The passed sessionID must be part of a valid {@link Session}<br>
+     * The {@link Lobby} the {@link User} tries to operate on has to exist<br>
+     * The {@link User} must be part of the {@link Lobby} he tries to operate on<br>
      *
      * @param session     the websocket {@link Session}
      * @param sessionID   the HTTPServlet session ID of the user

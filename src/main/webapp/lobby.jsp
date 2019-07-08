@@ -14,7 +14,7 @@
     <script>
         const websocketID = `<c:out value="${pageContext.session.id}" />`
     </script>
-    <script src="${pageContext.request.contextPath}/assets/js/websocket.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/websocket.js" async></script>
     <script src="${pageContext.request.contextPath}/assets/js/lobby-and-game.js"></script>
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/lobby.css">
