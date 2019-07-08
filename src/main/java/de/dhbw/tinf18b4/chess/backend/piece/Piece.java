@@ -1,8 +1,10 @@
 package de.dhbw.tinf18b4.chess.backend.piece;
 
+import de.dhbw.tinf18b4.chess.backend.Board;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * @author Leonhard.Gahr
@@ -10,33 +12,34 @@ import java.util.List;
 public interface Piece {
 
     /**
-     * Move the piece to the given position. Returns true if the move was valid, false if it wasn't
-     *
-     * @param position the destination position
-     * @return whether the move was made or not
-     */
-    boolean moveTo(Position position);
-
-    /**
-     * Get the position of the piece on the board. For captured figures, the return value is unreliable
+     * Get the position of the piece on the board. For captured pieces, the return value is unreliable
      *
      * @return where the piece is
      */
     Position getPosition();
 
     /**
+     * Move the piece to the given position
+     *
+     * @param position the destination position
+     */
+    void setPosition(Position position);
+
+    /**
      * Get a list of all possible moves for the piece. Dies not include kill moves
      *
+     * @param board the board
      * @return a list of all possible moves
      */
-    List<Position> getValidMoves();
+    Stream<Position> getValidMoves(@NotNull Board board);
 
     /**
      * Get a list of all possible capture options
      *
+     * @param board the board
      * @return all capture options
      */
-    List<Position> getValidCaptureMoves();
+    Stream<Position> getValidCaptureMoves(@NotNull Board board);
 
     /**
      * Get the color of the piece
@@ -51,4 +54,11 @@ public interface Piece {
      * @return whether the piece has been captured or not
      */
     boolean isCaptured();
+
+    /**
+     * Get the FEN identifier of the piece
+     *
+     * @return the FEN identifier
+     */
+    char getFenIdentifier();
 }

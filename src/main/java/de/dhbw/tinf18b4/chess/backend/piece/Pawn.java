@@ -1,8 +1,12 @@
 package de.dhbw.tinf18b4.chess.backend.piece;
 
+import de.dhbw.tinf18b4.chess.backend.Board;
+import de.dhbw.tinf18b4.chess.backend.Move;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * @author Leonhard Gahr
@@ -16,65 +20,115 @@ public class Pawn implements Piece {
         this.position = position;
     }
 
-    /**
-     * Move the piece to the given position. Returns true if the move was valid, false if it wasn't
-     *
-     * @param position the destination position
-     * @return whether the move was made or not
-     */
     @Override
-    public boolean moveTo(Position position) {
+    public void setPosition(Position position) {
         this.position = position;
-        return true;
     }
 
-    /**
-     * Get the position of the piece on the board
-     *
-     * @return where the piece is
-     */
     @Override
     public Position getPosition() {
         return position;
     }
 
-    /**
-     * Get a list of all possible moves for the piece. Dies not include kill moves
-     *
-     * @return a list of all possible moves
-     */
     @Override
-    public List<Position> getValidMoves() {
-        return null;
+    public Stream<Position> getValidMoves(@NotNull Board board) {
+        Position singleMove = white ? position.topNeighbor() : position.bottomNeighbor();
+        Position doubleMove = null;
+
+        // if this pawn has not moved allow moving two fields forward
+        if (white && position.getRank() == 2
+                || !white && position.getRank() == 7) {
+            if (white) {
+                doubleMove = Optional.ofNullable(singleMove)
+                        .map(Position::topNeighbor)
+                        .orElse(null);
+            } else {
+                doubleMove = Optional.ofNullable(singleMove)
+                        .map(Position::bottomNeighbor)
+                        .orElse(null);
+            }
+        }
+
+        return Stream.concat(Stream.ofNullable(singleMove), Stream.ofNullable(doubleMove));
     }
 
-    /**
-     * Get a list of all possible capture options
-     *
-     * @return all capture options
-     */
     @Override
-    public List<Position> getValidCaptureMoves() {
-        return null;
+    public Stream<Position> getValidCaptureMoves(@NotNull Board board) {
+        return getValidCaptureMoves(board, true);
     }
 
-    /**
-     * Get the color of the piece
-     *
-     * @return whether the piece is white or not
-     */
+
+    public Stream<Position> getValidCaptureMoves(Board board, boolean careAboutEnPassant) {
+        if (careAboutEnPassant) {
+            Position enPassant = calculateEnPassantPossibility(board);
+            if (enPassant != null) {
+                return Stream.of(enPassant);
+            }
+        }
+
+        Stream<Position> captureLeft;
+        Stream<Position> captureRight;
+
+        // Because white pawns move "up" (towards file 8) and black pawns move "down"
+        // (towards file 1) we need to check for the color of the piece
+        if (white) {
+            captureLeft = Stream.ofNullable(position.upperLeftNeighbor());
+            captureRight = Stream.ofNullable(position.upperRightNeighbor());
+        } else {
+            captureLeft = Stream.ofNullable(position.lowerLeftNeighbor());
+            captureRight = Stream.ofNullable(position.lowerRightNeighbor());
+        }
+
+        return Stream.concat(captureLeft, captureRight);
+    }
+
+
+    private Position calculateEnPassantPossibility(Board board) {
+        Move lastMove = board.getGame().getHistory().peekingPop();
+
+        // If there is no first move en passant is not possible
+        if (lastMove == null) {
+            return null;
+        }
+
+        boolean whiteHasJustPlayed = lastMove
+                .getPlayer()
+                .isWhite();
+
+        boolean enemyPawnMovedFromStartingPoint = lastMove.getPiece().getFenIdentifier() == (whiteHasJustPlayed ? 'P' : 'p');
+        // FIXME: Check origin square
+        boolean enemyPawnMovedTwoSquares = lastMove.getDestination().getRank() == 4;
+
+        // find the intercept position where the en passant capture happens
+        // it's behind the pawn to be captured (which was involved in the last move)
+        Position enPassantCapturePosition = !white
+                ? lastMove.getPiece().getPosition().bottomNeighbor()
+                : lastMove.getPiece().getPosition().topNeighbor();
+
+        // find if any of the pawns could capture the enemy pawn if it only moved on square
+        boolean enPassantPossible = getValidCaptureMoves(board, false).anyMatch(position -> position == enPassantCapturePosition);
+
+        // if all of these predicates are true this pawn can do an en passant move
+        // so we return the position where it should move to do the en passant move
+        return enemyPawnMovedFromStartingPoint
+                && enemyPawnMovedTwoSquares
+                && enPassantPossible
+                ? enPassantCapturePosition
+                : null;
+    }
+
     @Override
     public boolean isWhite() {
         return white;
     }
 
-    /**
-     * Get the capture state of the piece
-     *
-     * @return whether the piece has been captured or not
-     */
     @Override
     public boolean isCaptured() {
         return false;
+    }
+
+    @Override
+    public char getFenIdentifier() {
+        return white ? 'P' : 'p';
     }
 }

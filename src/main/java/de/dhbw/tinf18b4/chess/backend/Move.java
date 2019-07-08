@@ -2,6 +2,7 @@ package de.dhbw.tinf18b4.chess.backend;
 
 import de.dhbw.tinf18b4.chess.backend.piece.Piece;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * An move made by a player on board. When it is applied onto a board it will move a piece
@@ -9,12 +10,12 @@ import de.dhbw.tinf18b4.chess.backend.position.Position;
  * To prevent invalid moves, one must first check this move against the game rules
  * for this piece and the current board state.
  */
-class Move {
+public class Move {
     final private Player player;
     final private Position destination;
     final private Piece piece;
 
-    Move(Player player, Position destination, Piece piece) {
+    public Move(@NotNull Player player, @NotNull Position destination, @NotNull Piece piece) {
         if (player.isWhite() != piece.isWhite()) {
             String message = String.format("Player %s can't move piece %s of another player %s", player, piece, player);
             throw new IllegalArgumentException(message);
@@ -30,7 +31,7 @@ class Move {
      *
      * @return the player
      */
-    Player getPlayer() {
+    public Player getPlayer() {
         return player;
     }
 
@@ -39,7 +40,7 @@ class Move {
      *
      * @return the destination position
      */
-    Position getDestination() {
+    public Position getDestination() {
         return destination;
     }
 
@@ -48,7 +49,7 @@ class Move {
      *
      * @return the piece
      */
-    Piece getPiece() {
+    public Piece getPiece() {
         return piece;
     }
 }

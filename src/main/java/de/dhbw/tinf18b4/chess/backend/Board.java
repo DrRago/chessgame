@@ -2,11 +2,20 @@ package de.dhbw.tinf18b4.chess.backend;
 
 import de.dhbw.tinf18b4.chess.backend.piece.*;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
+import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.stream.Stream;
 
-class Board {
+public class Board {
     final private Piece[] pieces = initialSetup();
+    @Getter
+    final private Game game;
+
+    public Board(@NotNull Game game) {
+        this.game = game;
+    }
 
     /**
      * Create an array with pieces at their initial positions
@@ -23,6 +32,7 @@ class Board {
                 new Pawn(true, new Position('e', 2)),
                 new Pawn(true, new Position('f', 2)),
                 new Pawn(true, new Position('g', 2)),
+                new Pawn(true, new Position('h', 2)),
                 new Rook(true, new Position('a', 1)),
                 new Rook(true, new Position('h', 1)),
                 new Knight(true, new Position('b', 1)),
@@ -40,8 +50,9 @@ class Board {
                 new Pawn(false, new Position('e', 7)),
                 new Pawn(false, new Position('f', 7)),
                 new Pawn(false, new Position('g', 7)),
-                new Rook(false, new Position('a', 7)),
-                new Rook(false, new Position('h', 7)),
+                new Pawn(false, new Position('h', 7)),
+                new Rook(false, new Position('a', 8)),
+                new Rook(false, new Position('h', 8)),
                 new Knight(false, new Position('b', 8)),
                 new Knight(false, new Position('g', 8)),
                 new Bishop(false, new Position('c', 8)),
@@ -59,15 +70,13 @@ class Board {
      * @param move The move
      * @return whether is possible to make the move
      */
-    boolean checkMove(Move move) {
+    boolean checkMove(@NotNull Move move) {
         boolean isCaptured = move.getPiece().isCaptured();
         boolean isAllowedMovement = move.getPiece()
-                .getValidMoves()
-                .stream()
+                .getValidMoves(this)
                 .anyMatch(position -> position.equals(move.getDestination()));
         boolean isAllowedCaptureMove = move.getPiece()
-                .getValidCaptureMoves()
-                .stream()
+                .getValidCaptureMoves(this)
                 .anyMatch(position -> position.equals(move.getDestination()));
         boolean isEmptyField = getOccupiedPositions()
                 .noneMatch(position -> position.equals(move.getDestination()));
@@ -83,8 +92,8 @@ class Board {
      *
      * @return The pieces
      */
-    Stream<Piece> getPieces() {
-        return Stream.of(pieces);
+    public Stream<Piece> getPieces() {
+        return Stream.of(pieces).filter(Objects::nonNull);
     }
 
     /**
@@ -97,15 +106,37 @@ class Board {
     }
 
     /**
+     * Determine whether there is a piece on the provided position
+     *
+     * @param position The position to check
+     * @return true if the position is occupied
+     */
+    public boolean isOccupied(@NotNull Position position) {
+        return getOccupiedPositions().anyMatch(position::equals);
+    }
+
+    /**
+     * Find the piece on the given position
+     *
+     * @param position The position
+     * @return The found piece or null if there is none
+     */
+    public Piece findPieceByPosition(@NotNull Position position) {
+        return getPieces().filter(piece -> piece.getPosition().equals(position))
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
      * Apply a move to the board
      *
      * @param move The move
      */
-    void applyMove(Move move) {
+    void applyMove(@NotNull Move move) {
         getPieces()
                 .filter(piece -> piece.equals(move.getPiece()))
                 .findFirst()
                 .orElseThrow()
-                .moveTo(move.getDestination());
+                .setPosition(move.getDestination());
     }
 }
