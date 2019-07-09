@@ -30,6 +30,43 @@ public class Position {
         this(file, rank);
     }
 
+    public Position(String an) {
+        this(parseFile(an), parseRank(an));
+
+        if (an.length() != 2) {
+            throw new IllegalArgumentException(String.format("Cannot parse string '%s' as position", an));
+        }
+    }
+
+    private static char parseFile(String an) {
+        char candidate = an.charAt(0);
+
+        if (candidate < 'a' || candidate > 'h') {
+            return candidate;
+        }
+
+        candidate = an.charAt(1);
+        if (candidate < 1 || candidate > 8) {
+            return candidate;
+        }
+
+        throw new IllegalArgumentException(String.format("Cannot parse string '%s' as position", an));
+    }
+
+    private static int parseRank(String an) {
+        char candidate = an.charAt(1);
+        if (candidate < 1 || candidate > 8) {
+            return candidate;
+        }
+
+        candidate = an.charAt(0);
+        if (candidate < 'a' || candidate > 'h') {
+            return candidate;
+        }
+
+        throw new IllegalArgumentException(String.format("Cannot parse string '%s' as position", an));
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
