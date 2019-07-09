@@ -26,7 +26,7 @@ public class Position {
         this.file = file;
     }
 
-    private Position(int rank, char file) {
+    public Position(int rank, char file) {
         this(file, rank);
     }
 
@@ -41,12 +41,12 @@ public class Position {
     private static char parseFile(String an) {
         char candidate = an.charAt(0);
 
-        if (candidate < 'a' || candidate > 'h') {
+        if (candidate >= 'a' && candidate <= 'h') {
             return candidate;
         }
 
         candidate = an.charAt(1);
-        if (candidate < 1 || candidate > 8) {
+        if (candidate >= 'a' && candidate <= 'h') {
             return candidate;
         }
 
@@ -55,13 +55,13 @@ public class Position {
 
     private static int parseRank(String an) {
         char candidate = an.charAt(1);
-        if (candidate < 1 || candidate > 8) {
-            return candidate;
+        if (candidate >= '1' && candidate <= '8') {
+            return candidate - '0';
         }
 
         candidate = an.charAt(0);
-        if (candidate < 'a' || candidate > 'h') {
-            return candidate;
+        if (candidate >= '1' && candidate <= '8') {
+            return candidate - '0';
         }
 
         throw new IllegalArgumentException(String.format("Cannot parse string '%s' as position", an));
