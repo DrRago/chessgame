@@ -2,6 +2,7 @@ package de.dhbw.tinf18b4.chess.backend;
 
 import de.dhbw.tinf18b4.chess.backend.piece.Piece;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
+import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -11,45 +12,53 @@ import org.jetbrains.annotations.NotNull;
  * for this piece and the current board state.
  */
 public class Move {
+    /**
+     * player associated with this move
+     */
+    @Getter
     final private Player player;
+
+    /**
+     * the original position of this move
+     */
+    @Getter
+    final private Position origin;
+
+    /**
+     * the destination position of this move
+     */
+    @Getter
     final private Position destination;
+
+    /**
+     * the piece associated with this move
+     */
+    @Getter
     final private Piece piece;
 
-    public Move(@NotNull Player player, @NotNull Position destination, @NotNull Piece piece) {
+    public Move(@NotNull Player player, @NotNull Position origin, @NotNull Position destination, @NotNull Piece piece) {
         if (player.isWhite() != piece.isWhite()) {
             String message = String.format("Player %s can't move piece %s of another player %s", player, piece, player);
             throw new IllegalArgumentException(message);
         }
 
         this.player = player;
+        this.origin = origin;
         this.destination = destination;
         this.piece = piece;
     }
 
-    /**
-     * Return the player associated with this move
-     *
-     * @return the player
-     */
-    public Player getPlayer() {
-        return player;
+    public Move(@NotNull Player player, @NotNull Position origin, @NotNull Position destination, @NotNull Board board) {
+        this(player, origin, destination, getPiece(player, origin, destination, board));
     }
 
-    /**
-     * Return the position associated with this move
-     *
-     * @return the destination position
-     */
-    public Position getDestination() {
-        return destination;
-    }
+    private static Piece getPiece(@NotNull Player player, @NotNull Position origin, @NotNull Position destination, @NotNull Board board) {
+        Piece piece = board.findPieceByPosition(origin);
+        if (null == piece) {
+            String message = String.format("Player %s can't move a piece from origin position %s to destination %s: there is no piece at the origin", player, origin, destination);
+            throw new IllegalArgumentException(message);
+        }
 
-    /**
-     * Return the piece associated with this move
-     *
-     * @return the piece
-     */
-    public Piece getPiece() {
         return piece;
     }
 }
