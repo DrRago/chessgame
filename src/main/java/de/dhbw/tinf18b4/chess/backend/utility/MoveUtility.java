@@ -3,6 +3,7 @@ package de.dhbw.tinf18b4.chess.backend.utility;
 import de.dhbw.tinf18b4.chess.backend.Board;
 import de.dhbw.tinf18b4.chess.backend.Move;
 import de.dhbw.tinf18b4.chess.backend.Player;
+import de.dhbw.tinf18b4.chess.backend.position.Position;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -45,10 +46,13 @@ public class MoveUtility {
     /**
      * Build the {@link Move} according to a valid {@link Move} format defined in checkMoveFormat()
      *
-     *
-     * @return
+     * @return the move
      */
     public static @NotNull Move buildMove(String move, Board board, Player player) {
-        return null;
+        String[] moveArray = move.split("-");
+        Position origin = new Position(moveArray[0]);
+        Position destination = new Position(moveArray[1]);
+
+        return new Move(player, origin, destination, board);
     }
 }
