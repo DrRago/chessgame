@@ -1,12 +1,12 @@
 package de.dhbw.tinf18b4.chess.frontend.websocket;
 
 
+import de.dhbw.tinf18b4.chess.backend.Board;
 import de.dhbw.tinf18b4.chess.backend.Move;
 import de.dhbw.tinf18b4.chess.backend.Player;
 import de.dhbw.tinf18b4.chess.backend.lobby.Lobby;
 import de.dhbw.tinf18b4.chess.backend.lobby.LobbyManager;
 import de.dhbw.tinf18b4.chess.backend.user.User;
-import de.dhbw.tinf18b4.chess.backend.utility.MoveUtility;
 import de.dhbw.tinf18b4.chess.frontend.JSON.JSONHandler;
 import de.dhbw.tinf18b4.chess.frontend.SessionManager;
 import org.jetbrains.annotations.NotNull;
@@ -96,11 +96,11 @@ public class Websocket extends HttpServlet {
                 // TODO: 04/07/2019 perform move operations
                 String moveString = (String) parsedMessage.get("value");
                 // received move should be in a valid format
-                if (!MoveUtility.checkMoveFormat(moveString)) {
+                if (!Board.checkMoveFormat(moveString)) {
                     sendErrorMessageToClient("Invalid move format", session, "error");
                     return;
                 }
-                Move move = MoveUtility.buildMove(moveString, playerLobby.getGame().getBoard(), playerLobby.getPlayerByUser(currentUser));
+                Move move = playerLobby.getGame().getBoard().buildMove(moveString,  playerLobby.getPlayerByUser(currentUser));
 
                 break;
             case "getPlayerNames":
