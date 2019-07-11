@@ -86,7 +86,7 @@ public class Position {
 
     @Override
     public String toString() {
-        return Character.toString(rank) + file;
+        return String.valueOf(file) + rank;
     }
 
     public Position leftNeighbor() {
