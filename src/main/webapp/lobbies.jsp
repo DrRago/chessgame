@@ -9,14 +9,14 @@
     <meta charset="UTF-8">
     <title>Chess - Lobbies</title>
 
-    <link rel="stylesheet" href="assets/css/login.css">
     <%@include file='parts/styles.jsp' %>
     <%@include file='parts/javascript.jsp' %>
 
-    <script src="assets/js/login.js"></script>
 </head>
 <body>
 <jsp:useBean id="lobbies" class="de.dhbw.tinf18b4.chess.frontend.beans.LobbyHelper" scope="request"/>
+
+<%@include file="parts/nav.jsp" %>
 <div class="container mt-5 pt-5">
     <%@include file="parts/errors.jsp" %>
     <table class="table table-bordered table-striped table-hover">
@@ -35,6 +35,5 @@
     </table>
     <a href="${pageContext.request.contextPath}/lobby/create" class="btn btn-outline-success">Create Lobby</a>
 </div>
-
 </body>
 </html>

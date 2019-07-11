@@ -15,7 +15,7 @@ const parseLobbyID = () => {
 };
 
 // the websocket connection
-const webSocket = new WebSocket(`ws://${location.host}/websocketendpoint`);
+const webSocket = new WebSocket(`ws://${location.host}/websocketendpoint/${parseLobbyID()}/${websocketID}`);
 
 // acknowledge boolean to check the server state
 let acknowledge = false;
@@ -23,21 +23,14 @@ let acknowledge = false;
 // the template for every message sent to the server
 let messageTemplate = {
     "content": "",
-    "ID": websocketID,
-    "lobbyID": parseLobbyID(),
     "value": ""
 };
 
 /**
  * handler on successful connect to server
- * sending a validation object and await an answer
- * if the answer is not received, the server is not working properly
  */
 webSocket.onopen = () => {
-    sendToSocket("ACK", "alive");
 
-    // ask for player information
-    sendToSocket("getPlayerNames", null);
 };
 
 const sendToSocket = (content, value) => {
@@ -89,7 +82,7 @@ webSocket.onmessage = message => {
             updateUserList(msgObj.value);
             break;
         case "redirect":
-            location.href += msgObj.value;
+            location.href = msgObj.value;
             break;
     }
 };
@@ -131,4 +124,8 @@ const updateUserList = (playerData) => {
     playerData.forEach(player => {
         players.append($(`<li class="list-group-item chess-white"><i class="fas fa-chess-queen"></i>${player}</li>`))
     })
+};
+
+const leaveLobby = () => {
+    sendToSocket("lobbyAction", "leave");
 };

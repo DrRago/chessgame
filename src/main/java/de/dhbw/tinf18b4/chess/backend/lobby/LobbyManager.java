@@ -79,6 +79,15 @@ public class LobbyManager {
     }
 
     /**
+     * Remove a {@link Lobby}
+     *
+     * @param lobby the {@link Lobby} to be removed
+     */
+    public static void removeLobby(@NotNull Lobby lobby) {
+        lobbies.entrySet().removeIf(entry -> entry.getValue() == lobby);
+    }
+
+    /**
      * Generate a random {@link String} with the length of 7
      *
      * @return the random {@link String}
