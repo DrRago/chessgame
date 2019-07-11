@@ -27,29 +27,23 @@ public class King implements Piece {
     @Override
     public Stream<Position> getValidMoves(@NotNull Board board) {
         List<Position> castlingRookPositions = calculateCastlingPossibility(board).collect(Collectors.toList());
-        Stream<Position> castlingMoves = switch (castlingRookPositions.size()) {
-            case 0 -> Stream.empty();
-            case 1 | 2 -> {
-                Stream.Builder<Position> kingMoves = Stream.builder();
-                for (Position rook : castlingRookPositions) {
-                    if (rook.leftNeighbor() == null) {
-                        kingMoves.accept(rook.leftNeighbor().leftNeighbor());
-                    } else if (rook.rightNeighbor() == null) {
-                        kingMoves.accept(rook.rightNeighbor().rightNeighbor());
-                    }
-                }
-                break kingMoves.build();
-            }
-            // this might only happen when this player has 3 or more rooks (=never ???)
-            default -> throw new IllegalStateException("Unexpected value: " + castlingRookPositions.size());
-        };
+        Stream.Builder<Position> castlingMoves = Stream.builder();
+        castlingRookPositions.stream()
+                // we don't bother checking where the rook is
+                // we just find the relative position and add it if it exists
+                .map(rook -> Stream.of(
+                        Stream.ofNullable(rook.leftNeighbor()).map(Position::leftNeighbor),
+                        Stream.ofNullable(rook.rightNeighbor()).map(Position::rightNeighbor))
+                        .flatMap(s -> s))
+                .flatMap(s -> s)
+                .forEach(castlingMoves::accept);
 
         return Stream.of(
                 Stream.ofNullable(position.topNeighbor()),
                 Stream.ofNullable(position.bottomNeighbor()),
                 Stream.ofNullable(position.leftNeighbor()),
                 Stream.ofNullable(position.rightNeighbor()),
-                castlingMoves)
+                castlingMoves.build())
                 .flatMap(s -> s);
     }
 
