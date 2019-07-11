@@ -6,8 +6,6 @@ import de.dhbw.tinf18b4.chess.backend.position.Position;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.stream.Stream;
-
 /**
  * @author Leonhard Gahr
  */
@@ -35,7 +33,7 @@ public class Game {
      * @return whether it the move was applied
      */
     public boolean makeMove(@NotNull Move move) {
-        Move lastMove = history.peekingPop();
+        Move lastMove = history.lastMove();
 
         // Prevent player from making a move if they ...
 
@@ -57,7 +55,7 @@ public class Game {
         if (board.checkMove(move)) {
             board.applyMove(move);
 
-            history.push(move);
+            history.addMove(move);
 
             return true;
         }
@@ -111,33 +109,5 @@ public class Game {
         // remove the last "/"
         stringBuilder.setLength(stringBuilder.length() - 1);
         return stringBuilder.toString();
-    }
-
-    /**
-     * We don't have a real History class yet
-     * TODO: Implement the History class and remove this.
-     */
-    public class History {
-        /**
-         * Add a move to history to make it the most recent move
-         *
-         * @param move The move
-         */
-        void push(Move move) {
-
-        }
-
-        /**
-         * Return the most recent move without removing it from history
-         *
-         * @return The Move
-         */
-        public Move peekingPop() {
-            return null;
-        }
-
-        public Stream<Move> stream() {
-            return null;
-        }
     }
 }

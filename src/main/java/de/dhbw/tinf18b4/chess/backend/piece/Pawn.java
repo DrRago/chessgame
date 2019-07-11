@@ -84,7 +84,7 @@ public class Pawn implements Piece {
 
 
     private Position calculateEnPassantPossibility(Board board) {
-        Move lastMove = board.getGame().getHistory().peekingPop();
+        Move lastMove = board.getGame().getHistory().lastMove();
 
         // If there is no first move en passant is not possible
         if (lastMove == null) {
