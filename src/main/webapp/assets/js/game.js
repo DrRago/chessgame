@@ -1,4 +1,5 @@
-let myColor = 'white';
+let myColor;
+let board;
 
 const onDragStart = (source, piece, position, orientation) => {
     // only pick up pieces for the side to move
@@ -8,7 +9,14 @@ const onDragStart = (source, piece, position, orientation) => {
     }
 };
 
-$(() => {
+const onDrop = (source, target) => {
+    sendToSocket('move', `${source}-${target}`)
+};
+
+
+const initGame = color => {
+    myColor = color;
+
     const objDiv = document.getElementById("chat");
     objDiv.scrollTop = objDiv.scrollHeight;
 
@@ -18,7 +26,9 @@ $(() => {
         pieceTheme: '/assets/img/chesspieces/wikipedia/{piece}.png',
         draggable: true,
         orientation: myColor,
-        onDragStart: onDragStart
+        onDragStart: onDragStart,
+        onDrop: onDrop,
     };
-    const board = Chessboard('board1', config);
-});
+
+    board = Chessboard('board1', config);
+};

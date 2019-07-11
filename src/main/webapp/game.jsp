@@ -17,6 +17,8 @@
     <script src="${pageContext.request.contextPath}/assets/js/websocket.js"></script>
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/chessboard-1.0.0.min.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/lobby.css">
+
     <script src="${pageContext.request.contextPath}/assets/js/chessboard-1.0.0.min.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/game.js"></script>
 </head>

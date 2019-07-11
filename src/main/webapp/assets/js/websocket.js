@@ -44,6 +44,15 @@ const sendToSocket = (content, value) => {
     webSocket.send(JSON.stringify(message));
 };
 
+const alert = message => {
+    $.alert({
+        title: 'Alert!',
+        type: 'red',
+        content: message,
+        theme: 'material'
+    });
+};
+
 /**
  * send the move object to the server
  * @param move
@@ -84,6 +93,12 @@ webSocket.onmessage = message => {
         case "redirect":
             location.href = msgObj.value;
             break;
+        case "initGame":
+            initGame(msgObj.value);
+            break;
+        case "move":
+            board.position(msgObj.value);
+            break;
     }
 };
 
@@ -91,10 +106,11 @@ webSocket.onmessage = message => {
  * page should be left if the connection is closed
  */
 webSocket.onclose = event => {
-    alert(`Connection closed! Reason: ${event.reason}`);
     // on abnormal close reason, alert and redirect to lobby overview
     if (event.code !== 1000 && event.code !== 1001) {
         location.href = `${location.protocol}//${location.host}/lobby`;
+    } else {
+        alert(`Connection closed! Reason: ${event.reason}`);
     }
 };
 
@@ -115,14 +131,10 @@ const updateUserList = (playerData) => {
     const players = $("#playerList");
     players.find("li").each((index, player) => {
         player = $(player);
-        if (!playerData.includes(player.text())) {
-            player.remove();
-        } else {
-            playerData.splice(playerData.indexOf(player.text()), 1);
-        }
+        player.remove();
     });
     playerData.forEach(player => {
-        players.append($(`<li class="list-group-item chess-white"><i class="fas fa-chess-queen"></i>${player}</li>`))
+        players.append($(`<li class="list-group-item chess-${player.color}"><i class="fas fa-chess-queen"></i>${player.name}</li>`))
     })
 };
 

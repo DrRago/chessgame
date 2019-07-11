@@ -6,6 +6,7 @@ import de.dhbw.tinf18b4.chess.backend.Move;
 import de.dhbw.tinf18b4.chess.backend.Player;
 import de.dhbw.tinf18b4.chess.backend.lobby.Lobby;
 import de.dhbw.tinf18b4.chess.backend.lobby.LobbyManager;
+import de.dhbw.tinf18b4.chess.backend.lobby.LobbyStatus;
 import de.dhbw.tinf18b4.chess.backend.user.User;
 import de.dhbw.tinf18b4.chess.frontend.JSON.JSONHandler;
 import de.dhbw.tinf18b4.chess.frontend.SessionManager;
@@ -67,18 +68,23 @@ public class Websocket extends HttpServlet {
         // cannot be null because the lobby must have the user,
         // otherwise the verifyRequest function would have returned null
         // and we wouldn't even reach this point of code
-        User currentUser = Arrays.stream(playerLobby.getPlayers())
+        Player currentPlayer = Arrays.stream(playerLobby.getPlayers())
                 .filter(Objects::nonNull)
                 .filter(player -> player.getUser().getID().equals(sessionID))
-                .map(Player::getUser).findFirst().orElse(null);
+                .findFirst().orElseThrow();
 
         sessionToSessionID.put(session, sessionID);
         sessionToLobby.put(session, playerLobby);
         sessionToLobbyID.put(session, lobbyID);
-        sessionToUser.put(session, currentUser);
+        sessionToUser.put(session, currentPlayer.getUser());
 
         // send new playerlist to to complete lobby
         sendToLobby(playerLobby, getPlayerNames(playerLobby));
+
+        if (playerLobby.getStatus().equals(LobbyStatus.GAME_STARTED)) {
+            // send color to session
+            sendToSession(session, "initGame", currentPlayer.isWhite() ? "white" : "black");
+        }
     }
 
     @OnClose
@@ -115,7 +121,13 @@ public class Websocket extends HttpServlet {
                     sendErrorMessageToClient("Invalid move format", session, "error");
                     return;
                 }
-                Move move = playerLobby.getGame().getBoard().buildMove(moveString, playerLobby.getPlayerByUser(currentUser));
+                try {
+                    Move move = playerLobby.getGame().getBoard().buildMove(moveString, playerLobby.getPlayerByUser(currentUser));
+                    System.out.println(playerLobby.getGame().makeMove(move));
+                    sendToLobby(playerLobby, "move", playerLobby.getGame().asFen());
+                } catch (IllegalArgumentException e) {
+                    sendErrorMessageToClient(e.getMessage(), session, "error");
+                }
 
                 break;
             case "lobbyAction":
@@ -157,13 +169,16 @@ public class Websocket extends HttpServlet {
     }
 
     private @NotNull JSONObject getPlayerNames(@NotNull Lobby lobby) {
-        List<String> names = Arrays.stream(lobby.getPlayers())
-                .filter(Objects::nonNull)
-                .map(player -> player.getUser().getDisplayName())
-                .collect(Collectors.toList());
-
         JSONArray nameArray = new JSONArray();
-        nameArray.addAll(names);
+
+        Arrays.stream(lobby.getPlayers())
+                .filter(Objects::nonNull)
+                .forEach(player -> {
+                    JSONObject name = new JSONObject();
+                    name.put("color", player.isWhite() ? "white" : "black");
+                    name.put("name", player.getUser().getDisplayName());
+                    nameArray.add(name);
+                });
 
         JSONObject nameAnswer = buildAnswerTemplate();
         nameAnswer.put("content", "updatePlayerNames");
@@ -173,8 +188,9 @@ public class Websocket extends HttpServlet {
     }
 
     @OnError
-    public void onError(Throwable e) {
+    public void onError(Session session, Throwable e) throws IOException {
         e.printStackTrace();
+       sendErrorMessageToClient(e.getMessage(), session, "error");
     }
 
     public void sendToLobby(@NotNull Lobby lobby, @NotNull String content, @NotNull String message) throws IOException {

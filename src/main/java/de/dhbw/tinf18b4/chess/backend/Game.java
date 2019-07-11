@@ -78,6 +78,7 @@ public class Game {
         // build a 8x8 board with pieces as char name
         char[][] fenBoard = new char[8][8];
         board.getPieces().forEach(piece -> {
+            if (piece.isCaptured()) return;
             int y = piece.getPosition().getRank() - 1;
             int x = piece.getPosition().getFile() - 'a';
 
