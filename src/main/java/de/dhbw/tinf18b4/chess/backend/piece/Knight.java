@@ -4,6 +4,7 @@ import de.dhbw.tinf18b4.chess.backend.Board;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -69,7 +70,8 @@ public class Knight implements Piece {
                         .map(Position::topNeighbor),
                 Stream.ofNullable(rightTurningPoint)
                         .map(Position::bottomNeighbor))
-                .flatMap(s -> s);
+                .flatMap(s -> s)
+                .filter(Objects::nonNull);
     }
 
     @Override
