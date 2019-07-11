@@ -6,7 +6,6 @@ import de.dhbw.tinf18b4.chess.backend.Move;
 import de.dhbw.tinf18b4.chess.backend.Player;
 import de.dhbw.tinf18b4.chess.backend.lobby.Lobby;
 import de.dhbw.tinf18b4.chess.backend.lobby.LobbyManager;
-import de.dhbw.tinf18b4.chess.backend.lobby.LobbyStatus;
 import de.dhbw.tinf18b4.chess.backend.user.User;
 import de.dhbw.tinf18b4.chess.frontend.JSON.JSONHandler;
 import de.dhbw.tinf18b4.chess.frontend.SessionManager;
@@ -69,8 +68,9 @@ public class Websocket extends HttpServlet {
         // otherwise the verifyRequest function would have returned null
         // and we wouldn't even reach this point of code
         User currentUser = Arrays.stream(playerLobby.getPlayers())
+                .filter(Objects::nonNull)
                 .filter(player -> player.getUser().getID().equals(sessionID))
-                .map(Player::getUser).findFirst().orElseThrow();
+                .map(Player::getUser).findFirst().orElse(null);
 
         sessionToSessionID.put(session, sessionID);
         sessionToLobby.put(session, playerLobby);
@@ -131,21 +131,22 @@ public class Websocket extends HttpServlet {
                         }
                         break;
                     case "leave":
-                        playerLobby.leave(currentUser);
+                        // only remove session from the lobby map to avoid errors in the next steps
+                        // the rest will be removed on connection close
+                        sessionToLobby.remove(session);
 
-                        // lobby empty check
-                        if (Arrays.stream(playerLobby.getPlayers()).allMatch(Objects::isNull)) {
-                            LobbyManager.removeLobby(playerLobby);
+                        if (playerLobby.leave(currentUser)) {
+                            sendToLobby(playerLobby, "redirect", "/lobby/" + lobbyID);
                         } else {
                             // send new playerlist to to complete lobby
                             sendToLobby(playerLobby, getPlayerNames(playerLobby));
                         }
 
-                        if (playerLobby.getStatus().equals(LobbyStatus.GAME_STARTED)) {
-                            playerLobby.stopGame();
-                            sendToLobby(playerLobby, "redirect", "/lobby/" + lobbyID);
-                        }
                         sendToSession(session, "redirect", "/");
+                        // lobby empty check
+                        if (Arrays.stream(playerLobby.getPlayers()).allMatch(Objects::isNull)) {
+                            LobbyManager.removeLobby(playerLobby);
+                        }
                         break;
                 }
                 break;
