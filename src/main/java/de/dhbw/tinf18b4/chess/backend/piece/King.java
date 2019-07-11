@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -24,15 +26,39 @@ public class King implements Piece {
 
     @Override
     public Stream<Position> getValidMoves(@NotNull Board board) {
+        List<Position> castlingRookPositions = calculateCastlingPossibility(board).collect(Collectors.toList());
+        Stream<Position> castlingMoves = switch (castlingRookPositions.size()) {
+            case 0 -> Stream.empty();
+            case 1 | 2 -> {
+                Stream.Builder<Position> kingMoves = Stream.builder();
+                for (Position rook : castlingRookPositions) {
+                    if (rook.leftNeighbor() == null) {
+                        kingMoves.accept(rook.leftNeighbor().leftNeighbor());
+                    } else if (rook.rightNeighbor() == null) {
+                        kingMoves.accept(rook.rightNeighbor().rightNeighbor());
+                    }
+                }
+                break kingMoves.build();
+            }
+            // this might only happen when this player has 3 or more rooks (=never ???)
+            default -> throw new IllegalStateException("Unexpected value: " + castlingRookPositions.size());
+        };
+
         return Stream.of(
                 Stream.ofNullable(position.topNeighbor()),
                 Stream.ofNullable(position.bottomNeighbor()),
                 Stream.ofNullable(position.leftNeighbor()),
                 Stream.ofNullable(position.rightNeighbor()),
-                calculateCastlingPossibility(board))
+                castlingMoves)
                 .flatMap(s -> s);
     }
 
+    /**
+     * Finds the rooks towards which the castling special move can be done
+     *
+     * @param board the board
+     * @return the rooks
+     */
     private Stream<Position> calculateCastlingPossibility(Board board) {
         if (isInCheck(board)) {
             return Stream.empty();
@@ -63,7 +89,7 @@ public class King implements Piece {
                 .takeWhile(position -> !position.equals(leftPosition))
                 .noneMatch(position -> capturePositions.anyMatch(capturePosition -> capturePosition.equals(position)));
         boolean hasToPassThroughAnAttackedSquareRight = Stream.iterate(position, Position::rightNeighbor)
-                .takeWhile(position -> !position.equals(leftPosition))
+                .takeWhile(position -> !position.equals(rightPosition))
                 .noneMatch(position -> capturePositions.anyMatch(capturePosition -> capturePosition.equals(position)));
 
         if (piecesLeft > 1 || hasToPassThroughAnAttackedSquareLeft) {
