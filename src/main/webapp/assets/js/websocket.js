@@ -99,6 +99,9 @@ webSocket.onmessage = message => {
         case "move":
             handleMove(msgObj.value);
             break;
+        case "logs":
+            addLog(msgObj.value);
+            break;
     }
 };
 

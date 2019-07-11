@@ -7,6 +7,7 @@ import de.dhbw.tinf18b4.chess.backend.Player;
 import de.dhbw.tinf18b4.chess.backend.lobby.Lobby;
 import de.dhbw.tinf18b4.chess.backend.lobby.LobbyManager;
 import de.dhbw.tinf18b4.chess.backend.lobby.LobbyStatus;
+import de.dhbw.tinf18b4.chess.backend.piece.King;
 import de.dhbw.tinf18b4.chess.backend.piece.Piece;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 import de.dhbw.tinf18b4.chess.backend.user.User;
@@ -58,6 +59,16 @@ public class Websocket extends HttpServlet {
     private static Map<Session, User> sessionToUser = new HashMap<>();
 
 
+    /**
+     * The onOpen method of a websocket
+     * it handles the first steps to validate a client. The client has to send the lobbyID and sessionID
+     * of the HTTP-Session as url parameter
+     *
+     * @param lobbyID the lobbyID
+     * @param sessionID the http sessionID
+     * @param session the websocket session
+     * @throws IOException on session send error
+     */
     @OnOpen
     public void onOpen(@PathParam("lobbyID") String lobbyID, @PathParam("sessionID") String sessionID, Session session) throws IOException {
         logger.info(String.format("Incoming socket connection from %s (%s)...", sessionID, lobbyID));
@@ -91,6 +102,12 @@ public class Websocket extends HttpServlet {
         }
     }
 
+    /**
+     * The onClose websocket method
+     * removes the session from all maps to avoid sending data to a closed websocket
+     *
+     * @param session the closing session
+     */
     @OnClose
     public void onClose(Session session) {
         logger.info(String.format("Close connection for %s (%s)", sessionToSessionID.get(session), sessionToLobbyID.get(session)));
@@ -131,6 +148,7 @@ public class Websocket extends HttpServlet {
                         logger.info("Invalid move");
                     }
                     sendToLobby(playerLobby, getMoveResponse(playerLobby));
+                    sendToLobby(playerLobby, "logs", playerLobby.getGame().getHistory().lastMove().toString()); // pass color of log entry
                 } catch (IllegalArgumentException e) {
                     sendErrorMessageToClient(e.getMessage(), session, "error");
                 }
@@ -183,19 +201,17 @@ public class Websocket extends HttpServlet {
 
         // get all possible moves for all pieces identified by it's position on the board
         Map<Piece, Stream<Position>> moveMap = new HashMap<>();
-        lobby.getGame().getBoard().getPieces().forEach(piece -> moveMap.put(piece, piece.getValidMoves(lobby.getGame().getBoard())));
-
-        Map<String, Stream<String>> moveMapString = moveMap.entrySet().stream().collect(Collectors.toMap(
-                e -> e.getKey().getPosition().toString(),
-                e -> e.getValue().map(Position::toString)));
+        lobby.getGame().getBoard().getPieces().filter(piece -> !(piece instanceof King)).forEach(piece -> moveMap.put(piece, piece.getValidMoves(lobby.getGame().getBoard())));
         JSONArray possibilitiesArray = new JSONArray();
 
-        moveMapString.forEach((key, value) -> {
+        moveMap.entrySet().forEach(entry -> {
             JSONObject positionObject = new JSONObject();
             JSONArray positionArray = new JSONArray();
-            positionArray.addAll(value.collect(Collectors.toList()));
+            positionArray.addAll(entry.getValue().map(Position::toString).collect(Collectors.toList()));
 
-            positionObject.put("piece", key);
+            positionObject.put("piece", entry.getKey().getPosition().toString());
+            positionObject.put("color", entry.getKey().isWhite() ? "white" : "black");
+
             positionObject.put("possibilities", positionArray);
 
             possibilitiesArray.add(positionObject);

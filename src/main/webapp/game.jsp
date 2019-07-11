@@ -31,7 +31,7 @@
         </div>
     </div>
     <div class="row mt-4">
-        <div class="col">
+        <div class="col-lg-3 col-sm-5">
             <div class="card">
                 <div class="card-header"><h4>Players</h4></div>
                 <div class="card-body">
@@ -58,78 +58,9 @@
                                 <div class="card-header">
                                     <h4>Logs</h4>
                                 </div>
-                                <div class="card-body" style="overflow-y: scroll;" id="chat">
-                                    <table>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
+                                <div class="card-body" style="overflow-y: scroll;" id="logs">
+                                    <table class="w-100">
 
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
                                     </table>
                                 </div>
                             </div>
