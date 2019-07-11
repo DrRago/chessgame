@@ -91,13 +91,8 @@ public class Pawn implements Piece {
             return null;
         }
 
-        boolean whiteHasJustPlayed = lastMove
-                .getPlayer()
-                .isWhite();
-
-        boolean enemyPawnMovedFromStartingPoint = lastMove.getPiece().getFenIdentifier() == (whiteHasJustPlayed ? 'P' : 'p');
-        // FIXME: Check origin square
-        boolean enemyPawnMovedTwoSquares = lastMove.getDestination().getRank() == 4;
+        boolean enemyPawnMovedFromStartingPoint = 1 == numberOfMoves(board.getGame());
+        boolean enemyPawnMovedTwoSquares = 2 == Math.abs(lastMove.getDestination().getFile() - lastMove.getOrigin().getFile());
 
         // find the intercept position where the en passant capture happens
         // it's behind the pawn to be captured (which was involved in the last move)
@@ -106,7 +101,8 @@ public class Pawn implements Piece {
                 : lastMove.getPiece().getPosition().topNeighbor();
 
         // find if any of the pawns could capture the enemy pawn if it only moved on square
-        boolean enPassantPossible = getValidCaptureMoves(board, false).anyMatch(position -> position == enPassantCapturePosition);
+        boolean enPassantPossible = getValidCaptureMoves(board, false)
+                .anyMatch(position -> position.equals(enPassantCapturePosition));
 
         // if all of these predicates are true this pawn can do an en passant move
         // so we return the position where it should move to do the en passant move

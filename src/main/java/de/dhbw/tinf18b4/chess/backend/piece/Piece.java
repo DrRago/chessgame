@@ -1,6 +1,7 @@
 package de.dhbw.tinf18b4.chess.backend.piece;
 
 import de.dhbw.tinf18b4.chess.backend.Board;
+import de.dhbw.tinf18b4.chess.backend.Game;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 import org.jetbrains.annotations.NotNull;
 
@@ -61,4 +62,16 @@ public interface Piece {
      * @return the FEN identifier
      */
     char getFenIdentifier();
+
+    default boolean hasEverMoved(Game game) {
+        return 0 == numberOfMoves(game);
+    }
+
+    default int numberOfMoves(Game game) {
+        long count = game.getHistory().stream()
+                .filter(move -> move.getPiece().equals(this))
+                .count();
+
+        return Math.toIntExact(count);
+    }
 }

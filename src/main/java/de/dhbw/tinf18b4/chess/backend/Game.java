@@ -6,6 +6,8 @@ import de.dhbw.tinf18b4.chess.backend.position.Position;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.stream.Stream;
+
 /**
  * @author Leonhard Gahr
  */
@@ -130,6 +132,10 @@ public class Game {
          * @return The Move
          */
         public Move peekingPop() {
+            return null;
+        }
+
+        public Stream<Move> stream() {
             return null;
         }
     }
