@@ -15,9 +15,10 @@ import static org.junit.Assert.assertTrue;
  * @author Leonhard Gahr
  */
 public class PawnTest {
-    private User test = new User("", "", "");
-    private Player white = new Player(true, test);
-    private Player black = new Player(false, test);
+    private User user1 = new User("player1", "", "");
+    private User user2 = new User("player2", "", "");
+    private Player white = new Player(true, user1);
+    private Player black = new Player(false, user2);
 
     @Test
     public void enPassantTest() {
