@@ -97,7 +97,7 @@ webSocket.onmessage = message => {
             initGame(msgObj.value);
             break;
         case "move":
-            board.position(msgObj.value);
+            handleMove(msgObj.value);
             break;
     }
 };

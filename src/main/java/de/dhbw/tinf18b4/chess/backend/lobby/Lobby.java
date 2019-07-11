@@ -148,12 +148,4 @@ public class Lobby {
     public String toString() {
         return String.format("Lobby (%d/%d) - %s", Arrays.stream(players).filter(Objects::isNull).count(), 2, status);
     }
-
-    /**
-     * stop the {@link Game}
-     */
-    public void stopGame() {
-        game = null;
-        status = LobbyStatus.WAITING_FOR_START;
-    }
 }

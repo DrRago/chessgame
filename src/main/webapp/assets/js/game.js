@@ -1,10 +1,11 @@
 let myColor;
 let board;
+let isTurn;
 
 const onDragStart = (source, piece, position, orientation) => {
     // only pick up pieces for the side to move
     if ((myColor.startsWith('w') && piece.search(/^b/) !== -1) ||
-        (myColor.startsWith('b') && piece.search(/^w/) !== -1)) {
+        (myColor.startsWith('b') && piece.search(/^w/) !== -1) || !isTurn) {
         return false
     }
 };
@@ -31,4 +32,10 @@ const initGame = color => {
     };
 
     board = Chessboard('board1', config);
+};
+
+const handleMove = message => {
+    const fen = message.fen;
+    isTurn = message.turn === myColor;
+    board.position(fen);
 };

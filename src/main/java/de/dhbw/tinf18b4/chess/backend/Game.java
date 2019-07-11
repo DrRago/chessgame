@@ -37,16 +37,20 @@ public class Game {
 
         // Prevent player from making a move if they ...
 
-        // ... don't belong in this game or ...
+        // ... don't belong in this game, ...
         if (!(player1.equals(move.getPlayer())
                 || player2.equals(move.getPlayer()))) {
             return false;
 
         }
 
+        // ... is not the white player when making the first move or ...
+        if (lastMove == null && !move.getPlayer().isWhite()) {
+            return false;
+        }
+
         // ... have just made a move
-        if (lastMove != null
-                && move.getPlayer().equals(lastMove.getPlayer())) {
+        if (lastMove != null && move.getPlayer().equals(lastMove.getPlayer())) {
             return false;
         }
 
@@ -61,6 +65,23 @@ public class Game {
         }
 
         return false;
+    }
+
+    /**
+     * Get the {@link Player} who's up to turn
+     *
+     * @return the {@link Player}
+     */
+    public @NotNull Player whoseTurn() {
+        Move lastMove = history.lastMove();
+
+        // it's whites turn
+        if (lastMove == null) {
+            return player1.isWhite() ? player1 : player2;
+        }
+
+        // the player who hasn't moved last
+        return lastMove.getPlayer().equals(player1) ? player2 : player1;
     }
 
     /**

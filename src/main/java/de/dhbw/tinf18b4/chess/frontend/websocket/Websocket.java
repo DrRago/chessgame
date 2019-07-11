@@ -7,6 +7,8 @@ import de.dhbw.tinf18b4.chess.backend.Player;
 import de.dhbw.tinf18b4.chess.backend.lobby.Lobby;
 import de.dhbw.tinf18b4.chess.backend.lobby.LobbyManager;
 import de.dhbw.tinf18b4.chess.backend.lobby.LobbyStatus;
+import de.dhbw.tinf18b4.chess.backend.piece.Piece;
+import de.dhbw.tinf18b4.chess.backend.position.Position;
 import de.dhbw.tinf18b4.chess.backend.user.User;
 import de.dhbw.tinf18b4.chess.frontend.JSON.JSONHandler;
 import de.dhbw.tinf18b4.chess.frontend.SessionManager;
@@ -25,6 +27,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static de.dhbw.tinf18b4.chess.frontend.JSON.JSONHandler.buildAnswerTemplate;
 import static de.dhbw.tinf18b4.chess.frontend.JSON.JSONHandler.parseMessage;
@@ -84,6 +87,7 @@ public class Websocket extends HttpServlet {
         if (playerLobby.getStatus().equals(LobbyStatus.GAME_STARTED)) {
             // send color to session
             sendToSession(session, "initGame", currentPlayer.isWhite() ? "white" : "black");
+            sendToLobby(playerLobby, getMoveResponse(playerLobby));
         }
     }
 
@@ -114,7 +118,6 @@ public class Websocket extends HttpServlet {
 
         switch (contentType) {
             case "move":
-                // TODO: 04/07/2019 perform move operations
                 String moveString = (String) parsedMessage.get("value");
                 // received move should be in a valid format
                 if (!Board.checkMoveFormat(moveString)) {
@@ -123,8 +126,11 @@ public class Websocket extends HttpServlet {
                 }
                 try {
                     Move move = playerLobby.getGame().getBoard().buildMove(moveString, playerLobby.getPlayerByUser(currentUser));
-                    System.out.println(playerLobby.getGame().makeMove(move));
-                    sendToLobby(playerLobby, "move", playerLobby.getGame().asFen());
+
+                    if (!playerLobby.getGame().makeMove(move)) {
+                        logger.info("Invalid move");
+                    }
+                    sendToLobby(playerLobby, getMoveResponse(playerLobby));
                 } catch (IllegalArgumentException e) {
                     sendErrorMessageToClient(e.getMessage(), session, "error");
                 }
@@ -168,6 +174,40 @@ public class Websocket extends HttpServlet {
         }
     }
 
+    private @NotNull JSONObject getMoveResponse(@NotNull Lobby lobby) {
+        JSONObject moveAnswer = buildAnswerTemplate();
+
+        JSONObject answerValue = new JSONObject();
+        answerValue.put("fen", lobby.getGame().asFen()); // the fen string of the board
+        answerValue.put("turn", lobby.getGame().whoseTurn().isWhite() ? "white" : "black"); // the color whose turn it is
+
+        // get all possible moves for all pieces identified by it's position on the board
+        Map<Piece, Stream<Position>> moveMap = new HashMap<>();
+        lobby.getGame().getBoard().getPieces().forEach(piece -> moveMap.put(piece, piece.getValidMoves(lobby.getGame().getBoard())));
+
+        Map<String, Stream<String>> moveMapString = moveMap.entrySet().stream().collect(Collectors.toMap(
+                e -> e.getKey().getPosition().toString(),
+                e -> e.getValue().map(Position::toString)));
+        JSONArray possibilitiesArray = new JSONArray();
+
+        moveMapString.forEach((key, value) -> {
+            JSONObject positionObject = new JSONObject();
+            JSONArray positionArray = new JSONArray();
+            positionArray.addAll(value.collect(Collectors.toList()));
+
+            positionObject.put("piece", key);
+            positionObject.put("possibilities", positionArray);
+
+            possibilitiesArray.add(positionObject);
+        });
+
+        answerValue.put("possibilities", possibilitiesArray); // the possible moves
+        moveAnswer.put("content", "move");
+        moveAnswer.put("value", answerValue);
+
+        return moveAnswer;
+    }
+
     private @NotNull JSONObject getPlayerNames(@NotNull Lobby lobby) {
         JSONArray nameArray = new JSONArray();
 
@@ -190,7 +230,7 @@ public class Websocket extends HttpServlet {
     @OnError
     public void onError(Session session, Throwable e) throws IOException {
         e.printStackTrace();
-       sendErrorMessageToClient(e.getMessage(), session, "error");
+        sendErrorMessageToClient(e.getMessage(), session, "error");
     }
 
     public void sendToLobby(@NotNull Lobby lobby, @NotNull String content, @NotNull String message) throws IOException {
