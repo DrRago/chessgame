@@ -49,6 +49,10 @@ public interface Piece {
      */
     boolean isWhite();
 
+    default boolean isBlack() {
+        return !isWhite();
+    }
+
     /**
      * Get the capture state of the piece
      *
