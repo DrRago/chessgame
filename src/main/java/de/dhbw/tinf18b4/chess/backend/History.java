@@ -1,5 +1,6 @@
 package de.dhbw.tinf18b4.chess.backend;
 
+import java.util.EmptyStackException;
 import java.util.Stack;
 import java.util.stream.Stream;
 
@@ -26,7 +27,11 @@ public class History {
      * @return the Move
      */
     public Move lastMove() {
-        return history.peek();
+        try {
+            return history.peek();
+        } catch (EmptyStackException empty) {
+            return null;
+        }
     }
 
     /**
