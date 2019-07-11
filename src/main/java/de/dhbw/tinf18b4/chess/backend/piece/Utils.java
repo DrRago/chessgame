@@ -17,7 +17,7 @@ class Utils {
                         // stop when we reach the end of the board
                         .takeWhile(Objects::nonNull)
                         // or when we reach another piece
-                        .takeWhile(board::isOccupied))
+                        .takeWhile(position -> !board.isOccupied(position)))
                 .flatMap(s -> s);
     }
 }
