@@ -32,6 +32,15 @@ public class Knight implements Piece {
 
     @Override
     public Stream<Position> getValidMoves(@NotNull Board board) {
+        return getPossibleMoves().filter(position -> board.findPieceByPosition(position) == null);
+    }
+
+    /**
+     * Get the moves that are possible on any chessboard without considering other pieces
+     *
+     * @return the possible moves
+     */
+    private @NotNull Stream<Position> getPossibleMoves() {
         // Knights always move 3 squares. First they 2 vertical or horizontal and then they make a turn.
         // Afterwards they move one square orthogonally.
         Position topTurningPoint = Optional.ofNullable(position.topNeighbor())
@@ -76,7 +85,10 @@ public class Knight implements Piece {
 
     @Override
     public Stream<Position> getValidCaptureMoves(@NotNull Board board) {
-        return getValidMoves(board);
+        return getPossibleMoves()
+                .filter(position -> board.findPieceByPosition(position) != null)
+                .filter(position -> board.findPieceByPosition(position).isBlack() == white);
+
     }
 
     @Override
