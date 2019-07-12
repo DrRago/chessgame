@@ -51,6 +51,13 @@ public class PawnTest {
 
         assertTrue("Could not move P2a two squares forward", game.makeMove(game.getBoard().buildMove("a2-a4", white)));
         assertTrue("Could not move P7a two squares forward", game.makeMove(game.getBoard().buildMove("a7-a5", black)));
+
+        // test case against jumping over another piece
+        game = new Game(white, black);
+
+        assertTrue("Could not move N1a", game.makeMove(game.getBoard().buildMove("b1-a3", white)));
+        assertTrue("Could not move P7a", game.makeMove(game.getBoard().buildMove("a7-a6", black)));
+        assertFalse("Could move P2a", game.makeMove(game.getBoard().buildMove("a2-a3", white)));
     }
 
     @Test

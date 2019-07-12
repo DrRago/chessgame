@@ -3,6 +3,8 @@ package de.dhbw.tinf18b4.chess.backend.piece;
 import de.dhbw.tinf18b4.chess.backend.Board;
 import de.dhbw.tinf18b4.chess.backend.Move;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -13,6 +15,8 @@ import java.util.stream.Stream;
  */
 public class Pawn implements Piece {
     private final boolean white;
+    @Getter
+    @Setter
     private Position position;
 
     public Pawn(boolean white, Position position) {
@@ -21,23 +25,13 @@ public class Pawn implements Piece {
     }
 
     @Override
-    public void setPosition(Position position) {
-        this.position = position;
-    }
-
-    @Override
-    public Position getPosition() {
-        return position;
-    }
-
-    @Override
     public Stream<Position> getValidMoves(@NotNull Board board) {
         Position singleMove = white ? position.topNeighbor() : position.bottomNeighbor();
         Position doubleMove = null;
 
         // if this pawn has not moved allow moving two fields forward
-        if (white && position.getRank() == 2
-                || !white && position.getRank() == 7) {
+        // allow a moving two fields at once
+        if (hasEverMoved(board.getGame())) {
             if (white) {
                 doubleMove = Optional.ofNullable(singleMove)
                         .map(Position::topNeighbor)
@@ -46,6 +40,11 @@ public class Pawn implements Piece {
                 doubleMove = Optional.ofNullable(singleMove)
                         .map(Position::bottomNeighbor)
                         .orElse(null);
+            }
+
+            // prevent pawn from jumping over other pieces
+            if (singleMove != null && board.isOccupied(singleMove)) {
+                doubleMove = null;
             }
         }
 
