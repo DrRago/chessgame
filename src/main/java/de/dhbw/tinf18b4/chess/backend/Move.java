@@ -61,4 +61,9 @@ public class Move {
 
         return piece;
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s moved %s to %s", player.getUser().getDisplayName(), piece.getClass().getSimpleName(), destination);
+    }
 }

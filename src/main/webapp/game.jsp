@@ -17,6 +17,8 @@
     <script src="${pageContext.request.contextPath}/assets/js/websocket.js"></script>
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/chessboard-1.0.0.min.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/lobby.css">
+
     <script src="${pageContext.request.contextPath}/assets/js/chessboard-1.0.0.min.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/game.js"></script>
 </head>
@@ -29,7 +31,7 @@
         </div>
     </div>
     <div class="row mt-4">
-        <div class="col">
+        <div class="col-lg-3 col-sm-5">
             <div class="card">
                 <div class="card-header"><h4>Players</h4></div>
                 <div class="card-body">
@@ -56,78 +58,9 @@
                                 <div class="card-header">
                                     <h4>Logs</h4>
                                 </div>
-                                <div class="card-body" style="overflow-y: scroll;" id="chat">
-                                    <table>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
+                                <div class="card-body" style="overflow-y: scroll;" id="logs">
+                                    <table class="w-100">
 
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
-                                        <tr>
-                                            <td>Data</td>
-                                        </tr>
                                     </table>
                                 </div>
                             </div>

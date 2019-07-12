@@ -15,7 +15,7 @@ const parseLobbyID = () => {
 };
 
 // the websocket connection
-const webSocket = new WebSocket(`ws://${location.host}/websocketendpoint`);
+const webSocket = new WebSocket(`ws://${location.host}/websocketendpoint/${parseLobbyID()}/${websocketID}`);
 
 // acknowledge boolean to check the server state
 let acknowledge = false;
@@ -23,21 +23,14 @@ let acknowledge = false;
 // the template for every message sent to the server
 let messageTemplate = {
     "content": "",
-    "ID": websocketID,
-    "lobbyID": parseLobbyID(),
     "value": ""
 };
 
 /**
  * handler on successful connect to server
- * sending a validation object and await an answer
- * if the answer is not received, the server is not working properly
  */
 webSocket.onopen = () => {
-    sendToSocket("ACK", "alive");
 
-    // ask for player information
-    sendToSocket("getPlayerNames", null);
 };
 
 const sendToSocket = (content, value) => {
@@ -49,6 +42,15 @@ const sendToSocket = (content, value) => {
     console.log(message);
 
     webSocket.send(JSON.stringify(message));
+};
+
+const alert = message => {
+    $.alert({
+        title: 'Alert!',
+        type: 'red',
+        content: message,
+        theme: 'material'
+    });
 };
 
 /**
@@ -89,7 +91,16 @@ webSocket.onmessage = message => {
             updateUserList(msgObj.value);
             break;
         case "redirect":
-            location.href += msgObj.value;
+            location.href = msgObj.value;
+            break;
+        case "initGame":
+            initGame(msgObj.value);
+            break;
+        case "move":
+            handleMove(msgObj.value);
+            break;
+        case "logs":
+            addLog(msgObj.value);
             break;
     }
 };
@@ -98,10 +109,11 @@ webSocket.onmessage = message => {
  * page should be left if the connection is closed
  */
 webSocket.onclose = event => {
-    alert(`Connection closed! Reason: ${event.reason}`);
     // on abnormal close reason, alert and redirect to lobby overview
     if (event.code !== 1000 && event.code !== 1001) {
         location.href = `${location.protocol}//${location.host}/lobby`;
+    } else {
+        alert(`Connection closed! Reason: ${event.reason}`);
     }
 };
 
@@ -122,13 +134,13 @@ const updateUserList = (playerData) => {
     const players = $("#playerList");
     players.find("li").each((index, player) => {
         player = $(player);
-        if (!playerData.includes(player.text())) {
-            player.remove();
-        } else {
-            playerData.splice(playerData.indexOf(player.text()), 1);
-        }
+        player.remove();
     });
     playerData.forEach(player => {
-        players.append($(`<li class="list-group-item chess-white"><i class="fas fa-chess-queen"></i>${player}</li>`))
+        players.append($(`<li class="list-group-item chess-${player.color}"><i class="fas fa-chess-queen"></i>${player.name}</li>`))
     })
+};
+
+const leaveLobby = () => {
+    sendToSocket("lobbyAction", "leave");
 };

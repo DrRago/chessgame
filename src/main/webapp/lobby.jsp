@@ -15,10 +15,10 @@
         const websocketID = `<c:out value="${pageContext.session.id}" />`
     </script>
     <script src="${pageContext.request.contextPath}/assets/js/websocket.js"></script>
+    <script src="${pageContext.request.contextPath}/assets/js/lobby.js"></script>
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/lobby.css">
 
-    <script src="${pageContext.request.contextPath}/assets/js/lobby.js"></script>
 </head>
 <body>
 <div class="container mt-5 pt-5">
