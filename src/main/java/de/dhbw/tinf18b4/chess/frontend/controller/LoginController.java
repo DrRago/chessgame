@@ -67,7 +67,7 @@ public class LoginController extends HttpServlet {
                         currSession.setAttribute("user", user);
                         SessionManager.addSession(currSession);
 
-                        sendTarget = "index.jsp";
+                        sendTarget = "lobby";
                     } else {
                         logger.info("user authentication failed");
                         // invalid credentials
@@ -106,7 +106,7 @@ public class LoginController extends HttpServlet {
 
                     User guestUser = new User("guest", "", currSession.getId());
                     currSession.setAttribute("user", guestUser);
-                    sendTarget = "index.jsp";
+                    sendTarget = "lobby";
                     break;
 
                 default:

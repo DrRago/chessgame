@@ -2,8 +2,8 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <%-- catch if user is already logged in --%>
-<c:if test="${sessionScope.loginUser != null}">
-    <c:redirect url="index.jsp"/>
+<c:if test="${sessionScope.user != null}">
+    <c:redirect url="/lobby"/>
 </c:if>
 
 

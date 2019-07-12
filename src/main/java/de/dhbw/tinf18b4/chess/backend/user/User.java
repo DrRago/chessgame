@@ -54,9 +54,6 @@ public class User {
                 return user2.ID.equals(this.ID);
             }
             return user2.username.equalsIgnoreCase(this.username);
-        } else if (obj instanceof String) {
-            // string comparision on id
-            return this.ID.equals(obj);
         }
         return false;
     }
