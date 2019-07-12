@@ -43,6 +43,10 @@ public class King implements Piece {
                 Stream.ofNullable(position.bottomNeighbor()),
                 Stream.ofNullable(position.leftNeighbor()),
                 Stream.ofNullable(position.rightNeighbor()),
+                Stream.ofNullable(position.upperRightNeighbor()),
+                Stream.ofNullable(position.upperLeftNeighbor()),
+                Stream.ofNullable(position.lowerRightNeighbor()),
+                Stream.ofNullable(position.lowerLeftNeighbor()),
                 castlingMoves.build())
                 .flatMap(s -> s);
     }
@@ -54,7 +58,7 @@ public class King implements Piece {
      * @return the rooks
      */
     private Stream<Position> calculateCastlingPossibility(Board board) {
-        if (isInCheck(board)) {
+        if (isInCheck(board) || !hasEverMoved(board.getGame())) {
             return Stream.empty();
         }
 
@@ -73,18 +77,20 @@ public class King implements Piece {
                 .count());
 
         // find all position which are attackable by an enemy piece
-        Stream<Position> capturePositions = board.getPieces()
+        List<Position> capturePositions = board.getPieces()
                 // consider only enemy pieces
                 .filter(piece -> piece.isWhite() != white)
+                .filter(piece -> piece.getFenIdentifier() == (white ? 'K' : 'k'))
                 // find all the position where they can move in a capture
                 .map(piece -> piece.getValidCaptureMoves(board))
-                .flatMap(s -> s);
+                .flatMap(s -> s)
+                .collect(Collectors.toList());
         boolean hasToPassThroughAnAttackedSquareLeft = Stream.iterate(position, Position::leftNeighbor)
                 .takeWhile(position -> !position.equals(leftPosition))
-                .noneMatch(position -> capturePositions.anyMatch(capturePosition -> capturePosition.equals(position)));
+                .noneMatch(position -> capturePositions.stream().anyMatch(capturePosition -> capturePosition.equals(position)));
         boolean hasToPassThroughAnAttackedSquareRight = Stream.iterate(position, Position::rightNeighbor)
                 .takeWhile(position -> !position.equals(rightPosition))
-                .noneMatch(position -> capturePositions.anyMatch(capturePosition -> capturePosition.equals(position)));
+                .noneMatch(position -> capturePositions.stream().anyMatch(capturePosition -> capturePosition.equals(position)));
 
         if (piecesLeft > 1 || hasToPassThroughAnAttackedSquareLeft) {
             left = null;
@@ -129,6 +135,7 @@ public class King implements Piece {
         Stream<Position> capturePositions = board.getPieces()
                 // consider only enemy pieces
                 .filter(piece -> piece.isWhite() != white)
+                .filter(piece -> piece.getFenIdentifier() == (white ? 'K' : 'k'))
                 // find all the position where they can move in a capture
                 .map(piece -> piece.getValidCaptureMoves(board))
                 .flatMap(s -> s);
