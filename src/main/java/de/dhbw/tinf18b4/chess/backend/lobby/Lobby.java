@@ -103,8 +103,9 @@ public class Lobby {
      * Remove a {@link Player} by it's user object from the {@link Lobby}
      *
      * @param user the {@link User} object (not null)
+     * @return whether the game of the lobby hat to be stopped or not
      */
-    public void leave(@NotNull User user) {
+    public boolean leave(@NotNull User user) {
         for (int i = 0; i < 2; i++) {
             if (players[i] != null && players[i].getUser().equals(user)) {
                 players[i] = null;
@@ -115,8 +116,9 @@ public class Lobby {
         if (status == LobbyStatus.GAME_STARTED) {
             status = LobbyStatus.WAITING_FOR_START;
             game = null;
+            return true;
         }
-        // TODO: 02/07/2019 check lobby for still being active
+        return false;
     }
 
     /**

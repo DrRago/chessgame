@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 
 public class Player {
+    @Getter
     private boolean isWhite;
     @Getter
     private User user;

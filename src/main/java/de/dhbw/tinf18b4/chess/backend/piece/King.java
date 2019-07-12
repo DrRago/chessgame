@@ -7,6 +7,8 @@ import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -65,32 +67,31 @@ public class King implements Piece {
         Piece left = board.findPieceByPosition(new Position('a', white ? 1 : 8));
         Piece right = board.findPieceByPosition(new Position('h', white ? 1 : 8));
 
-        Position leftPosition = left.getPosition();
         int piecesLeft = Math.toIntExact(Stream.iterate(position, Position::leftNeighbor)
-                .takeWhile(position -> !position.equals(leftPosition))
+                .filter(Objects::nonNull)
+                .takeWhile(position -> position.getFile() != 'a')
                 .filter(position -> board.findPieceByPosition(position) != null)
                 .count());
-        Position rightPosition = right.getPosition();
         int piecesRight = Math.toIntExact(Stream.iterate(position, Position::rightNeighbor)
-                .takeWhile(position -> !position.equals(rightPosition))
+                .filter(Objects::nonNull)
+                .takeWhile(position -> position.getFile() != 'h')
                 .filter(position -> board.findPieceByPosition(position) != null)
                 .count());
 
         // find all position which are attackable by an enemy piece
-        List<Position> capturePositions = board.getPieces()
+        Supplier<Stream<Position>> capturePositions = () -> board.getPieces()
                 // consider only enemy pieces
                 .filter(piece -> piece.isWhite() != white)
-                .filter(piece -> piece.getFenIdentifier() == (white ? 'K' : 'k'))
                 // find all the position where they can move in a capture
+                .filter(piece -> !(piece instanceof King))
                 .map(piece -> piece.getValidCaptureMoves(board))
-                .flatMap(s -> s)
-                .collect(Collectors.toList());
+                .flatMap(s -> s);
         boolean hasToPassThroughAnAttackedSquareLeft = Stream.iterate(position, Position::leftNeighbor)
-                .takeWhile(position -> !position.equals(leftPosition))
-                .noneMatch(position -> capturePositions.stream().anyMatch(capturePosition -> capturePosition.equals(position)));
+                .takeWhile(position -> position.getFile() != 'a')
+                .noneMatch(position -> capturePositions.get().anyMatch(capturePosition -> capturePosition.equals(position)));
         boolean hasToPassThroughAnAttackedSquareRight = Stream.iterate(position, Position::rightNeighbor)
-                .takeWhile(position -> !position.equals(rightPosition))
-                .noneMatch(position -> capturePositions.stream().anyMatch(capturePosition -> capturePosition.equals(position)));
+                .takeWhile(position -> position.getFile() != 'h')
+                .noneMatch(position -> capturePositions.get().anyMatch(capturePosition -> capturePosition.equals(position)));
 
         if (piecesLeft > 1 || hasToPassThroughAnAttackedSquareLeft) {
             left = null;
@@ -135,8 +136,8 @@ public class King implements Piece {
         Stream<Position> capturePositions = board.getPieces()
                 // consider only enemy pieces
                 .filter(piece -> piece.isWhite() != white)
-                .filter(piece -> piece.getFenIdentifier() == (white ? 'K' : 'k'))
                 // find all the position where they can move in a capture
+                .filter(piece -> !(piece instanceof King))
                 .map(piece -> piece.getValidCaptureMoves(board))
                 .flatMap(s -> s);
 
