@@ -96,24 +96,21 @@ public class Board {
     /**
      * Check whether a move is allowed on this board
      * <p>
-     * TODO: Implement
      *
      * @param move The move
      * @return whether is possible to make the move
      */
     boolean checkMove(@NotNull Move move) {
-        boolean isCaptured = move.getPiece().isCaptured();
+        // a piece is captured if it doesn't exist on this board anymore
+        boolean isCaptured = getPieces().noneMatch(piece -> piece.equals(move.getPiece()));
         boolean isAllowedMovement = move.getPiece()
                 .getValidMoves(this)
                 .anyMatch(position -> position.equals(move.getDestination()));
         boolean isAllowedCaptureMove = move.getPiece()
                 .getValidCaptureMoves(this)
                 .anyMatch(position -> position.equals(move.getDestination()));
-        boolean isEmptyField = getOccupiedPositions()
-                .noneMatch(position -> position.equals(move.getDestination()));
 
         return !isCaptured
-                && isEmptyField
                 && (isAllowedMovement
                 || isAllowedCaptureMove);
     }
@@ -159,16 +156,32 @@ public class Board {
     }
 
     /**
+     * set a specific piece of the game as null
+     *
+     * @param toRemove the piece to set as null on the board
+     */
+    private void removePiece(Piece toRemove) {
+        for (int i = 0; i < pieces.length; i++) {
+            if (pieces[i] == toRemove) {
+                pieces[i] = null;
+            }
+        }
+    }
+
+    /**
      * Apply a move to the board
      *
      * @param move The move
      */
     void applyMove(@NotNull Move move) {
-        getPieces()
+        Piece movedPiece = getPieces()
                 .filter(piece -> piece.equals(move.getPiece()))
                 .findFirst()
-                .orElseThrow()
-                .setPosition(move.getDestination());
+                .orElseThrow();
+        if (findPieceByPosition(move.getDestination()) != null) {
+            removePiece(findPieceByPosition(move.getDestination()));
+        }
+        movedPiece.setPosition(move.getDestination());
     }
 
     /**
