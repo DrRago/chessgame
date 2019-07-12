@@ -69,6 +69,17 @@ public class PawnTest {
 
         game = new Game(white, black);
 
+        assertTrue("Couldn't move P3a forward", game.makeMove(game.getBoard().buildMove("a2-a4", white)));
+        assertTrue("Couldn't move P7a forward", game.makeMove(game.getBoard().buildMove("c7-c5", black)));
+        assertTrue("Couldn't move P3a forward", game.makeMove(game.getBoard().buildMove("a4-a5", white)));
+        assertTrue("Couldn't move P7a forward", game.makeMove(game.getBoard().buildMove("c5-c4", black)));
+        assertTrue("Couldn't move P3a forward", game.makeMove(game.getBoard().buildMove("a5-a6", white)));
+        assertTrue("Couldn't move P7a forward", game.makeMove(game.getBoard().buildMove("c4-c3", black)));
+        assertTrue("Couldn't move P2b diagonally", game.makeMove(game.getBoard().buildMove("b2-c3", white)));
+        assertTrue("Couldn't move P7b diagonally", game.makeMove(game.getBoard().buildMove("b7-a6", black)));
+
+        game = new Game(white, black);
+
         assertFalse("Could move P2b diagonally", game.makeMove(game.getBoard().buildMove("b2-c3", white)));
         assertFalse("Could move P7b diagonally", game.makeMove(game.getBoard().buildMove("b7-c6", black)));
     }
