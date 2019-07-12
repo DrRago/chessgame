@@ -46,8 +46,7 @@
                     <form action="${pageContext.request.contextPath}/DoLoginOrRegister" method="post">
                         <div class="form-group">
                             <input type="text" name="username" class="form-control" id="login_username"
-                                   placeholder="Username"
-                                   required autofocus>
+                                   placeholder="Username" required autofocus value="${param.username || ""}">
                         </div>
 
                         <div class="form-group">
@@ -59,7 +58,8 @@
                             <button type="submit" class="btn btn-primary" name="function" value="login">Login</button>
                         </div>
                         <div class="text-center pt-4">
-                            <button type="submit" id="guest-login" class="btn btn-primary" name="function" value="guest">
+                            <button type="submit" id="guest-login" class="btn btn-primary" name="function"
+                                    value="guest">
                                 Login as Guest
                             </button>
                         </div>
