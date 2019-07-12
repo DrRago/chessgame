@@ -21,7 +21,7 @@ public class UserUtility {
      * @return whether the registration was successful
      */
     public static boolean createUser(String username, String password) {
-        password = DigestUtils.sha256Hex(password);
+        password = DigestUtils.sha512Hex(password);
         try {
             MySQLUtility.executeQuery("INSERT INTO user VALUES(?, ?, '1')", username, password);
         } catch (SQLException e) {
