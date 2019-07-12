@@ -111,11 +111,12 @@ public class Board {
                 .anyMatch(position -> position.equals(move.getDestination()));
         boolean isEmptyField = getOccupiedPositions()
                 .noneMatch(position -> position.equals(move.getDestination()));
+        boolean isOccupiedByEnemy = !isEmptyField
+                && findPieceByPosition(move.getDestination()).isWhite() != move.getPiece().isWhite();
 
         return !isCaptured
-                && isEmptyField
-                && (isAllowedMovement
-                || isAllowedCaptureMove);
+                && ((isAllowedMovement && isEmptyField)
+                || (isAllowedCaptureMove && isOccupiedByEnemy));
     }
 
     /**
