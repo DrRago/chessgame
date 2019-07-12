@@ -7,7 +7,6 @@ import de.dhbw.tinf18b4.chess.backend.Player;
 import de.dhbw.tinf18b4.chess.backend.lobby.Lobby;
 import de.dhbw.tinf18b4.chess.backend.lobby.LobbyManager;
 import de.dhbw.tinf18b4.chess.backend.lobby.LobbyStatus;
-import de.dhbw.tinf18b4.chess.backend.piece.King;
 import de.dhbw.tinf18b4.chess.backend.piece.Piece;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 import de.dhbw.tinf18b4.chess.backend.user.User;
@@ -201,7 +200,7 @@ public class Websocket extends HttpServlet {
 
         // get all possible moves for all pieces identified by it's position on the board
         Map<Piece, Stream<Position>> moveMap = new HashMap<>();
-        lobby.getGame().getBoard().getPieces().filter(piece -> !(piece instanceof King)).forEach(piece -> moveMap.put(piece, piece.getValidMoves(lobby.getGame().getBoard())));
+        lobby.getGame().getBoard().getPieces().forEach(piece -> moveMap.put(piece, Stream.concat(piece.getValidMoves(lobby.getGame().getBoard()), piece.getValidCaptureMoves(lobby.getGame().getBoard()))));
         JSONArray possibilitiesArray = new JSONArray();
 
         moveMap.entrySet().forEach(entry -> {
