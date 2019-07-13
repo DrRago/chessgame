@@ -10,6 +10,9 @@ import java.util.stream.Stream;
  * Additionally it can be used to obtain a complete listing of all the moves.
  */
 public class History {
+    /**
+     * History stack containing all previous moves
+     */
     private Stack<Move> history = new Stack<>();
 
     /**
