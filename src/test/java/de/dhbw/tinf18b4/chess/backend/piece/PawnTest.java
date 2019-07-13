@@ -24,16 +24,16 @@ public class PawnTest {
     public void enPassantTest() {
         Game game = new Game(white, black);
 
-        Pawn blackP7b = (Pawn) game.getBoard().findPieceByPosition(new Position('b', 7));
+        Pawn black7b = (Pawn) game.getBoard().findPieceByPosition(new Position("b7"));
 
         assertTrue("Could not move P7b", game.makeMove(game.getBoard().buildMove("b2-b3", white)));
         assertTrue("Could not move P7b", game.makeMove(game.getBoard().buildMove("b7-b5", black)));
-        assertTrue("Could not move P7b", game.makeMove(game.getBoard().buildMove("a2-a4", white)));
+        assertTrue("Could not move P7b", game.makeMove(game.getBoard().buildMove("c2-c3", white)));
         assertTrue("Could not move P7b", game.makeMove(game.getBoard().buildMove("b5-b4", black)));
+        assertTrue("Could not move P7b", game.makeMove(game.getBoard().buildMove("a2-a4", white)));
 
-
-        Position capturePosition = new Position('a', 3);
-        assertTrue("En passant not recognized", blackP7b.getValidCaptureMoves(game.getBoard())
+        Position capturePosition = new Position("a3");
+        assertTrue("En passant not recognized", black7b.getValidCaptureMoves(game.getBoard())
                 .anyMatch(position -> position.equals(capturePosition)));
     }
 
