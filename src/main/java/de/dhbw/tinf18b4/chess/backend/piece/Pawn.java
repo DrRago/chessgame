@@ -48,7 +48,8 @@ public class Pawn implements Piece {
             }
         }
 
-        return Stream.concat(Stream.ofNullable(singleMove), Stream.ofNullable(doubleMove));
+        return Stream.concat(Stream.ofNullable(singleMove), Stream.ofNullable(doubleMove))
+                .filter(position -> !board.isOccupied(position));
     }
 
     @Override
