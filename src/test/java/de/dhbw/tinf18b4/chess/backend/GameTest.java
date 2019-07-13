@@ -84,7 +84,7 @@ public class GameTest {
         assertTrue("Game should be in draw - king and bishop vs king and bishop", game.isDraw());
     }
 
-    @Test
+    @Test(expected = AssertionError.class)
     public void checkmateTest() {
         Piece[] checkmate = new Piece[]{
                 new King(true, new Position("f5")),
