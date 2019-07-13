@@ -293,6 +293,7 @@ public class Websocket extends HttpServlet {
     }
 
     private void sendErrorMessageToClient(@NotNull String message, @NotNull Session session, @NotNull String type) throws IOException {
+        System.out.println(message);
         JSONObject answer = JSONHandler.buildAnswerTemplate();
         answer.put("content", type);
         answer.put("value", message);

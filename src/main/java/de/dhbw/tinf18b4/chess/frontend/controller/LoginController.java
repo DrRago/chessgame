@@ -106,6 +106,8 @@ public class LoginController extends HttpServlet {
 
                     User guestUser = new User("guest", "", currSession.getId());
                     currSession.setAttribute("user", guestUser);
+                    SessionManager.addSession(currSession);
+
                     sendTarget = "lobby";
                     break;
 
