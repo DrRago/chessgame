@@ -1,6 +1,8 @@
 package de.dhbw.tinf18b4.chess.backend.utility;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,7 +24,7 @@ public class MySQLUtility {
         return dataSource.getConnection();
     }
 
-    static ResultSet executeQuery(String query, Object... parameters) throws SQLException {
+    static @Nullable ResultSet executeQuery(String query, @NotNull Object... parameters) throws SQLException {
         Connection con = createConnection();
         PreparedStatement stmt = con.prepareStatement(query);
 

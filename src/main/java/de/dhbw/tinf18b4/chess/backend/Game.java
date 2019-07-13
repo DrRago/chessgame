@@ -21,6 +21,7 @@ public class Game {
     /**
      * The Board instance modeling the state of the Game
      */
+    @NotNull
     @Getter
     private final Board board;
     @Getter
@@ -86,7 +87,8 @@ public class Game {
      *
      * @return the {@link Player}
      */
-    public @NotNull Player whoseTurn() {
+    @NotNull
+    public Player whoseTurn() {
         Move lastMove = history.lastMove();
 
         // it's whites turn
@@ -105,6 +107,7 @@ public class Game {
      * @return the FEN string
      * @see <a href='https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation'>FEN Wikipedia</a>
      */
+    @NotNull
     public String asFen() {
         StringBuilder stringBuilder = new StringBuilder();
 
@@ -206,7 +209,7 @@ public class Game {
         return stalemate || isKingVsKing || isKingBishopVsKing || isKingKnightVsKing | isKingBishopVsKingBishop;
     }
 
-    private static boolean isWhiteSquare(Position p) {
+    private static boolean isWhiteSquare(@NotNull Position p) {
         return (p.getFile() * 35 + p.getRank()) % 2 == 0;
     }
 }

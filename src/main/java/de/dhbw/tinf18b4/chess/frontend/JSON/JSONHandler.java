@@ -1,5 +1,6 @@
 package de.dhbw.tinf18b4.chess.frontend.JSON;
 
+import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -15,6 +16,7 @@ public class JSONHandler {
      *
      * @return the JSONObject template
      */
+    @NotNull
     public static JSONObject buildAnswerTemplate() {
         JSONObject template = new JSONObject();
 
@@ -24,6 +26,7 @@ public class JSONHandler {
         return template;
     }
 
+    @NotNull
     public static JSONObject buildAnswerTemplate(String content, String value) {
         JSONObject template = new JSONObject();
 
@@ -33,6 +36,7 @@ public class JSONHandler {
         return template;
     }
 
+    @NotNull
     public static JSONObject parseMessage(String message) throws ParseException {
         JSONParser parser = new JSONParser();
         return (JSONObject) parser.parse(message);

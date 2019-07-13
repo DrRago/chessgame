@@ -2,6 +2,8 @@ package de.dhbw.tinf18b4.chess.backend.piece;
 
 import de.dhbw.tinf18b4.chess.backend.Board;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
@@ -12,24 +14,20 @@ import java.util.stream.Stream;
  * @author Leonhard Gahr
  */
 public class Knight implements Piece {
+    @Getter
     private final boolean white;
+
+    @Getter
+    @Setter
+    @NotNull
     private Position position;
 
-    public Knight(boolean white, Position position) {
+    public Knight(boolean white, @NotNull Position position) {
         this.white = white;
         this.position = position;
     }
 
-    @Override
-    public void setPosition(Position position) {
-        this.position = position;
-    }
-
-    @Override
-    public Position getPosition() {
-        return position;
-    }
-
+    @NotNull
     @Override
     public Stream<Position> getValidMoves(@NotNull Board board) {
         return getPossibleMoves().filter(board::isNotOccupied);
@@ -40,7 +38,8 @@ public class Knight implements Piece {
      *
      * @return the possible moves
      */
-    private @NotNull Stream<Position> getPossibleMoves() {
+    @NotNull
+    private Stream<Position> getPossibleMoves() {
         // Knights always move 3 squares. First they 2 vertical or horizontal and then they make a turn.
         // Afterwards they move one square orthogonally.
         Position topTurningPoint = Optional.ofNullable(position.topNeighbor())
@@ -83,6 +82,7 @@ public class Knight implements Piece {
                 .filter(Objects::nonNull);
     }
 
+    @NotNull
     @Override
     public Stream<Position> getValidCaptureMoves(@NotNull Board board) {
         return getPossibleMoves()
@@ -91,11 +91,6 @@ public class Knight implements Piece {
                 // only enemy pieces can be captured
                 .filter(position -> isOwnedByEnemy(board.findPieceByPosition(position)));
 
-    }
-
-    @Override
-    public boolean isWhite() {
-        return white;
     }
 
     @Override

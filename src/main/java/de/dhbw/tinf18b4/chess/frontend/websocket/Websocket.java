@@ -43,18 +43,22 @@ public class Websocket extends HttpServlet {
     /**
      * mapper from websocket session to http session ID
      */
+    @NotNull
     private static Map<Session, String> sessionToSessionID = new HashMap<>();
     /**
      * mapper from websocket session to game lobby ID
      */
+    @NotNull
     private static Map<Session, String> sessionToLobbyID = new HashMap<>();
     /**
      * mapper from websocket session to game lobby
      */
+    @NotNull
     private static Map<Session, Lobby> sessionToLobby = new HashMap<>();
     /**
      * mapper from websocket session to http session ID
      */
+    @NotNull
     private static Map<Session, User> sessionToUser = new HashMap<>();
 
 
@@ -69,7 +73,7 @@ public class Websocket extends HttpServlet {
      * @throws IOException on session send error
      */
     @OnOpen
-    public void onOpen(@PathParam("lobbyID") String lobbyID, @PathParam("sessionID") String sessionID, Session session) throws IOException {
+    public void onOpen(@PathParam("lobbyID") String lobbyID, @PathParam("sessionID") String sessionID, @NotNull Session session) throws IOException {
         logger.info(String.format("Incoming socket connection from %s (%s)...", sessionID, lobbyID));
 
         Lobby playerLobby;
@@ -119,7 +123,7 @@ public class Websocket extends HttpServlet {
     }
 
     @OnMessage
-    public void onMessage(Session session, String message) throws ParseException, IOException {
+    public void onMessage(@NotNull Session session, String message) throws ParseException, IOException {
         logger.info(String.format("Got message from client %s (%s):", sessionToSessionID.get(session), sessionToLobbyID.get(session)));
         logger.info(message);
         JSONObject parsedMessage = parseMessage(message);
@@ -253,7 +257,7 @@ public class Websocket extends HttpServlet {
     }
 
     @OnError
-    public void onError(Session session, Throwable e) throws IOException {
+    public void onError(@NotNull Session session, @NotNull Throwable e) throws IOException {
         e.printStackTrace();
         sendErrorMessageToClient(e.getMessage(), session, "error");
     }
@@ -317,7 +321,7 @@ public class Websocket extends HttpServlet {
      * @return the {@link Lobby} of the request
      * @throws IOException inherited from sendErrorMessageToClient()
      */
-    private Lobby verifyRequest(@NotNull Session session, @Nullable String sessionID, @Nullable String lobbyID) throws IOException {
+    private @Nullable Lobby verifyRequest(@NotNull Session session, @Nullable String sessionID, @Nullable String lobbyID) throws IOException {
         if (sessionID == null || lobbyID == null) {
             sendErrorMessageToClient("Unallowed call to server", session, "fatal");
             return null;

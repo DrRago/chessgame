@@ -17,6 +17,7 @@ public class User {
     private String username; // login name
     private String displayName; // a display name
     private String password; // login password
+    @NotNull
     private final String ID; // session ID
     private Permission permission; // the permission level
 

@@ -1,6 +1,7 @@
 package de.dhbw.tinf18b4.chess.backend.lobby;
 
 import de.dhbw.tinf18b4.chess.backend.user.User;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -11,6 +12,7 @@ import static org.junit.Assert.*;
  * @author Leonhard Gahr
  */
 public class LobbyManagerTest {
+    @NotNull
     private static User me = new User("test", "123", "123");
 
 

@@ -17,6 +17,7 @@ public interface Piece {
      *
      * @return where the piece is
      */
+    @NotNull
     Position getPosition();
 
     /**
@@ -24,7 +25,7 @@ public interface Piece {
      *
      * @param position the destination position
      */
-    void setPosition(Position position);
+    void setPosition(@NotNull Position position);
 
     /**
      * Get a list of all possible moves for the piece. Dies not include kill moves
@@ -32,6 +33,7 @@ public interface Piece {
      * @param board the board
      * @return a list of all possible moves
      */
+    @NotNull
     Stream<Position> getValidMoves(@NotNull Board board);
 
     /**
@@ -40,6 +42,7 @@ public interface Piece {
      * @param board the board
      * @return all capture options
      */
+    @NotNull
     Stream<Position> getValidCaptureMoves(@NotNull Board board);
 
     /**
@@ -71,15 +74,15 @@ public interface Piece {
      */
     char getFenIdentifier();
 
-    default boolean hasNeverMoved(Game game) {
+    default boolean hasNeverMoved(@NotNull Game game) {
         return 0 != numberOfMoves(game);
     }
 
-    default boolean hasEverMoved(Game game) {
+    default boolean hasEverMoved(@NotNull Game game) {
         return 0 == numberOfMoves(game);
     }
 
-    default int numberOfMoves(Game game) {
+    default int numberOfMoves(@NotNull Game game) {
         long count = game.getHistory().stream()
                 .filter(move -> move.getPiece().equals(this))
                 .count();
@@ -93,7 +96,7 @@ public interface Piece {
      * @param piece the piece to test against
      * @return true is this piece and the other are owned by the same player
      */
-    default boolean isOwnedBySamePlayer(Piece piece) {
+    default boolean isOwnedBySamePlayer(@NotNull Piece piece) {
         return isWhite() == piece.isWhite();
     }
 
@@ -103,7 +106,7 @@ public interface Piece {
      * @param piece the piece to test against
      * @return true is this piece and the other are owned by different players
      */
-    default boolean isOwnedByEnemy(Piece piece) {
-        return isWhite() != piece.isWhite();
+    default boolean isOwnedByEnemy(@NotNull Piece piece) {
+        return isBlack() == piece.isWhite();
     }
 }

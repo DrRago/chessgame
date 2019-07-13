@@ -1,6 +1,8 @@
 package de.dhbw.tinf18b4.chess.backend.position;
 
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Leonhard Gahr
@@ -30,7 +32,7 @@ public class Position {
         this(file, rank);
     }
 
-    public Position(String an) {
+    public Position(@NotNull String an) {
         this(parseFile(an), parseRank(an));
 
         if (an.length() != 2) {
@@ -38,7 +40,7 @@ public class Position {
         }
     }
 
-    private static char parseFile(String an) {
+    private static char parseFile(@NotNull String an) {
         char candidate = an.charAt(0);
 
         if (candidate >= 'a' && candidate <= 'h') {
@@ -53,7 +55,7 @@ public class Position {
         throw new IllegalArgumentException(String.format("Cannot parse string '%s' as position", an));
     }
 
-    private static int parseRank(String an) {
+    private static int parseRank(@NotNull String an) {
         char candidate = an.charAt(1);
         if (candidate >= '1' && candidate <= '8') {
             return candidate - '0';
@@ -68,7 +70,7 @@ public class Position {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
@@ -84,12 +86,13 @@ public class Position {
         return result;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return String.valueOf(file) + rank;
     }
 
-    public Position leftNeighbor() {
+    public @Nullable Position leftNeighbor() {
         try {
             return new Position(rank, (char) (file - 1));
         } catch (IllegalArgumentException e) {
@@ -97,7 +100,7 @@ public class Position {
         }
     }
 
-    public Position rightNeighbor() {
+    public @Nullable Position rightNeighbor() {
         try {
             return new Position(rank, (char) (file + 1));
         } catch (IllegalArgumentException e) {
@@ -105,7 +108,7 @@ public class Position {
         }
     }
 
-    public Position topNeighbor() {
+    public @Nullable Position topNeighbor() {
         try {
             return new Position(rank + 1, file);
         } catch (IllegalArgumentException e) {
@@ -113,7 +116,7 @@ public class Position {
         }
     }
 
-    public Position bottomNeighbor() {
+    public @Nullable Position bottomNeighbor() {
         try {
             return new Position(rank - 1, file);
         } catch (IllegalArgumentException e) {
@@ -121,7 +124,7 @@ public class Position {
         }
     }
 
-    public Position upperLeftNeighbor() {
+    public @Nullable Position upperLeftNeighbor() {
         try {
             return new Position(rank + 1, (char) (file - 1));
         } catch (IllegalArgumentException e) {
@@ -129,7 +132,7 @@ public class Position {
         }
     }
 
-    public Position upperRightNeighbor() {
+    public @Nullable Position upperRightNeighbor() {
         try {
             return new Position(rank + 1, (char) (file + 1));
         } catch (IllegalArgumentException e) {
@@ -137,7 +140,7 @@ public class Position {
         }
     }
 
-    public Position lowerLeftNeighbor() {
+    public @Nullable Position lowerLeftNeighbor() {
         try {
             return new Position(rank - 1, (char) (file - 1));
         } catch (IllegalArgumentException e) {
@@ -145,7 +148,7 @@ public class Position {
         }
     }
 
-    public Position lowerRightNeighbor() {
+    public @Nullable Position lowerRightNeighbor() {
         try {
             return new Position(rank - 1, (char) (file + 1));
         } catch (IllegalArgumentException e) {

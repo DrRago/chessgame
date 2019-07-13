@@ -5,6 +5,8 @@ import de.dhbw.tinf18b4.chess.backend.position.Position;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 /**
  * An move made by a player on board. When it is applied onto a board it will move a piece
  * from its current position on the board to the destination position.
@@ -15,24 +17,28 @@ public class Move {
     /**
      * player associated with this move
      */
+    @NotNull
     @Getter
     final private Player player;
 
     /**
      * the original position of this move
      */
+    @NotNull
     @Getter
     final private Position origin;
 
     /**
      * the destination position of this move
      */
+    @NotNull
     @Getter
     final private Position destination;
 
     /**
      * the piece associated with this move
      */
+    @NotNull
     @Getter
     final private Piece piece;
 
@@ -52,12 +58,10 @@ public class Move {
         this(player, origin, destination, getPiece(player, origin, destination, board));
     }
 
+    @NotNull
     private static Piece getPiece(@NotNull Player player, @NotNull Position origin, @NotNull Position destination, @NotNull Board board) {
         Piece piece = board.findPieceByPosition(origin);
-        if (null == piece) {
-            String message = String.format("Player %s can't move a piece from origin position %s to destination %s: there is no piece at the origin", player, origin, destination);
-            throw new IllegalArgumentException(message);
-        }
+        Objects.requireNonNull(piece, String.format("Player %s can't move a piece from origin position %s to destination %s: there is no piece at the origin", player, origin, destination));
 
         return piece;
     }

@@ -6,6 +6,7 @@ import de.dhbw.tinf18b4.chess.backend.position.Position;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -14,16 +15,20 @@ import java.util.stream.Stream;
  * @author Leonhard Gahr
  */
 public class Pawn implements Piece {
+    @Getter
     private final boolean white;
+
     @Getter
     @Setter
+    @NotNull
     private Position position;
 
-    public Pawn(boolean white, Position position) {
+    public Pawn(boolean white, @NotNull Position position) {
         this.white = white;
         this.position = position;
     }
 
+    @NotNull
     @Override
     public Stream<Position> getValidMoves(@NotNull Board board) {
         Position singleMove = white ? position.topNeighbor() : position.bottomNeighbor();
@@ -52,6 +57,7 @@ public class Pawn implements Piece {
                 .filter(position -> !board.isOccupied(position));
     }
 
+    @NotNull
     @Override
     public Stream<Position> getValidCaptureMoves(@NotNull Board board) {
         Stream<Position> capturePositions = getPossibleCaptureMoves()
@@ -62,7 +68,7 @@ public class Pawn implements Piece {
         return Stream.concat(Stream.ofNullable(calculateEnPassantPossibility(board)), capturePositions);
     }
 
-
+    @NotNull
     private Stream<Position> getPossibleCaptureMoves() {
         Stream<Position> captureLeft;
         Stream<Position> captureRight;
@@ -80,8 +86,8 @@ public class Pawn implements Piece {
         return Stream.concat(captureLeft, captureRight);
     }
 
-
-    private Position calculateEnPassantPossibility(Board board) {
+    @Nullable
+    private Position calculateEnPassantPossibility(@NotNull Board board) {
         Move lastMove = board.getGame().getHistory().lastMove();
 
         // If there is no first move en passant is not possible
@@ -114,11 +120,6 @@ public class Pawn implements Piece {
                 && enPassantPossible
                 ? enPassantCapturePosition
                 : null;
-    }
-
-    @Override
-    public boolean isWhite() {
-        return white;
     }
 
     @Override

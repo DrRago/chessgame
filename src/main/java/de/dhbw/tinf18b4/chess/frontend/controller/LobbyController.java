@@ -5,6 +5,7 @@ import de.dhbw.tinf18b4.chess.backend.lobby.Lobby;
 import de.dhbw.tinf18b4.chess.backend.lobby.LobbyManager;
 import de.dhbw.tinf18b4.chess.backend.lobby.LobbyStatus;
 import de.dhbw.tinf18b4.chess.backend.user.User;
+import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -12,8 +13,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-
-;
 
 /**
  * Controller for {@link Lobby}-related requests
@@ -24,7 +23,7 @@ import java.io.IOException;
 @WebServlet({"/lobby", "/lobby/*"})
 public class LobbyController extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+    protected void doGet(@NotNull HttpServletRequest req, @NotNull HttpServletResponse resp) throws IOException, ServletException {
         // validate that the user is authenticated
         User user = (User) req.getSession().getAttribute("user");
         if (user == null || !user.validateLogin()) {

@@ -3,12 +3,14 @@ package de.dhbw.tinf18b4.chess.backend;
 import de.dhbw.tinf18b4.chess.backend.user.User;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
 public class Player {
     @Getter
     private boolean isWhite;
+
     @Getter
     private User user;
 
@@ -17,12 +19,8 @@ public class Player {
         this.user = user;
     }
 
-    public boolean isWhite() {
-        return isWhite;
-    }
-
     @Override
-    public boolean equals(Object o) {
+    public boolean equals(@Nullable Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Player player = (Player) o;

@@ -3,6 +3,8 @@ package de.dhbw.tinf18b4.chess.backend.piece;
 
 import de.dhbw.tinf18b4.chess.backend.Board;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
@@ -12,24 +14,20 @@ import java.util.stream.Stream;
  * @author Leonhard Gahr
  */
 public class Bishop implements Piece {
+    @Getter
     private final boolean white;
+
+    @Getter
+    @Setter
+    @NotNull
     private Position position;
 
-    public Bishop(boolean white, Position position) {
+    public Bishop(boolean white, @NotNull Position position) {
         this.white = white;
         this.position = position;
     }
 
-    @Override
-    public void setPosition(Position position) {
-        this.position = position;
-    }
-
-    @Override
-    public Position getPosition() {
-        return position;
-    }
-
+    @NotNull
     @Override
     public Stream<Position> getValidMoves(@NotNull Board board) {
         // The bishop can move diagonally as far as he wants but he can't leap over other pieces.
@@ -42,6 +40,7 @@ public class Bishop implements Piece {
                 .flatMap(s -> s);
     }
 
+    @NotNull
     @Override
     public Stream<Position> getValidCaptureMoves(@NotNull Board board) {
         // The bishop can move diagonally as far as he wants but he can't leap over other pieces.
@@ -53,11 +52,6 @@ public class Bishop implements Piece {
                 Utils.directionalIteratorFirstEnemy(position, board, white, Position::lowerLeftNeighbor),
                 Utils.directionalIteratorFirstEnemy(position, board, white, Position::lowerRightNeighbor))
                 .flatMap(Optional::stream);
-    }
-
-    @Override
-    public boolean isWhite() {
-        return white;
     }
 
     @Override

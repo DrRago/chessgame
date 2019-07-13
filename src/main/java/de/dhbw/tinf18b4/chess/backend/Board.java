@@ -11,12 +11,15 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 public class Board {
-    final private Piece[] pieces;
+    final private Piece @NotNull [] pieces;
+    @NotNull
     @Getter
     final private Game game;
 
+    @Nullable
     @Getter
     King whiteKing = null;
+    @Nullable
     @Getter
     King blackKing = null;
 
@@ -24,7 +27,7 @@ public class Board {
         this(game, initialSetup());
     }
 
-    public Board(@NotNull Game game, @NotNull Piece[] pieces) {
+    public Board(@NotNull Game game, Piece @NotNull [] pieces) {
         this.pieces = pieces;
         this.game = game;
 
@@ -73,7 +76,7 @@ public class Board {
      *
      * @return the pieces
      */
-    private static Piece[] initialSetup() {
+    private static Piece @NotNull [] initialSetup() {
         return new Piece[]{
                 // white pieces
                 new Pawn(true, new Position('a', 2)),
@@ -140,6 +143,7 @@ public class Board {
      *
      * @return The pieces
      */
+    @NotNull
     public Stream<Piece> getPieces() {
         return Stream.of(pieces).filter(Objects::nonNull);
     }
@@ -149,6 +153,7 @@ public class Board {
      *
      * @return The positions
      */
+    @NotNull
     Stream<Position> getOccupiedPositions() {
         return getPieces().map(Piece::getPosition);
     }
@@ -169,7 +174,7 @@ public class Board {
      * @param position The position to check
      * @return true if the position is not occupied
      */
-    public boolean isNotOccupied(Position position) {
+    public boolean isNotOccupied(@NotNull Position position) {
         return getOccupiedPositions().noneMatch(position::equals);
     }
 
@@ -179,6 +184,7 @@ public class Board {
      * @param position The position
      * @return The found piece or null if there is none
      */
+    @Nullable
     public Piece findPieceByPosition(@NotNull Position position) {
         return getPieces().filter(piece -> piece.getPosition().equals(position))
                 .findFirst()
@@ -229,7 +235,8 @@ public class Board {
      *
      * @return the move
      */
-    public @NotNull Move buildMove(String move, Player player) {
+    @NotNull
+    public Move buildMove(@NotNull String move, @NotNull Player player) {
         String[] moveArray = move.split("-");
         Position origin = new Position(moveArray[0]);
         Position destination = new Position(moveArray[1]);

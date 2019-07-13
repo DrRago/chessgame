@@ -4,6 +4,7 @@ import de.dhbw.tinf18b4.chess.backend.piece.*;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 import de.dhbw.tinf18b4.chess.backend.user.User;
 import junit.framework.AssertionFailedError;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertTrue;
@@ -16,10 +17,14 @@ import static org.junit.Assert.assertFalse;
  * @author Leonhard Gahr
  */
 public class GameTest {
+    @NotNull
     private User user1 = new User("user1", "", "");
+    @NotNull
     private User user2 = new User("user2", "", "");
 
+    @NotNull
     private Player white = new Player(true, user1);
+    @NotNull
     private Player black = new Player(false, user2);
 
     @Test

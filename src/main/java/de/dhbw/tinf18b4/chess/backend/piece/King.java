@@ -16,16 +16,20 @@ import java.util.stream.Stream;
  * @author Leonhard Gahr
  */
 public class King implements Piece {
+    @Getter
     private final boolean white;
+
     @Getter
     @Setter
+    @NotNull
     private Position position;
 
-    public King(boolean white, Position position) {
+    public King(boolean white, @NotNull Position position) {
         this.white = white;
         this.position = position;
     }
 
+    @NotNull
     @Override
     public Stream<Position> getValidMoves(@NotNull Board board) {
         return getPossibleMoves(board).filter(board::isNotOccupied);
@@ -36,7 +40,8 @@ public class King implements Piece {
      *
      * @return the possible moves
      */
-    private @NotNull Stream<Position> getPossibleMoves(Board board) {
+    @NotNull
+    private Stream<Position> getPossibleMoves(@NotNull Board board) {
         List<Position> castlingRookPositions = calculateCastlingPossibility(board).collect(Collectors.toList());
         // since castling is only possible with rooks at their initial position
         // we don't bother checking where the rook is and just find the new position
@@ -67,7 +72,8 @@ public class King implements Piece {
      * @param board the board
      * @return the rooks
      */
-    private Stream<Position> calculateCastlingPossibility(Board board) {
+    @NotNull
+    private Stream<Position> calculateCastlingPossibility(@NotNull Board board) {
         if (isInCheck(board) || hasNeverMoved(board.getGame())) {
             return Stream.empty();
         }
@@ -119,6 +125,7 @@ public class King implements Piece {
                 .map(Piece::getPosition);
     }
 
+    @NotNull
     @Override
     public Stream<Position> getValidCaptureMoves(@NotNull Board board) {
         return getPossibleMoves(board)
@@ -126,11 +133,6 @@ public class King implements Piece {
                 .filter(board::isOccupied)
                 // only enemy pieces can be captured
                 .filter(position -> isOwnedByEnemy(board.findPieceByPosition(position)));
-    }
-
-    @Override
-    public boolean isWhite() {
-        return white;
     }
 
     @Override
@@ -143,7 +145,7 @@ public class King implements Piece {
         return white ? 'K' : 'k';
     }
 
-    public boolean isInCheck(Board board) {
+    public boolean isInCheck(@NotNull Board board) {
         // find all position which are attackable by an enemy piece
         Stream<Position> capturePositions = board.getPieces()
                 // consider only enemy pieces

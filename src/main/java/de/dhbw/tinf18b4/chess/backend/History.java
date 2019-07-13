@@ -1,5 +1,8 @@
 package de.dhbw.tinf18b4.chess.backend;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.EmptyStackException;
 import java.util.Stack;
 import java.util.stream.Stream;
@@ -10,6 +13,7 @@ import java.util.stream.Stream;
  * Additionally it can be used to obtain a complete listing of all the moves.
  */
 public class History {
+    @NotNull
     private Stack<Move> history = new Stack<>();
 
     /**
@@ -26,6 +30,7 @@ public class History {
      *
      * @return the Move
      */
+    @Nullable
     public Move lastMove() {
         try {
             return history.peek();
@@ -39,6 +44,7 @@ public class History {
      *
      * @return the moves
      */
+    @NotNull
     public Stream<Move> stream() {
         return history.stream();
     }

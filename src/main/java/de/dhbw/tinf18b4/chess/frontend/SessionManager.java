@@ -1,5 +1,7 @@
 package de.dhbw.tinf18b4.chess.frontend;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +15,7 @@ public class SessionManager {
     /**
      * the list holding all logged in sessions
      */
+    @NotNull
     private static List<HttpSession> sessions = new ArrayList<>();
 
     /**
