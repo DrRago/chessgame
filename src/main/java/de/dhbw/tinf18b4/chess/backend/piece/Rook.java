@@ -4,6 +4,7 @@ import de.dhbw.tinf18b4.chess.backend.Board;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
@@ -32,16 +33,25 @@ public class Rook implements Piece {
     public Stream<Position> getValidMoves(@NotNull Board board) {
         // The rook can move vertically or horizontally as far as he wants but he can't leap over other pieces.
         // Thus, we iterate over the diagonal positions in each of the 4 possible directions.
-        return Utils.directionalIterator(position, board,
-                Position::topNeighbor,
-                Position::bottomNeighbor,
-                Position::leftNeighbor,
-                Position::rightNeighbor);
+        return Stream.of(
+                Utils.directionalIteratorUntilOccupied(position, board, Position::topNeighbor),
+                Utils.directionalIteratorUntilOccupied(position, board, Position::bottomNeighbor),
+                Utils.directionalIteratorUntilOccupied(position, board, Position::leftNeighbor),
+                Utils.directionalIteratorUntilOccupied(position, board, Position::rightNeighbor))
+                .flatMap(s -> s);
     }
 
     @Override
     public Stream<Position> getValidCaptureMoves(@NotNull Board board) {
-        return getValidMoves(board);
+        // The rook can move vertically or horizontally as far as he wants but he can't leap over other pieces.
+        // Thus, we iterate over the diagonal positions in each of the 4 possible directions.
+        // To obtain the capture positions find the nearest enemy piece along all directions.
+        return Stream.of(
+                Utils.directionalIteratorFirstEnemy(position, board, white, Position::topNeighbor),
+                Utils.directionalIteratorFirstEnemy(position, board, white, Position::bottomNeighbor),
+                Utils.directionalIteratorFirstEnemy(position, board, white, Position::leftNeighbor),
+                Utils.directionalIteratorFirstEnemy(position, board, white, Position::rightNeighbor))
+                .flatMap(Optional::stream);
     }
 
     @Override
