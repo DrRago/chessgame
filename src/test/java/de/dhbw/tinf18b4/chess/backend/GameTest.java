@@ -83,4 +83,17 @@ public class GameTest {
         game = new Game(white, black, kingBishopVsKingBishop);
         assertTrue("Game should be in draw - king and bishop vs king and bishop", game.isDraw());
     }
+
+    @Test
+    public void checkmateTest() {
+        Piece[] checkmate = new Piece[]{
+                new King(true, new Position("f5")),
+                new Rook(true, new Position("h1")),
+
+                new King(false, new Position("h5"))
+        };
+
+        Game game = new Game(white, black, checkmate);
+        assertEquals("White player should have won", white, game.isCheckmate());
+    }
 }
