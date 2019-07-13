@@ -69,8 +69,8 @@ public class Pawn implements Piece {
         Stream<Position> captureLeft;
         Stream<Position> captureRight;
 
-        // Because white pawns move "up" (towards file 8) and black pawns move "down"
-        // (towards file 1) we need to check for the color of the piece
+        // Because white pawns move "up" (towards rank 8) and black pawns move "down"
+        // (towards rank 1) we need to check for the color of the piece
         if (white) {
             captureLeft = Stream.ofNullable(position.upperLeftNeighbor());
             captureRight = Stream.ofNullable(position.upperRightNeighbor());
@@ -79,7 +79,10 @@ public class Pawn implements Piece {
             captureRight = Stream.ofNullable(position.lowerRightNeighbor());
         }
 
-        return Stream.concat(captureLeft, captureRight);
+        return Stream.concat(captureLeft, captureRight)
+                .filter(position -> Optional.ofNullable(board.findPieceByPosition(position))
+                        .map(piece -> piece.isWhite() != white)
+                        .orElse(false));
     }
 
 
