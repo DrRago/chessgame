@@ -47,7 +47,7 @@ class Utils {
                 // stop when we reach the end of the board
                 .takeWhile(Objects::nonNull)
                 .filter(board::isOccupied)
-                .filter(position -> board.findPieceByPosition(position).isWhite() != white)
+                .takeWhile(position -> board.findPieceByPosition(position).isWhite() != white)
                 .findFirst();
     }
 }
