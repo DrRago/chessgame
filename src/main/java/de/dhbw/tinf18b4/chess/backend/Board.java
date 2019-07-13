@@ -11,12 +11,32 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 public class Board {
-    final private Piece[] pieces = initialSetup();
+    final private Piece[] pieces;
     @Getter
     final private Game game;
 
+    @Getter
+    King whiteKing = null;
+    @Getter
+    King blackKing = null;
+
     public Board(@NotNull Game game) {
+        this(game, initialSetup());
+    }
+
+    public Board(@NotNull Game game, @NotNull Piece[] pieces) {
+        this.pieces = pieces;
         this.game = game;
+
+        for (Piece piece : pieces) {
+            if (piece instanceof King) {
+                if (piece.isWhite()) {
+                    whiteKing = (King) piece;
+                } else {
+                    blackKing = (King) piece;
+                }
+            }
+        }
     }
 
     /**
@@ -53,7 +73,7 @@ public class Board {
      *
      * @return the pieces
      */
-    private Piece[] initialSetup() {
+    private static Piece[] initialSetup() {
         return new Piece[]{
                 // white pieces
                 new Pawn(true, new Position('a', 2)),
