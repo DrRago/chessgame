@@ -60,12 +60,20 @@ public interface Piece {
      */
     boolean isCaptured();
 
+    default boolean isNotCaptured() {
+        return !isCaptured();
+    }
+
     /**
      * Get the FEN identifier of the piece
      *
      * @return the FEN identifier
      */
     char getFenIdentifier();
+
+    default boolean hasNeverMoved(Game game) {
+        return 0 != numberOfMoves(game);
+    }
 
     default boolean hasEverMoved(Game game) {
         return 0 == numberOfMoves(game);
@@ -77,5 +85,25 @@ public interface Piece {
                 .count();
 
         return Math.toIntExact(count);
+    }
+
+    /**
+     * Check whether this piece and another are owned by the same player
+     *
+     * @param piece the piece to test against
+     * @return true is this piece and the other are owned by the same player
+     */
+    default boolean isOwnedBySamePlayer(Piece piece) {
+        return isWhite() == piece.isWhite();
+    }
+
+    /**
+     * Check whether this piece and another are owned by different players
+     *
+     * @param piece the piece to test against
+     * @return true is this piece and the other are owned by different players
+     */
+    default boolean isOwnedByEnemy(Piece piece) {
+        return isWhite() != piece.isWhite();
     }
 }

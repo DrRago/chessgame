@@ -32,7 +32,7 @@ public class Knight implements Piece {
 
     @Override
     public Stream<Position> getValidMoves(@NotNull Board board) {
-        return getPossibleMoves().filter(position -> board.findPieceByPosition(position) == null);
+        return getPossibleMoves().filter(board::isNotOccupied);
     }
 
     /**
@@ -86,8 +86,10 @@ public class Knight implements Piece {
     @Override
     public Stream<Position> getValidCaptureMoves(@NotNull Board board) {
         return getPossibleMoves()
-                .filter(position -> board.findPieceByPosition(position) != null)
-                .filter(position -> board.findPieceByPosition(position).isBlack() == white);
+                // only consider moves to occupied squares
+                .filter(board::isOccupied)
+                // only enemy pieces can be captured
+                .filter(position -> isOwnedByEnemy(board.findPieceByPosition(position)));
 
     }
 

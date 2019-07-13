@@ -164,6 +164,16 @@ public class Board {
     }
 
     /**
+     * Determine whether there is no piece on the provided position
+     *
+     * @param position The position to check
+     * @return true if the position is not occupied
+     */
+    public boolean isNotOccupied(Position position) {
+        return getOccupiedPositions().noneMatch(position::equals);
+    }
+
+    /**
      * Find the piece on the given position
      *
      * @param position The position
