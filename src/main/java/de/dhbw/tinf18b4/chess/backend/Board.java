@@ -182,6 +182,16 @@ public class Board {
             removePiece(findPieceByPosition(move.getDestination()));
         }
         movedPiece.setPosition(move.getDestination());
+
+        // transform a pawn to queen if he reached the enemy site
+        if (movedPiece instanceof Pawn && movedPiece.getPosition().getRank() == (movedPiece.isWhite() ? 8 : 1)) {
+            Queen newPiece = new Queen(movedPiece.isWhite(), movedPiece.getPosition());
+            for (int i = 0; i < pieces.length; i++) {
+                if (pieces[i] == movedPiece) {
+                    pieces[i] = newPiece;
+                }
+            }
+        }
     }
 
     /**
