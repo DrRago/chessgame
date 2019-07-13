@@ -28,6 +28,15 @@ public class King implements Piece {
 
     @Override
     public Stream<Position> getValidMoves(@NotNull Board board) {
+        return getPossibleMoves(board).filter(position -> board.findPieceByPosition(position) == null);
+    }
+
+    /**
+     * Get the moves that are possible on any chessboard without considering other pieces
+     *
+     * @return the possible moves
+     */
+    private @NotNull Stream<Position> getPossibleMoves(Board board) {
         List<Position> castlingRookPositions = calculateCastlingPossibility(board).collect(Collectors.toList());
         Stream.Builder<Position> castlingMoves = Stream.builder();
         castlingRookPositions.stream()
@@ -113,7 +122,9 @@ public class King implements Piece {
 
     @Override
     public Stream<Position> getValidCaptureMoves(@NotNull Board board) {
-        return getValidMoves(board);
+        return getPossibleMoves(board)
+                .filter(position -> board.findPieceByPosition(position) != null)
+                .filter(position -> board.findPieceByPosition(position).isBlack() == white);
     }
 
     @Override
