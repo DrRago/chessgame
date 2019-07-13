@@ -4,6 +4,7 @@ let isTurn;
 let possibilities;
 const whiteSquareGrey = '#a9a9a9';
 const blackSquareGrey = '#696969';
+const redSquareColor = '#ff7979';
 
 const addLog = message => {
     $("#logs > table").append(`<tr><td>${message}</td></tr>`);
@@ -56,9 +57,9 @@ function removeGreySquares () {
 }
 
 function greySquare (square) {
-    var $square = $('#board1 .square-' + square)
+    var $square = $('#board1 .square-' + square);
 
-    var background = whiteSquareGrey
+    var background = whiteSquareGrey;
     if ($square.hasClass('black-3c85d')) {
         background = blackSquareGrey
     }
@@ -66,10 +67,17 @@ function greySquare (square) {
     $square.css('background', background)
 }
 
+function redSquare (square) {
+    var $square = $('#board1 .square-' + square);
+
+    $square.css('background', redSquareColor)
+}
+
 function onMouseoverSquare (square, piece) {
     // get list of possible moves for this square
     possibilities.forEach(value => {
         if (value.piece === square && value.color === myColor && isTurn) {
+            let i;
             let moves = value.possibilities;
 
             // exit if there are no moves available for this square
@@ -79,8 +87,13 @@ function onMouseoverSquare (square, piece) {
             greySquare(square);
 
             // highlight the possible squares for this piece
-            for (var i = 0; i < moves.length; i++) {
+            for (i = 0; i < moves.length; i++) {
                 greySquare(moves[i])
+            }
+
+            const captueMoves = value.capturePossibilities;
+            for (i = 0; i < captueMoves.length; i++) {
+                redSquare(captueMoves[i])
             }
         }
     });

@@ -63,9 +63,9 @@ public class Websocket extends HttpServlet {
      * it handles the first steps to validate a client. The client has to send the lobbyID and sessionID
      * of the HTTP-Session as url parameter
      *
-     * @param lobbyID the lobbyID
+     * @param lobbyID   the lobbyID
      * @param sessionID the http sessionID
-     * @param session the websocket session
+     * @param session   the websocket session
      * @throws IOException on session send error
      */
     @OnOpen
@@ -191,6 +191,7 @@ public class Websocket extends HttpServlet {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private @NotNull JSONObject getMoveResponse(@NotNull Lobby lobby) {
         JSONObject moveAnswer = buildAnswerTemplate();
 
@@ -200,18 +201,27 @@ public class Websocket extends HttpServlet {
 
         // get all possible moves for all pieces identified by it's position on the board
         Map<Piece, Stream<Position>> moveMap = new HashMap<>();
-        lobby.getGame().getBoard().getPieces().forEach(piece -> moveMap.put(piece, Stream.concat(piece.getValidMoves(lobby.getGame().getBoard()), piece.getValidCaptureMoves(lobby.getGame().getBoard()))));
+        Map<Piece, Stream<Position>> captureMoveMap = new HashMap<>();
+        lobby.getGame().getBoard().getPieces().forEach(piece -> {
+                    captureMoveMap.put(piece, piece.getValidCaptureMoves(lobby.getGame().getBoard()));
+                    moveMap.put(piece, piece.getValidMoves(lobby.getGame().getBoard()));
+                }
+        );
         JSONArray possibilitiesArray = new JSONArray();
 
-        moveMap.entrySet().forEach(entry -> {
+        moveMap.forEach((key, value) -> {
             JSONObject positionObject = new JSONObject();
             JSONArray positionArray = new JSONArray();
-            positionArray.addAll(entry.getValue().map(Position::toString).collect(Collectors.toList()));
+            positionArray.addAll(value.map(Position::toString).collect(Collectors.toList()));
 
-            positionObject.put("piece", entry.getKey().getPosition().toString());
-            positionObject.put("color", entry.getKey().isWhite() ? "white" : "black");
+            JSONArray captureArray = new JSONArray();
+            captureArray.addAll(captureMoveMap.get(key).map(Position::toString).collect(Collectors.toList()));
+
+            positionObject.put("piece", key.getPosition().toString());
+            positionObject.put("color", key.isWhite() ? "white" : "black");
 
             positionObject.put("possibilities", positionArray);
+            positionObject.put("capturePossibilities", captureArray);
 
             possibilitiesArray.add(positionObject);
         });

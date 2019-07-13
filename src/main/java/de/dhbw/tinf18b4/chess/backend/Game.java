@@ -1,10 +1,17 @@
 package de.dhbw.tinf18b4.chess.backend;
 
 
+import de.dhbw.tinf18b4.chess.backend.piece.Bishop;
+import de.dhbw.tinf18b4.chess.backend.piece.King;
+import de.dhbw.tinf18b4.chess.backend.piece.Knight;
 import de.dhbw.tinf18b4.chess.backend.piece.Piece;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Objects;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 /**
  * @author Leonhard Gahr
@@ -15,13 +22,20 @@ public class Game {
      * The Board instance modeling the state of the Game
      */
     @Getter
-    private final Board board = new Board(this);
+    private final Board board;
     @Getter
     private final History history = new History();
     private Player player1;
     private Player player2;
 
     public Game(@NotNull Player player1, @NotNull Player player2) {
+        board = new Board(this);
+        this.player1 = player1;
+        this.player2 = player2;
+    }
+
+    public Game(@NotNull Player player1, @NotNull Player player2, @NotNull Piece[] pieces) {
+        board = new Board(this, pieces);
         this.player1 = player1;
         this.player2 = player2;
     }
@@ -130,5 +144,69 @@ public class Game {
         // remove the last "/"
         stringBuilder.setLength(stringBuilder.length() - 1);
         return stringBuilder.toString();
+    }
+
+    /**
+     * Check if the game is a draw. The following rules are implemented:
+     * <ul>
+     * <li>stalemate</li>
+     * <li>insufficient material</li>
+     * </ul>
+     * <p>
+     * TODO check if is checkmate
+     *
+     * @return whether the game is a draw or not
+     */
+    public boolean isDraw() {
+        Supplier<Stream<Piece>> pieces = () -> getBoard().getPieces().filter(Objects::nonNull);
+
+        // check if is stalemate
+        final Move lastMove = getHistory().lastMove(); // the player whose turn is now
+        final Player currentPlayer;
+        if (lastMove == null) {
+            currentPlayer = player1.isWhite() ? player1 : player2;
+        } else {
+            currentPlayer = lastMove.getPlayer() == player1 ? player2 : player1;
+        }
+
+        // stalemate: when the player is not able to perform any valid move and the king is not in check
+        final boolean stalemate = pieces.get()
+                .filter(piece -> piece.isWhite() == currentPlayer.isWhite())
+                .allMatch(piece -> Stream.concat(piece.getValidMoves(getBoard()), piece.getValidCaptureMoves(getBoard())).count() == 0)
+
+                && !(currentPlayer.isWhite() ? getBoard().whiteKing : getBoard().blackKing).isInCheck(getBoard());
+
+        // draw by insufficient material is when one of these combinations occur
+        final boolean onlyKingAndBishop = pieces.get().allMatch(piece -> piece instanceof King || piece instanceof Bishop);
+
+        // king vs king
+        final boolean isKingVsKing = pieces.get().count() == 2;
+
+        // king and bishop vs king
+        final boolean isKingBishopVsKing = onlyKingAndBishop && pieces.get().count() == 3;
+
+        // king and knight vs king
+        final boolean isKingKnightVsKing = pieces.get()
+                .allMatch(piece -> piece instanceof King || piece instanceof Knight)
+                && pieces.get().count() == 3;
+
+        // king and bishop vs king and bishop with bishops of the same color
+        final boolean isKingBishopVsKingBishop;
+        if (!onlyKingAndBishop) {
+            isKingBishopVsKingBishop = false;
+        } else if (pieces.get().count() != 4) {
+            isKingBishopVsKingBishop = false;
+        } else {
+            isKingBishopVsKingBishop = pieces.get().filter(piece -> piece instanceof Bishop)
+                    .map(Piece::getPosition)
+                    .map(Game::isWhiteSquare)
+                    .distinct().count() == 1;
+        }
+
+        return stalemate || isKingVsKing || isKingBishopVsKing || isKingKnightVsKing | isKingBishopVsKingBishop;
+    }
+
+    private static boolean isWhiteSquare(Position p) {
+        return (p.getFile() * 35 + p.getRank()) % 2 == 0;
     }
 }

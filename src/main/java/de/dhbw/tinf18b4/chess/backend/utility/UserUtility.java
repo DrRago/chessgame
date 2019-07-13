@@ -1,6 +1,10 @@
 package de.dhbw.tinf18b4.chess.backend.utility;
 
 import de.dhbw.tinf18b4.chess.backend.user.User;
+import org.apache.commons.codec.digest.DigestUtils;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 /**
  * Some utility functions for the user
@@ -17,7 +21,14 @@ public class UserUtility {
      * @return whether the registration was successful
      */
     public static boolean createUser(String username, String password) {
-        return false;
+        password = DigestUtils.sha512Hex(password);
+        try {
+            MySQLUtility.executeQuery("INSERT INTO user VALUES(?, ?, '1')", username, password);
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -28,6 +39,19 @@ public class UserUtility {
      * @return whether the combination exists or not
      */
     public static boolean login(String username, String password) {
-        return true;
+        password = DigestUtils.sha512Hex(password);
+
+        try {
+            ResultSet result = MySQLUtility.executeQuery("SELECT * FROM user WHERE username=? AND password=?", username, password);
+            int size = 0;
+            if (result != null) {
+                result.last();    // moves cursor to the last row
+                size = result.getRow(); // get row id
+            }
+            return size == 1;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

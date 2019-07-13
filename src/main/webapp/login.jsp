@@ -39,6 +39,12 @@
             </ul>
         </div>
 
+        <%-- get the username from the url or set it as empty --%>
+        <c:set var="username" value=""/>
+        <c:if test="${param.username ne null}">
+            <c:set var="username" value="${param.username}"/>
+        </c:if>
+
         <div class="card-body pb-4">
             <div class="tab-content" id="pills-tabContent">
                 <div class="tab-pane fade show active" id="pills-login" role="tabpanel"
@@ -46,8 +52,7 @@
                     <form action="${pageContext.request.contextPath}/DoLoginOrRegister" method="post">
                         <div class="form-group">
                             <input type="text" name="username" class="form-control" id="login_username"
-                                   placeholder="Username"
-                                   required autofocus>
+                                   placeholder="Username" required autofocus value="${username}">
                         </div>
 
                         <div class="form-group">
@@ -59,7 +64,8 @@
                             <button type="submit" class="btn btn-primary" name="function" value="login">Login</button>
                         </div>
                         <div class="text-center pt-4">
-                            <button type="submit" id="guest-login" class="btn btn-primary" name="function" value="guest">
+                            <button type="submit" id="guest-login" class="btn btn-primary" name="function"
+                                    value="guest">
                                 Login as Guest
                             </button>
                         </div>
@@ -70,7 +76,7 @@
                     <form action="${pageContext.request.contextPath}/DoLoginOrRegister" method="post">
                         <div class="form-group">
                             <input type="text" name="username" id="name" class="form-control" placeholder="Username"
-                                   required autofocus>
+                                   required autofocus value="${username}">
                         </div>
 
                         <div class="form-group">
