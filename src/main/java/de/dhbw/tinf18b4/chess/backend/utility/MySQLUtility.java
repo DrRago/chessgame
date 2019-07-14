@@ -14,7 +14,7 @@ import java.sql.SQLException;
  * This class provides the SQL connection to a remote server and allows to
  * perform a prepared statement with parameters on that remote server
  */
-public class MySQLUtility {
+class MySQLUtility {
     /**
      * Create a new mysql {@link Connection} to a static specified server and database and return it
      *
