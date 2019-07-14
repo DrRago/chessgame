@@ -1,8 +1,8 @@
 package de.dhbw.tinf18b4.chess.frontend.controller;
 
 
-import de.dhbw.tinf18b4.chess.backend.utility.UserUtility;
 import de.dhbw.tinf18b4.chess.backend.user.User;
+import de.dhbw.tinf18b4.chess.backend.utility.UserUtility;
 import de.dhbw.tinf18b4.chess.frontend.SessionManager;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,8 +21,6 @@ import java.util.logging.Logger;
  * - login: logging in with a username and password
  * - register: register a {@link User} with a username and password
  * - guest: logging in a {@link User} as guest
- *
- * @author Leonhard Gahr
  */
 @WebServlet("/DoLoginOrRegister")
 public class LoginController extends HttpServlet {
