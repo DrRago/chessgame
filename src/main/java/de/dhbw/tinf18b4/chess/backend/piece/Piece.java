@@ -8,7 +8,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.stream.Stream;
 
 /**
- * @author Leonhard.Gahr
+ * Interface of a piece on the {@link Board chessboard}
+ * <p>
+ * Every real piece implements this interface
  */
 public interface Piece {
 
