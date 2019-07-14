@@ -58,6 +58,7 @@ public class King implements Piece {
     /**
      * Get the moves that are possible on any chessboard without considering other pieces
      *
+     * @param board the board to find the castling possibility
      * @return the possible moves
      */
     private Stream<Position> getPossibleMoves(@NotNull Board board) {
@@ -71,7 +72,7 @@ public class King implements Piece {
                         Stream.ofNullable(rook.rightNeighbor()).map(Position::rightNeighbor))
                         .flatMap(s -> s))
                 .flatMap(s -> s)
-                .forEach(castlingMoves::accept);
+                .forEach(castlingMoves);
 
         return Stream.of(
                 Stream.ofNullable(position.topNeighbor()),
@@ -144,6 +145,7 @@ public class King implements Piece {
                 .map(Piece::getPosition);
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public Stream<Position> getValidCaptureMoves(@NotNull Board board) {
         return getPossibleMoves(board)

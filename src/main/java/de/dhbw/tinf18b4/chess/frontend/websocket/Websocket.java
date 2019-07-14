@@ -128,8 +128,9 @@ public class Websocket extends HttpServlet {
      * Inform the user over the error
      * TODO remove for production purposes
      *
-     * @param session the session the error occured in
-     * @param e       the error that occured
+     * @param session the session the error occurred in
+     * @param e       the error that occurred
+     * @throws IOException on send error to session
      */
     @OnError
     public void onError(Session session, Throwable e) throws IOException {
@@ -145,6 +146,7 @@ public class Websocket extends HttpServlet {
      * @param session the users session
      * @param message the message the user sent (json string)
      * @throws ParseException on invalid json format
+     * @throws IOException    on send error to client
      */
     @OnMessage
     public void onMessage(Session session, String message) throws ParseException, IOException {
@@ -307,6 +309,7 @@ public class Websocket extends HttpServlet {
      * @param lobby   the lobby to send the message to
      * @param content the content field of the json message
      * @param message the value field of the json message
+     * @throws IOException on send error to client
      */
     @SuppressWarnings("unchecked")
     private void sendToLobby(@NotNull Lobby lobby, @NotNull String content, @NotNull String message) throws IOException {
@@ -324,6 +327,7 @@ public class Websocket extends HttpServlet {
      *
      * @param lobby      the lobby to send the object to
      * @param jsonObject the json object to send
+     * @throws IOException on send error to client
      */
     private void sendToLobby(@NotNull Lobby lobby, @NotNull JSONObject jsonObject) throws IOException {
         // collect all sessions that are in the current lobby
@@ -342,6 +346,7 @@ public class Websocket extends HttpServlet {
      * @param session the session to send the message to
      * @param content the content field of the json object
      * @param message the value field of the json object
+     * @throws IOException on send error to client
      */
     @SuppressWarnings("unchecked")
     private void sendToSession(@NotNull Session session, @NotNull String content, @NotNull String message) throws IOException {
@@ -357,6 +362,7 @@ public class Websocket extends HttpServlet {
      *
      * @param session    the session to send the object to
      * @param jsonObject the json object to send
+     * @throws IOException on send error to client
      */
     private void sendToSession(@NotNull Session session, @NotNull JSONObject jsonObject) throws IOException {
         logger.info("sending to client...");
@@ -369,6 +375,7 @@ public class Websocket extends HttpServlet {
      * @param message the message to send
      * @param session the session to send the error to
      * @param type    the type of the error
+     * @throws IOException on send error to client
      */
     @SuppressWarnings("unchecked")
     private void sendErrorMessageToClient(@NotNull String message, @NotNull Session session, @NotNull String type) throws IOException {
@@ -394,7 +401,7 @@ public class Websocket extends HttpServlet {
      * @param sessionID the HTTPServlet session ID of the user
      * @param lobbyID   the lobby ID the user wants to operate on
      * @return the {@link Lobby} of the request
-     * @throws IOException inherited from sendErrorMessageToClient()
+     * @throws IOException on send error to client
      */
     private @Nullable Lobby verifyRequest(@NotNull Session session, @Nullable String sessionID, @Nullable String lobbyID) throws IOException {
         if (sessionID == null || lobbyID == null) {
