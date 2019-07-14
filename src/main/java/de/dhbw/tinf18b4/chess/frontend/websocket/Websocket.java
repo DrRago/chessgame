@@ -2,6 +2,7 @@ package de.dhbw.tinf18b4.chess.frontend.websocket;
 
 
 import de.dhbw.tinf18b4.chess.backend.Board;
+import de.dhbw.tinf18b4.chess.backend.Game;
 import de.dhbw.tinf18b4.chess.backend.Move;
 import de.dhbw.tinf18b4.chess.backend.Player;
 import de.dhbw.tinf18b4.chess.backend.lobby.Lobby;
@@ -25,6 +26,7 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,20 +47,23 @@ public class Websocket extends HttpServlet {
     /**
      * mapper from websocket session to http session ID
      */
-    private static Map<Session, String> sessionToSessionID = new HashMap<>();
+    @NotNull
+    private static final Map<Session, String> sessionToSessionID = new HashMap<>();
     /**
      * mapper from websocket session to game lobby ID
      */
-    private static Map<Session, String> sessionToLobbyID = new HashMap<>();
+    @NotNull
+    private static final Map<Session, String> sessionToLobbyID = new HashMap<>();
     /**
      * mapper from websocket session to game lobby
      */
-    private static Map<Session, Lobby> sessionToLobby = new HashMap<>();
+    @NotNull
+    private static final Map<Session, Lobby> sessionToLobby = new HashMap<>();
     /**
      * mapper from websocket session to http session ID
      */
-    private static Map<Session, User> sessionToUser = new HashMap<>();
-
+    @NotNull
+    private static final Map<Session, User> sessionToUser = new HashMap<>();
 
     /**
      * The onOpen method of a websocket
@@ -72,7 +77,7 @@ public class Websocket extends HttpServlet {
      * @throws IOException on session send error
      */
     @OnOpen
-    public void onOpen(@PathParam("lobbyID") String lobbyID, @PathParam("sessionID") String sessionID, Session session) throws IOException {
+    public void onOpen(@PathParam("lobbyID") String lobbyID, @PathParam("sessionID") String sessionID, @NotNull Session session) throws IOException {
         logger.info(String.format("Incoming socket connection from %s (%s)...", sessionID, lobbyID));
 
         Lobby playerLobby;
@@ -94,12 +99,14 @@ public class Websocket extends HttpServlet {
         sessionToLobbyID.put(session, lobbyID);
         sessionToUser.put(session, currentPlayer.getUser());
 
-        // send new playerlist to to complete lobby
+        // send new player list to to complete lobby
         sendToLobby(playerLobby, getPlayerNames(playerLobby));
 
         if (playerLobby.getStatus().equals(LobbyStatus.GAME_STARTED)) {
             // send color to session
+            sendToLobby(playerLobby, "connect", currentPlayer.getUser().getDisplayName());
             sendToSession(session, "initGame", currentPlayer.isWhite() ? "white" : "black");
+            sendToSession(session, getCompleteLogHistory(playerLobby.getGame()));
             sendToLobby(playerLobby, getMoveResponse(playerLobby));
         }
     }
@@ -112,30 +119,34 @@ public class Websocket extends HttpServlet {
      * @param session the closing session
      */
     @OnClose
-    public void onClose(Session session) {
-        logger.info(String.format("Close connection for %s (%s)", sessionToSessionID.get(session), sessionToLobbyID.get(session)));
+    public void onClose(@NotNull Session session) throws IOException {
+        logger.info(String.format("Closed connection for %s (%s)", sessionToSessionID.get(session), sessionToLobbyID.get(session)));
 
         // remove identifiers
         sessionToSessionID.remove(session);
-        sessionToLobby.remove(session);
+        Lobby lobby = sessionToLobby.remove(session);
         sessionToLobbyID.remove(session);
-        sessionToUser.remove(session);
+        User user = sessionToUser.remove(session);
+
+        if (lobby != null && lobby.getStatus() == LobbyStatus.GAME_STARTED) {
+            // send other clients the disconnect message
+            sendToLobby(lobby, "disconnect", user.getDisplayName());
+        }
+        // leave the lobby if the game hasn't started yet
+        if (lobby != null && lobby.getStatus() != LobbyStatus.GAME_STARTED) {
+            lobby.leave(user);
+            sendToLobby(lobby, getPlayerNames(lobby));
+        }
     }
 
     /**
      * The onError websocket method
-     * <p>
-     * Inform the user over the error
-     * TODO remove for production purposes
      *
-     * @param session the session the error occurred in
-     * @param e       the error that occurred
-     * @throws IOException on send error to session
+     * @param e the error that occurred
      */
     @OnError
-    public void onError(Session session, Throwable e) throws IOException {
-        e.printStackTrace();
-        sendErrorMessageToClient(e.getMessage(), session, "error");
+    public void onError(@NotNull Throwable e) {
+        logger.log(Level.SEVERE, e.getMessage(), e);
     }
 
     /**
@@ -149,7 +160,7 @@ public class Websocket extends HttpServlet {
      * @throws IOException    on send error to client
      */
     @OnMessage
-    public void onMessage(Session session, String message) throws ParseException, IOException {
+    public void onMessage(@NotNull Session session, @NotNull String message) throws ParseException, IOException {
         logger.info(String.format("Got message from client %s (%s):", sessionToSessionID.get(session), sessionToLobbyID.get(session)));
         logger.info(message);
         JSONObject parsedMessage = parseMessage(message);
@@ -176,16 +187,18 @@ public class Websocket extends HttpServlet {
                         sendErrorMessageToClient("Not in lobby anymore", session, "fatal");
                         return;
                     }
-                    Move move = playerLobby.getGame().getBoard().buildMove(moveString, currentPlayer);
 
-                    if (!playerLobby.getGame().makeMove(move)) {
+                    final Game game = playerLobby.getGame();
+                    if (game == null) return;
+                    Move move = game.getBoard().buildMove(moveString, currentPlayer);
+
+                    if (!game.makeMove(move)) {
                         logger.info("Invalid move");
                     } else {
-                        sendToLobby(playerLobby, getMoveResponse(playerLobby));
-                        // cant be null due to successful makemove result
-                        //noinspection ConstantConditions
-                        sendToLobby(playerLobby, "logs", playerLobby.getGame().getHistory().lastMove().toString()); // TODO pass color of log entry
+                        // cant be null due to successful make move result
+                        sendToLobby(playerLobby, "logs", moveToJSON(move).toJSONString());
                     }
+                    sendToLobby(playerLobby, getMoveResponse(playerLobby));
                 } catch (IllegalArgumentException e) {
                     sendErrorMessageToClient(e.getMessage(), session, "error");
                 }
@@ -211,7 +224,7 @@ public class Websocket extends HttpServlet {
                         if (playerLobby.leave(currentUser)) {
                             sendToLobby(playerLobby, "redirect", "/lobby/" + lobbyID);
                         } else {
-                            // send new playerlist to to complete lobby
+                            // send new player list to to complete lobby
                             sendToLobby(playerLobby, getPlayerNames(playerLobby));
                         }
 
@@ -223,10 +236,34 @@ public class Websocket extends HttpServlet {
                         break;
                 }
                 break;
+            case "lobbyPrivacy":
+                playerLobby.setPublicLobby(!(boolean) parsedMessage.get("value"));
+                break;
             default:
                 sendErrorMessageToClient("Operation " + contentType + " not found", session, "error");
                 break;
         }
+    }
+
+    private JSONObject moveToJSON(@NotNull Move move) {
+        JSONObject obj = new JSONObject();
+        obj.put("player", move.getPlayer().isWhite() ? "white" : "black");
+        obj.put("entry", move.toString());
+
+        return obj;
+    }
+
+    private JSONObject getCompleteLogHistory(@NotNull Game game) {
+        JSONObject logHistory = buildAnswerTemplate();
+        JSONArray logArray = new JSONArray();
+        logArray.addAll(game.getHistory().stream()
+                .map(this::moveToJSON)
+                .collect(Collectors.toList()));
+
+        logHistory.put("content", "logs");
+        logHistory.put("value", logArray);
+
+        return logHistory;
     }
 
     /**
@@ -235,22 +272,24 @@ public class Websocket extends HttpServlet {
      * @param lobby the lobby to build the answer for
      * @return the json response object
      */
+    @NotNull
     @SuppressWarnings("unchecked")
     private JSONObject getMoveResponse(@NotNull Lobby lobby) {
         JSONObject moveAnswer = buildAnswerTemplate();
 
         JSONObject answerValue = new JSONObject();
-        answerValue.put("fen", lobby.getGame().asFen()); // the fen string of the board
-        answerValue.put("turn", lobby.getGame().whoseTurn().isWhite() ? "white" : "black"); // the color whose turn it is
+        Game game = lobby.getGame();
+        if (game == null) return moveAnswer;
+
+        answerValue.put("fen", game.asFen()); // the fen string of the board
+        answerValue.put("turn", game.whoseTurn().isWhite() ? "white" : "black"); // the color whose turn it is
 
         // get all possible moves for all pieces identified by it's position on the board
-        Map<Piece, Stream<Position>> moveMap = new HashMap<>();
-        Map<Piece, Stream<Position>> captureMoveMap = new HashMap<>();
-        lobby.getGame().getBoard().getPieces().forEach(piece -> {
-                    captureMoveMap.put(piece, piece.getValidCaptureMoves(lobby.getGame().getBoard()));
-                    moveMap.put(piece, piece.getValidMoves(lobby.getGame().getBoard()));
-                }
-        );
+        List<Map<Piece, Stream<Position>>> allMoves = lobby.getGame().getBoard().getAllPossibleMoves();
+        Map<Piece, Stream<Position>> moveMap = allMoves.get(0);
+        Map<Piece, Stream<Position>> captureMoveMap = allMoves.get(1);
+
+
         JSONArray possibilitiesArray = new JSONArray();
 
         moveMap.forEach((key, value) -> {
@@ -283,6 +322,7 @@ public class Websocket extends HttpServlet {
      * @param lobby the lobby to build the answer for
      * @return the json answer object
      */
+    @NotNull
     @SuppressWarnings("unchecked")
     private JSONObject getPlayerNames(@NotNull Lobby lobby) {
         JSONArray nameArray = new JSONArray();
@@ -362,11 +402,11 @@ public class Websocket extends HttpServlet {
      *
      * @param session    the session to send the object to
      * @param jsonObject the json object to send
-     * @throws IOException on send error to client
      */
-    private void sendToSession(@NotNull Session session, @NotNull JSONObject jsonObject) throws IOException {
-        logger.info("sending to client...");
-        session.getBasicRemote().sendText(jsonObject.toJSONString());
+    private void sendToSession(@NotNull Session session, @NotNull JSONObject jsonObject) {
+        if (!session.isOpen()) return;
+        logger.info(String.format("sending to client %s (%s)", sessionToSessionID.get(session), sessionToLobbyID.get(session)));
+        session.getAsyncRemote().sendText(jsonObject.toJSONString());
     }
 
     /**
