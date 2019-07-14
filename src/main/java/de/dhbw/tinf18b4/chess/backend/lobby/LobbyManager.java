@@ -17,8 +17,6 @@ import java.util.stream.Collectors;
  * <li>generate a new {@link Lobby}</li>
  * <li>remove a {@link Lobby}</li>
  * </ul>
- *
- * @author Leonhard Gahr
  */
 public class LobbyManager {
     /**
@@ -52,7 +50,7 @@ public class LobbyManager {
      *
      * @return the {@link Map} of all public lobbies
      */
-    public static Map<String, Lobby> getPublicLobbies() {
+    static Map<String, Lobby> getPublicLobbies() {
         return lobbies.entrySet().stream()
                 .filter(entry -> entry.getValue().isPublicLobby())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -74,7 +72,7 @@ public class LobbyManager {
      *
      * @param ID the ID of the {@link Lobby} to be removed
      */
-    public static void removeLobby(@NotNull String ID) {
+    static void removeLobby(@NotNull String ID) {
         lobbies.remove(ID);
     }
 

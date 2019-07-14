@@ -236,7 +236,7 @@ public class Game {
      *
      * @return the player who won or null
      */
-    public @Nullable Player isCheckmate() {
+    @Nullable Player isCheckmate() {
         Player currentPlayer = whoseTurn();
         King playersKing = currentPlayer.isWhite() ? getBoard().getWhiteKing() : getBoard().getBlackKing();
 
@@ -259,7 +259,7 @@ public class Game {
      * @param p the {@link Position} to check
      * @return whether the square is white or not
      */
-    private static boolean isWhiteSquare(Position p) {
+    private static boolean isWhiteSquare(@NotNull Position p) {
         return (p.getFile() * 35 + p.getRank()) % 2 == 0;
     }
 }
