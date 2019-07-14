@@ -13,15 +13,39 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
- * @author Leonhard Gahr
+ * The king implementation of the chess {@link Piece}
+ * <p>
+ * It moves one square in any direction (horizontally, vertically, or diagonally)
+ * <p>
+ * Additionally he can perform the special move <a href="https://en.wikipedia.org/wiki/Castling">castling</a>
+ * with a rook. Castling consists of moving the king two squares towards
+ * a rook on the player's first rank, then moving the rook to the square
+ * over which the king crossed. Castling may only be done if the king has
+ * never moved, the rook involved has never moved, the squares between the
+ * king and the rook involved are unoccupied, the king is not in check, and
+ * the king does not cross over or end on a square attacked by an enemy piece.
  */
 public class King implements Piece {
+    /**
+     * whether the king is white or not
+     */
+    @Getter
     private final boolean white;
+
+    /**
+     * The current {@link Position} of the king
+     */
     @Getter
     @Setter
     private Position position;
 
-    public King(boolean white, Position position) {
+    /**
+     * Initialize the king with a {@link Position} and whether it is white
+     *
+     * @param white    whether the king is white
+     * @param position the {@link Position}
+     */
+    public King(boolean white, @NotNull Position position) {
         this.white = white;
         this.position = position;
     }
@@ -36,7 +60,7 @@ public class King implements Piece {
      *
      * @return the possible moves
      */
-    private @NotNull Stream<Position> getPossibleMoves(Board board) {
+    private Stream<Position> getPossibleMoves(@NotNull Board board) {
         List<Position> castlingRookPositions = calculateCastlingPossibility(board).collect(Collectors.toList());
         Stream.Builder<Position> castlingMoves = Stream.builder();
         castlingRookPositions.stream()
@@ -127,10 +151,6 @@ public class King implements Piece {
                 .filter(position -> board.findPieceByPosition(position).isBlack() == white);
     }
 
-    @Override
-    public boolean isWhite() {
-        return white;
-    }
 
     @Override
     public boolean isCaptured() {
@@ -142,7 +162,14 @@ public class King implements Piece {
         return white ? 'K' : 'k';
     }
 
-    public boolean isInCheck(Board board) {
+    /**
+     * Check whether the king is in check or not,
+     * meaning whether any enemy piece may move on the king's {@link Position}
+     *
+     * @param board the current {@link Board chessboard}
+     * @return whether the king is in check ot not
+     */
+    public boolean isInCheck(@NotNull Board board) {
         // find all position which are attackable by an enemy piece
         Stream<Position> capturePositions = board.getPieces()
                 // consider only enemy pieces

@@ -20,8 +20,6 @@ import java.util.Objects;
  * <li>disallow join of a {@link User}</li>
  * <li>start a {@link Game}</li>
  * </ul>
- *
- * @author Leonhard Gahr
  */
 public class Lobby {
 
@@ -54,7 +52,7 @@ public class Lobby {
         this.players[0] = new Player(true, creator);
     }
 
-    public @NotNull LobbyStatus startGame() {
+    public LobbyStatus startGame() {
         if (Arrays.stream(players).anyMatch(Objects::isNull)) {
             return LobbyStatus.NOT_ENOUGH_PLAYERS;
         }

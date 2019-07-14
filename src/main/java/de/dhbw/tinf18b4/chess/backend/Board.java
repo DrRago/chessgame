@@ -10,20 +10,48 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+/**
+ * The board represents the status of the pieces and manages the {@link Move moves} on the it
+ */
 public class Board {
+    /**
+     * A representation of the current {@link Piece pieces} placed on the board. <br>
+     * The {@link Position positions} are stored in the {@link Piece pieces} itself,
+     * so the array could have null values or less than 32 entries
+     */
     final private Piece[] pieces;
+    /**
+     * A reference back to the {@link Game} object of this board
+     */
     @Getter
     final private Game game;
 
+    /**
+     * The white {@link King}
+     */
     @Getter
     King whiteKing = null;
+    /**
+     * The black {@link King}
+     */
     @Getter
     King blackKing = null;
 
+    /**
+     * Create a new board instance with the initial setup of a chessgame
+     *
+     * @param game the {@link Game} of the board
+     */
     public Board(@NotNull Game game) {
         this(game, initialSetup());
     }
 
+    /**
+     * Create a new board instance with a custom {@link Piece} layout
+     *
+     * @param game   the {@link Game} of this board
+     * @param pieces the custom {@link Piece} layout
+     */
     public Board(@NotNull Game game, @NotNull Piece[] pieces) {
         this.pieces = pieces;
         this.game = game;
@@ -149,7 +177,7 @@ public class Board {
      *
      * @return The positions
      */
-    Stream<Position> getOccupiedPositions() {
+    private Stream<Position> getOccupiedPositions() {
         return getPieces().map(Piece::getPosition);
     }
 
@@ -169,7 +197,7 @@ public class Board {
      * @param position The position
      * @return The found piece or null if there is none
      */
-    public Piece findPieceByPosition(@NotNull Position position) {
+    public @Nullable Piece findPieceByPosition(@NotNull Position position) {
         return getPieces().filter(piece -> piece.getPosition().equals(position))
                 .findFirst()
                 .orElse(null);
@@ -180,7 +208,7 @@ public class Board {
      *
      * @param toRemove the piece to set as null on the board
      */
-    private void removePiece(Piece toRemove) {
+    private void removePiece(@NotNull Piece toRemove) {
         for (int i = 0; i < pieces.length; i++) {
             if (pieces[i] == toRemove) {
                 pieces[i] = null;
@@ -198,8 +226,9 @@ public class Board {
                 .filter(piece -> piece.equals(move.getPiece()))
                 .findFirst()
                 .orElseThrow();
-        if (findPieceByPosition(move.getDestination()) != null) {
-            removePiece(findPieceByPosition(move.getDestination()));
+        Piece target = findPieceByPosition(move.getDestination());
+        if (target != null) {
+            removePiece(target);
         }
         movedPiece.setPosition(move.getDestination());
 
@@ -219,7 +248,7 @@ public class Board {
      *
      * @return the move
      */
-    public @NotNull Move buildMove(String move, Player player) {
+    public @NotNull Move buildMove(@NotNull String move, @NotNull Player player) {
         String[] moveArray = move.split("-");
         Position origin = new Position(moveArray[0]);
         Position destination = new Position(moveArray[1]);

@@ -2,31 +2,41 @@ package de.dhbw.tinf18b4.chess.backend.piece;
 
 import de.dhbw.tinf18b4.chess.backend.Board;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
- * @author Leonhard Gahr
+ * The rook implementation of the chess {@link Piece}
+ * <p>
+ * The rook moves horizontally or vertically, through any number of unoccupied squares
  */
 public class Rook implements Piece {
+    /**
+     * whether the rook is white or not
+     */
+    @Getter
     private final boolean white;
+
+    /**
+     * The current {@link Position} of the rook
+     */
+    @Getter
+    @Setter
     private Position position;
 
-    public Rook(boolean white, Position position) {
+    /**
+     * Initialize the rook with a {@link Position} and whether it is white
+     *
+     * @param white    whether the rook is white
+     * @param position the {@link Position}
+     */
+    public Rook(boolean white, @NotNull Position position) {
         this.white = white;
         this.position = position;
-    }
-
-    @Override
-    public void setPosition(Position position) {
-        this.position = position;
-    }
-
-    @Override
-    public Position getPosition() {
-        return position;
     }
 
     @Override
@@ -54,10 +64,6 @@ public class Rook implements Piece {
                 .flatMap(Optional::stream);
     }
 
-    @Override
-    public boolean isWhite() {
-        return white;
-    }
 
     @Override
     public boolean isCaptured() {

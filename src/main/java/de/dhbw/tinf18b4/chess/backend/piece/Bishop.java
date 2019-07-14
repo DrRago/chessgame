@@ -3,31 +3,41 @@ package de.dhbw.tinf18b4.chess.backend.piece;
 
 import de.dhbw.tinf18b4.chess.backend.Board;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
+import lombok.Getter;
+import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
- * @author Leonhard Gahr
+ * The bishop implementation of the chess {@link Piece}
+ * <p>
+ * The bishop moves diagonally, through any number of unoccupied squares
  */
 public class Bishop implements Piece {
+    /**
+     * whether the bishop is white or not
+     */
+    @Getter
     private final boolean white;
+
+    /**
+     * The current {@link Position} of the bishop
+     */
+    @Getter
+    @Setter
     private Position position;
 
-    public Bishop(boolean white, Position position) {
+    /**
+     * Initialize the bishop with a {@link Position} and whether it is white
+     *
+     * @param white    whether the bishop is white
+     * @param position the {@link Position}
+     */
+    public Bishop(boolean white, @NotNull Position position) {
         this.white = white;
         this.position = position;
-    }
-
-    @Override
-    public void setPosition(Position position) {
-        this.position = position;
-    }
-
-    @Override
-    public Position getPosition() {
-        return position;
     }
 
     @Override
@@ -53,11 +63,6 @@ public class Bishop implements Piece {
                 Utils.directionalIteratorFirstEnemy(position, board, white, Position::lowerLeftNeighbor),
                 Utils.directionalIteratorFirstEnemy(position, board, white, Position::lowerRightNeighbor))
                 .flatMap(Optional::stream);
-    }
-
-    @Override
-    public boolean isWhite() {
-        return white;
     }
 
     @Override
