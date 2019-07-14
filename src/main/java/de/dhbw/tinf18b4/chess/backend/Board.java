@@ -6,8 +6,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -23,17 +22,20 @@ public class Board {
     /**
      * A reference back to the {@link Game} object of this board
      */
+    @NotNull
     @Getter
     final private Game game;
 
     /**
      * The white {@link King}
      */
+    @Nullable
     @Getter
     King whiteKing = null;
     /**
      * The black {@link King}
      */
+    @Nullable
     @Getter
     King blackKing = null;
 
@@ -101,6 +103,7 @@ public class Board {
      *
      * @return the pieces
      */
+    @NotNull
     private static Piece[] initialSetup() {
         return new Piece[]{
                 // white pieces
@@ -168,6 +171,7 @@ public class Board {
      *
      * @return The pieces
      */
+    @NotNull
     public Stream<Piece> getPieces() {
         return Stream.of(pieces).filter(Objects::nonNull);
     }
@@ -177,6 +181,7 @@ public class Board {
      *
      * @return The positions
      */
+    @NotNull
     private Stream<Position> getOccupiedPositions() {
         return getPieces().map(Piece::getPosition);
     }
@@ -192,12 +197,23 @@ public class Board {
     }
 
     /**
+     * Determine whether there is no piece on the provided position
+     *
+     * @param position The position to check
+     * @return true if the position is not occupied
+     */
+    public boolean isNotOccupied(@NotNull Position position) {
+        return getOccupiedPositions().noneMatch(position::equals);
+    }
+
+    /**
      * Find the piece on the given position
      *
      * @param position The position
      * @return The found piece or null if there is none
      */
-    public @Nullable Piece findPieceByPosition(@NotNull Position position) {
+    @Nullable
+    public Piece findPieceByPosition(@NotNull Position position) {
         return getPieces().filter(piece -> piece.getPosition().equals(position))
                 .findFirst()
                 .orElse(null);
@@ -250,11 +266,39 @@ public class Board {
      * @param player the player who performed the move
      * @return the move
      */
-    public @NotNull Move buildMove(@NotNull String move, @NotNull Player player) {
+    @NotNull
+    public Move buildMove(@NotNull String move, @NotNull Player player) {
         String[] moveArray = move.split("-");
         Position origin = new Position(moveArray[0]);
         Position destination = new Position(moveArray[1]);
 
         return new Move(player, origin, destination, this);
+    }
+
+    /**
+     * Get all possible moves and capture moves in a list with two maps,
+     * the first is always the map with the moves and the second is
+     * always the map with the capture moves
+     * <p>
+     * TODO filter moves that would get the king into check
+     *
+     * @return the list with the maps with all possible moves
+     */
+    @NotNull
+    public List<Map<Piece, Stream<Position>>> getAllPossibleMoves() {
+        List<Map<Piece, Stream<Position>>> returnList = new ArrayList<>();
+
+        Map<Piece, Stream<Position>> moveMap = new HashMap<>();
+        Map<Piece, Stream<Position>> captureMoveMap = new HashMap<>();
+        getPieces().forEach(piece -> {
+                    captureMoveMap.put(piece, piece.getValidCaptureMoves(this));
+                    moveMap.put(piece, piece.getValidMoves(this));
+                }
+        );
+
+        returnList.add(moveMap);
+        returnList.add(captureMoveMap);
+
+        return returnList;
     }
 }

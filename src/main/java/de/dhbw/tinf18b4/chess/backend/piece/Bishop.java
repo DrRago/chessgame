@@ -27,6 +27,7 @@ public class Bishop implements Piece {
      */
     @Getter
     @Setter
+    @NotNull
     private Position position;
 
     /**
@@ -40,6 +41,7 @@ public class Bishop implements Piece {
         this.position = position;
     }
 
+    @NotNull
     @Override
     public Stream<Position> getValidMoves(@NotNull Board board) {
         // The bishop can move diagonally as far as he wants but he can't leap over other pieces.
@@ -52,6 +54,7 @@ public class Bishop implements Piece {
                 .flatMap(s -> s);
     }
 
+    @NotNull
     @Override
     public Stream<Position> getValidCaptureMoves(@NotNull Board board) {
         // The bishop can move diagonally as far as he wants but he can't leap over other pieces.
@@ -63,11 +66,6 @@ public class Bishop implements Piece {
                 Utils.directionalIteratorFirstEnemy(position, board, white, Position::lowerLeftNeighbor),
                 Utils.directionalIteratorFirstEnemy(position, board, white, Position::lowerRightNeighbor))
                 .flatMap(Optional::stream);
-    }
-
-    @Override
-    public boolean isCaptured() {
-        return false;
     }
 
     @Override
