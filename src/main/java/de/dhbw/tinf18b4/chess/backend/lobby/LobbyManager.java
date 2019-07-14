@@ -22,6 +22,7 @@ public class LobbyManager {
     /**
      * A {@link HashMap} with all active lobbies
      */
+    @NotNull
     @Getter
     static Map<String, Lobby> lobbies = new HashMap<>();
 

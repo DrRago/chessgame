@@ -27,6 +27,7 @@ public class Game {
     /**
      * The {@link Board} instance modeling the state of the Game
      */
+    @NotNull
     @Getter
     private final Board board;
     /**
@@ -38,11 +39,11 @@ public class Game {
     /**
      * {@link Player} 1 of the game
      */
-    private Player player1;
+    private final Player player1;
     /**
      * {@link Player} 2 of the game
      */
-    private Player player2;
+    private final Player player2;
 
     /**
      * Initialize a game with the default {@link Board} layout
@@ -134,13 +135,15 @@ public class Game {
      * @return the FEN string
      * @see <a href='https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation'>FEN Wikipedia</a>
      */
+    @NotNull
     public String asFen() {
         StringBuilder stringBuilder = new StringBuilder();
 
         // build a 8x8 board with pieces as char name
         char[][] fenBoard = new char[8][8];
-        board.getPieces().forEach(piece -> {
-            if (piece.isCaptured()) return;
+        board.getPieces()
+                .filter(Objects::nonNull)
+                .forEach(piece -> {
             int y = piece.getPosition().getRank() - 1;
             int x = piece.getPosition().getFile() - 'a';
 

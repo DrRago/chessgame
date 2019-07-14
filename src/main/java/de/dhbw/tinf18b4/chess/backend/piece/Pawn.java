@@ -73,6 +73,7 @@ public class Pawn implements Piece {
                 .filter(position -> !board.isOccupied(position));
     }
 
+    @NotNull
     @Override
     public Stream<Position> getValidCaptureMoves(@NotNull Board board) {
         Stream<Position> capturePositions = getPossibleCaptureMoves()
@@ -89,6 +90,7 @@ public class Pawn implements Piece {
      *
      * @return all move possibilities
      */
+    @NotNull
     private Stream<Position> getPossibleCaptureMoves() {
         Stream<Position> captureLeft;
         Stream<Position> captureRight;
@@ -109,7 +111,7 @@ public class Pawn implements Piece {
 
     /**
      * The pawn has a special capture move called en passant.
-     * This move allowes a pawn to capture another pawn,
+     * This move allows a pawn to capture another pawn,
      * if this pawn just moved next to him with a two-square move.
      * <p>
      * This pawn then walks diagonally behind the enemy pawn and the enemy pawn is then considered as captured.
@@ -150,11 +152,6 @@ public class Pawn implements Piece {
                 && enPassantPossible
                 ? enPassantCapturePosition
                 : null;
-    }
-
-    @Override
-    public boolean isCaptured() {
-        return false;
     }
 
     @Override

@@ -38,19 +38,16 @@ public class Queen implements Piece {
         this.position = position;
     }
 
+    @NotNull
     @Override
     public Stream<Position> getValidMoves(@NotNull Board board) {
         return Stream.concat(new Rook(white, position).getValidMoves(board), new Bishop(white, position).getValidMoves(board));
     }
 
+    @NotNull
     @Override
     public Stream<Position> getValidCaptureMoves(@NotNull Board board) {
         return getValidMoves(board);
-    }
-
-    @Override
-    public boolean isCaptured() {
-        return false;
     }
 
     @Override

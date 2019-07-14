@@ -16,6 +16,7 @@ public class User {
     private String username; // login name
     private String displayName; // a display name
     private String password; // login password
+    @NotNull
     private final String ID; // session ID
     private Permission permission; // the permission level
 
@@ -23,7 +24,7 @@ public class User {
         this(username, password, ID, Permission.USER);
     }
 
-    public User(@NotNull String username, @NotNull String password, @NotNull String ID, @NotNull Permission permission) {
+    private User(@NotNull String username, @NotNull String password, @NotNull String ID, @NotNull Permission permission) {
         this.username = username;
         this.displayName = username; // TODO change this
         this.password = password;

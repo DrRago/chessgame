@@ -23,17 +23,20 @@ public class Board {
     /**
      * A reference back to the {@link Game} object of this board
      */
+    @NotNull
     @Getter
     final private Game game;
 
     /**
      * The white {@link King}
      */
+    @Nullable
     @Getter
     King whiteKing = null;
     /**
      * The black {@link King}
      */
+    @Nullable
     @Getter
     King blackKing = null;
 
@@ -101,6 +104,7 @@ public class Board {
      *
      * @return the pieces
      */
+    @NotNull
     private static Piece[] initialSetup() {
         return new Piece[]{
                 // white pieces

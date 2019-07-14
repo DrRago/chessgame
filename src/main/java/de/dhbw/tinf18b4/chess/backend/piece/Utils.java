@@ -3,6 +3,7 @@ package de.dhbw.tinf18b4.chess.backend.piece;
 import de.dhbw.tinf18b4.chess.backend.Board;
 import de.dhbw.tinf18b4.chess.backend.Player;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -20,7 +21,7 @@ class Utils {
      * @return the positions the iterator found
      */
     @SafeVarargs
-    static Stream<Position> directionalIterator(Position initialPiecePosition, Board board, UnaryOperator<Position>... directions) {
+    static Stream<Position> directionalIterator(Position initialPiecePosition, @NotNull Board board, UnaryOperator<Position>... directions) {
         return Stream.of(directions)
                 .map(f -> Stream.iterate(initialPiecePosition, f)
                         // skip the first element which is the position of this piece
@@ -39,7 +40,7 @@ class Utils {
      * @param direction            the direction to move to
      * @return All positions in a direction
      */
-    static Stream<Position> directionalIteratorUntilEdge(Position initialPiecePosition, UnaryOperator<Position> direction) {
+    static Stream<Position> directionalIteratorUntilEdge(Position initialPiecePosition, @NotNull UnaryOperator<Position> direction) {
         return Stream.iterate(initialPiecePosition, direction)
                 // skip the first element which is the position of this piece
                 .skip(1)
@@ -55,7 +56,7 @@ class Utils {
      * @param direction            the direction to move to
      * @return All {@link Position} in a direction until a occupied one
      */
-    static Stream<Position> directionalIteratorUntilOccupied(Position initialPiecePosition, Board board, UnaryOperator<Position> direction) {
+    static Stream<Position> directionalIteratorUntilOccupied(Position initialPiecePosition, @NotNull Board board, @NotNull UnaryOperator<Position> direction) {
         return Stream.iterate(initialPiecePosition, direction)
                 // skip the first element which is the position of this piece
                 .skip(1)
@@ -74,8 +75,9 @@ class Utils {
      * @param direction            the direction to check
      * @return the {@link Optional optional position}
      */
+    @NotNull
     @SuppressWarnings("ConstantConditions")
-    static Optional<Position> directionalIteratorFirstEnemy(Position initialPiecePosition, Board board, boolean white, UnaryOperator<Position> direction) {
+    static Optional<Position> directionalIteratorFirstEnemy(Position initialPiecePosition, @NotNull Board board, boolean white, @NotNull UnaryOperator<Position> direction) {
         return Stream.iterate(initialPiecePosition, direction)
                 // skip the first element which is the position of this piece
                 .skip(1)

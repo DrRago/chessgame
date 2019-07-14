@@ -29,7 +29,7 @@ public class Position {
      * @param rank the rank or "row"
      * @param file the file or "column"
      */
-    public Position(@NotNull char file, @NotNull int rank) {
+    public Position(char file, int rank) {
         // validate the point to meet chess requirements
         if (file < 'a' || file > 'h' || rank < 1 || rank > 8)
             throw new IllegalArgumentException(Character.toString(rank) + file + " is invalid");
@@ -43,7 +43,7 @@ public class Position {
      * @param rank the rank or "row"
      * @param file the file or "column"
      */
-    public Position(@NotNull int rank, @NotNull char file) {
+    public Position(int rank, char file) {
         this(file, rank);
     }
 
@@ -125,6 +125,7 @@ public class Position {
         return result;
     }
 
+    @NotNull
     @Override
     public String toString() {
         return String.valueOf(file) + rank;

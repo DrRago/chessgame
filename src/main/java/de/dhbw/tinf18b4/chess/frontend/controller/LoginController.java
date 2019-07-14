@@ -24,7 +24,7 @@ import java.util.logging.Logger;
  */
 @WebServlet("/DoLoginOrRegister")
 public class LoginController extends HttpServlet {
-    private Logger logger = Logger.getLogger(LoginController.class.getName());
+    private final Logger logger = Logger.getLogger(LoginController.class.getName());
 
     /**
      * Determine whether a login or register request has been made,

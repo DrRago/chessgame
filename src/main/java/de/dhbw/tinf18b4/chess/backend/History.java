@@ -1,5 +1,6 @@
 package de.dhbw.tinf18b4.chess.backend;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EmptyStackException;
@@ -15,7 +16,8 @@ public class History {
     /**
      * History stack containing all previous moves
      */
-    private Stack<Move> history = new Stack<>();
+    @NotNull
+    private final Stack<Move> history = new Stack<>();
 
     /**
      * Add a move to history to make it the most recent move

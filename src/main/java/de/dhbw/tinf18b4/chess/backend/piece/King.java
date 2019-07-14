@@ -93,7 +93,7 @@ public class King implements Piece {
      * @param board the board
      * @return the rooks
      */
-    private Stream<Position> calculateCastlingPossibility(Board board) {
+    private Stream<Position> calculateCastlingPossibility(@NotNull Board board) {
         if (isInCheck(board) || !hasEverMoved(board.getGame())) {
             return Stream.empty();
         }
@@ -139,7 +139,7 @@ public class King implements Piece {
                 Stream.ofNullable(left),
                 Stream.ofNullable(right))
                 .flatMap(s -> s)
-                .filter(piece -> !piece.isCaptured())
+                .filter(Objects::nonNull)
                 .filter(piece -> !piece.hasEverMoved(board.getGame()))
                 .filter(piece -> white ? piece.getFenIdentifier() == 'R' : piece.getFenIdentifier() == 'r')
                 .map(Piece::getPosition);
@@ -153,11 +153,6 @@ public class King implements Piece {
                 .filter(position -> board.findPieceByPosition(position).isBlack() == white);
     }
 
-
-    @Override
-    public boolean isCaptured() {
-        return false;
-    }
 
     @Override
     public char getFenIdentifier() {

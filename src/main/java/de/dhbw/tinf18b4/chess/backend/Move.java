@@ -15,24 +15,28 @@ public class Move {
     /**
      * player associated with this move
      */
+    @NotNull
     @Getter
     final private Player player;
 
     /**
      * the original position of this move
      */
+    @NotNull
     @Getter
     final private Position origin;
 
     /**
      * the destination position of this move
      */
+    @NotNull
     @Getter
     final private Position destination;
 
     /**
      * the piece associated with this move
      */
+    @NotNull
     @Getter
     final private Piece piece;
 
@@ -44,7 +48,7 @@ public class Move {
      * @param destination the destination {@link Position}
      * @param piece       the {@link Piece} to move
      */
-    public Move(@NotNull Player player, @NotNull Position origin, @NotNull Position destination, @NotNull Piece piece) {
+    private Move(@NotNull Player player, @NotNull Position origin, @NotNull Position destination, @NotNull Piece piece) {
         if (player.isWhite() != piece.isWhite()) {
             String message = String.format("Player %s can't move piece %s of another player %s", player, piece, player);
             throw new IllegalArgumentException(message);
@@ -78,6 +82,7 @@ public class Move {
      * @param board       the {@link Board} to perform the {@link Move} on
      * @return the {@link Piece} that shall be moved
      */
+    @NotNull
     private static Piece getPiece(@NotNull Player player, @NotNull Position origin, @NotNull Position destination, @NotNull Board board) {
         Piece piece = board.findPieceByPosition(origin);
         if (null == piece) {

@@ -56,24 +56,17 @@ public interface Piece {
     }
 
     /**
-     * Get the capture state of the piece
-     *
-     * @return whether the piece has been captured or not
-     */
-    boolean isCaptured();
-
-    /**
      * Get the FEN identifier of the piece
      *
      * @return the FEN identifier
      */
     char getFenIdentifier();
 
-    default boolean hasEverMoved(Game game) {
+    default boolean hasEverMoved(@NotNull Game game) {
         return 0 == numberOfMoves(game);
     }
 
-    default int numberOfMoves(Game game) {
+    default int numberOfMoves(@NotNull Game game) {
         long count = game.getHistory().stream()
                 .filter(move -> move.getPiece().equals(this))
                 .count();
