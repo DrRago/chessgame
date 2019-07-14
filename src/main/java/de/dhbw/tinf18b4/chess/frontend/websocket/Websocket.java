@@ -119,7 +119,7 @@ public class Websocket extends HttpServlet {
      * @param session the closing session
      */
     @OnClose
-    public void onClose(@NotNull Session session) throws IOException {
+    public void onClose(@NotNull Session session) {
         logger.info(String.format("Closed connection for %s (%s)", sessionToSessionID.get(session), sessionToLobbyID.get(session)));
 
         // remove identifiers
@@ -245,6 +245,13 @@ public class Websocket extends HttpServlet {
         }
     }
 
+    /**
+     * Convert a move to a json object
+     *
+     * @param move the move to convert
+     * @return the json object
+     */
+    @SuppressWarnings("unchecked")
     private JSONObject moveToJSON(@NotNull Move move) {
         JSONObject obj = new JSONObject();
         obj.put("player", move.getPlayer().isWhite() ? "white" : "black");
@@ -253,6 +260,13 @@ public class Websocket extends HttpServlet {
         return obj;
     }
 
+    /**
+     * Generate a json object from the game history
+     *
+     * @param game the game
+     * @return the complete history
+     */
+    @SuppressWarnings("unchecked")
     private JSONObject getCompleteLogHistory(@NotNull Game game) {
         JSONObject logHistory = buildAnswerTemplate();
         JSONArray logArray = new JSONArray();
@@ -349,10 +363,9 @@ public class Websocket extends HttpServlet {
      * @param lobby   the lobby to send the message to
      * @param content the content field of the json message
      * @param message the value field of the json message
-     * @throws IOException on send error to client
      */
     @SuppressWarnings("unchecked")
-    private void sendToLobby(@NotNull Lobby lobby, @NotNull String content, @NotNull String message) throws IOException {
+    private void sendToLobby(@NotNull Lobby lobby, @NotNull String content, @NotNull String message) {
         // build the JSON object
         JSONObject answer = buildAnswerTemplate();
         answer.put("content", content);
@@ -367,9 +380,8 @@ public class Websocket extends HttpServlet {
      *
      * @param lobby      the lobby to send the object to
      * @param jsonObject the json object to send
-     * @throws IOException on send error to client
      */
-    private void sendToLobby(@NotNull Lobby lobby, @NotNull JSONObject jsonObject) throws IOException {
+    private void sendToLobby(@NotNull Lobby lobby, @NotNull JSONObject jsonObject) {
         // collect all sessions that are in the current lobby
         List<Session> lobbySessions = sessionToLobby.entrySet().stream()
                 .filter(entry -> entry.getValue() == lobby).map(Map.Entry::getKey).collect(Collectors.toList());
@@ -386,10 +398,9 @@ public class Websocket extends HttpServlet {
      * @param session the session to send the message to
      * @param content the content field of the json object
      * @param message the value field of the json object
-     * @throws IOException on send error to client
      */
     @SuppressWarnings("unchecked")
-    private void sendToSession(@NotNull Session session, @NotNull String content, @NotNull String message) throws IOException {
+    private void sendToSession(@NotNull Session session, @NotNull String content, @NotNull String message) {
         JSONObject answer = buildAnswerTemplate();
         answer.put("content", content);
         answer.put("value", message);
