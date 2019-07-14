@@ -6,8 +6,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class Board {
@@ -242,5 +241,31 @@ public class Board {
         Position destination = new Position(moveArray[1]);
 
         return new Move(player, origin, destination, this);
+    }
+
+    /**
+     * Get all possible moves and capture moves in a list with two maps,
+     * the first is always the map with the moves and the second is
+     * always the map with the capture moves
+     * <p>
+     * TODO filter moves that would get the king into check
+     *
+     * @return the list with the maps with all possible moves
+     */
+    public @NotNull List<Map<Piece, Stream<Position>>> getAllPossibleMoves() {
+        List<Map<Piece, Stream<Position>>> returnList = new ArrayList<>();
+
+        Map<Piece, Stream<Position>> moveMap = new HashMap<>();
+        Map<Piece, Stream<Position>> captureMoveMap = new HashMap<>();
+        getPieces().forEach(piece -> {
+                    captureMoveMap.put(piece, piece.getValidCaptureMoves(this));
+                    moveMap.put(piece, piece.getValidMoves(this));
+                }
+        );
+
+        returnList.add(moveMap);
+        returnList.add(captureMoveMap);
+
+        return returnList;
     }
 }
