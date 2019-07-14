@@ -26,7 +26,7 @@ class Utils {
         return Stream.of(directions)
                 .map(f -> directionalIteratorUntilEdge(initialPiecePosition, f)
                         // or when we reach another piece
-                        .takeWhile(board::isNotOccupied);
+                        .takeWhile(board::isNotOccupied))
                 .flatMap(s -> s);
     }
 
@@ -38,7 +38,7 @@ class Utils {
      * @return All positions in a direction
      */
     @NotNull
-    static Stream<Position> directionalIteratorUntilEdge(Position initialPiecePosition, @NotNull UnaryOperator<Position> direction) {
+    private static Stream<Position> directionalIteratorUntilEdge(Position initialPiecePosition, @NotNull UnaryOperator<Position> direction) {
         return Stream.iterate(initialPiecePosition, direction)
                 // skip the first element which is the position of this piece
                 .skip(1)

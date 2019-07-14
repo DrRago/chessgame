@@ -136,7 +136,8 @@ public class Position {
      *
      * @return the left neighbor or null
      */
-    public @Nullable Position leftNeighbor() {
+    @Nullable
+    public Position leftNeighbor() {
         try {
             return new Position(rank, (char) (file - 1));
         } catch (IllegalArgumentException e) {
@@ -149,7 +150,8 @@ public class Position {
      *
      * @return the right neighbor or null
      */
-    public @Nullable Position rightNeighbor() {
+    @Nullable
+    public Position rightNeighbor() {
         try {
             return new Position(rank, (char) (file + 1));
         } catch (IllegalArgumentException e) {
@@ -162,7 +164,8 @@ public class Position {
      *
      * @return the top neighbor or null
      */
-    public @Nullable Position topNeighbor() {
+    @Nullable
+    public Position topNeighbor() {
         try {
             return new Position(rank + 1, file);
         } catch (IllegalArgumentException e) {
@@ -175,7 +178,8 @@ public class Position {
      *
      * @return the bottom neighbor or null
      */
-    public @Nullable Position bottomNeighbor() {
+    @Nullable
+    public Position bottomNeighbor() {
         try {
             return new Position(rank - 1, file);
         } catch (IllegalArgumentException e) {
@@ -188,7 +192,8 @@ public class Position {
      *
      * @return the upper left neighbor or null
      */
-    public @Nullable Position upperLeftNeighbor() {
+    @Nullable
+    public Position upperLeftNeighbor() {
         try {
             return new Position(rank + 1, (char) (file - 1));
         } catch (IllegalArgumentException e) {
@@ -201,7 +206,8 @@ public class Position {
      *
      * @return the upper right neighbor or null
      */
-    public @Nullable Position upperRightNeighbor() {
+    @Nullable
+    public Position upperRightNeighbor() {
         try {
             return new Position(rank + 1, (char) (file + 1));
         } catch (IllegalArgumentException e) {
@@ -214,7 +220,8 @@ public class Position {
      *
      * @return the lower left neighbor or null
      */
-    public @Nullable Position lowerLeftNeighbor() {
+    @Nullable
+    public Position lowerLeftNeighbor() {
         try {
             return new Position(rank - 1, (char) (file - 1));
         } catch (IllegalArgumentException e) {
@@ -227,7 +234,8 @@ public class Position {
      *
      * @return the lower right neighbor or null
      */
-    public @Nullable Position lowerRightNeighbor() {
+    @Nullable
+    public Position lowerRightNeighbor() {
         try {
             return new Position(rank - 1, (char) (file + 1));
         } catch (IllegalArgumentException e) {

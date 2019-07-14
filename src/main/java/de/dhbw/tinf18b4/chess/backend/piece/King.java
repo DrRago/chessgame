@@ -65,7 +65,7 @@ public class King implements Piece {
      */
     @NotNull
     private Stream<Position> getPossibleMoves(@NotNull Board board) {
-        List<Position> castlingRookPositions = calculateCastlingPossibility(board).collect(Collectors.toList());
+        List<Position> castlingRookPositions = calculateCastlingPossibility(board).peek(System.out::println).collect(Collectors.toList());
         // since castling is only possible with rooks at their initial position
         // we don't bother checking where the rook is and just find the new position
         // of the king and add it if it exists
@@ -105,12 +105,10 @@ public class King implements Piece {
         Piece right = board.findPieceByPosition(new Position('h', white ? 1 : 8));
 
         int piecesLeft = Math.toIntExact(Stream.iterate(position, Position::leftNeighbor)
-                .filter(Objects::nonNull)
                 .takeWhile(position -> position.getFile() != 'a')
                 .filter(position -> board.findPieceByPosition(position) != null)
                 .count());
         int piecesRight = Math.toIntExact(Stream.iterate(position, Position::rightNeighbor)
-                .filter(Objects::nonNull)
                 .takeWhile(position -> position.getFile() != 'h')
                 .filter(position -> board.findPieceByPosition(position) != null)
                 .count());
@@ -151,6 +149,7 @@ public class King implements Piece {
     @NotNull
     @Override
     public Stream<Position> getValidCaptureMoves(@NotNull Board board) {
+        //noinspection ConstantConditions
         return getPossibleMoves(board)
                 // only consider moves to occupied squares
                 .filter(board::isOccupied)

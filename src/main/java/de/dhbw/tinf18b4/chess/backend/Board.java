@@ -182,7 +182,7 @@ public class Board {
      * @return The positions
      */
     @NotNull
-    Stream<Position> getOccupiedPositions() {
+    private Stream<Position> getOccupiedPositions() {
         return getPieces().map(Piece::getPosition);
     }
 
