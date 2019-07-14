@@ -6,20 +6,41 @@ import de.dhbw.tinf18b4.chess.backend.position.Position;
 import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
- * @author Leonhard Gahr
+ * The pawn implementation of the chess {@link Piece}
+ * <p>
+ * The pawn moves a single square, but the first time a pawn moves,
+ * it has the option of advancing two squares but not jump over an occupied square.
+ * He cannot move backwards.
+ * <p>
+ * Also he is only allowed to capture an enemy diagonally left or right.
  */
 public class Pawn implements Piece {
+    /**
+     * whether the pawn is white or not
+     */
+    @Getter
     private final boolean white;
+
+    /**
+     * The current {@link Position} of the pawn
+     */
     @Getter
     @Setter
     private Position position;
 
-    public Pawn(boolean white, Position position) {
+    /**
+     * Initialize the pawn with a {@link Position} and whether it is white
+     *
+     * @param white    whether the pawn is white
+     * @param position the {@link Position}
+     */
+    public Pawn(boolean white, @NotNull Position position) {
         this.white = white;
         this.position = position;
     }
@@ -63,6 +84,11 @@ public class Pawn implements Piece {
     }
 
 
+    /**
+     * Get all possible moves of a pawn on a {@link Board chessboard} without considering any other {@link Piece}
+     *
+     * @return all move possibilities
+     */
     private Stream<Position> getPossibleCaptureMoves() {
         Stream<Position> captureLeft;
         Stream<Position> captureRight;
@@ -81,7 +107,17 @@ public class Pawn implements Piece {
     }
 
 
-    private Position calculateEnPassantPossibility(Board board) {
+    /**
+     * The pawn has a special capture move called en passant.
+     * This move allowes a pawn to capture another pawn,
+     * if this pawn just moved next to him with a two-square move.
+     * <p>
+     * This pawn then walks diagonally behind the enemy pawn and the enemy pawn is then considered as captured.
+     *
+     * @param board the current {@link Board chessboard}
+     * @return the {@link Position} the pawn can possibly do an en passant to
+     */
+    private @Nullable Position calculateEnPassantPossibility(@NotNull Board board) {
         Move lastMove = board.getGame().getHistory().lastMove();
 
         // If there is no first move en passant is not possible
@@ -114,11 +150,6 @@ public class Pawn implements Piece {
                 && enPassantPossible
                 ? enPassantCapturePosition
                 : null;
-    }
-
-    @Override
-    public boolean isWhite() {
-        return white;
     }
 
     @Override

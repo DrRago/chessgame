@@ -34,7 +34,9 @@ import static de.dhbw.tinf18b4.chess.frontend.JSON.JSONHandler.parseMessage;
 import static javax.websocket.CloseReason.CloseCodes.CANNOT_ACCEPT;
 
 /**
- * @author Leonhard Gahr
+ * The websocket endpoint for the client to play the game
+ * <p>
+ * This class handles everything around managing the lobby or the game for any player
  */
 @ServerEndpoint("/websocketendpoint/{lobbyID}/{sessionID}")
 public class Websocket extends HttpServlet {
@@ -60,6 +62,7 @@ public class Websocket extends HttpServlet {
 
     /**
      * The onOpen method of a websocket
+     * <p>
      * it handles the first steps to validate a client. The client has to send the lobbyID and sessionID
      * of the HTTP-Session as url parameter
      *
@@ -103,6 +106,7 @@ public class Websocket extends HttpServlet {
 
     /**
      * The onClose websocket method
+     * <p>
      * removes the session from all maps to avoid sending data to a closed websocket
      *
      * @param session the closing session
@@ -118,6 +122,32 @@ public class Websocket extends HttpServlet {
         sessionToUser.remove(session);
     }
 
+    /**
+     * The onError websocket method
+     * <p>
+     * Inform the user over the error
+     * TODO remove for production purposes
+     *
+     * @param session the session the error occurred in
+     * @param e       the error that occurred
+     * @throws IOException on send error to session
+     */
+    @OnError
+    public void onError(Session session, Throwable e) throws IOException {
+        e.printStackTrace();
+        sendErrorMessageToClient(e.getMessage(), session, "error");
+    }
+
+    /**
+     * The onMessage websocket method
+     * <p>
+     * it handles everything from determining the request type of the user to control the game
+     *
+     * @param session the users session
+     * @param message the message the user sent (json string)
+     * @throws ParseException on invalid json format
+     * @throws IOException    on send error to client
+     */
     @OnMessage
     public void onMessage(Session session, String message) throws ParseException, IOException {
         logger.info(String.format("Got message from client %s (%s):", sessionToSessionID.get(session), sessionToLobbyID.get(session)));
@@ -141,13 +171,21 @@ public class Websocket extends HttpServlet {
                     return;
                 }
                 try {
-                    Move move = playerLobby.getGame().getBoard().buildMove(moveString, playerLobby.getPlayerByUser(currentUser));
+                    Player currentPlayer = playerLobby.getPlayerByUser(currentUser);
+                    if (currentPlayer == null) {
+                        sendErrorMessageToClient("Not in lobby anymore", session, "fatal");
+                        return;
+                    }
+                    Move move = playerLobby.getGame().getBoard().buildMove(moveString, currentPlayer);
 
                     if (!playerLobby.getGame().makeMove(move)) {
                         logger.info("Invalid move");
+                    } else {
+                        sendToLobby(playerLobby, getMoveResponse(playerLobby));
+                        // cant be null due to successful makemove result
+                        //noinspection ConstantConditions
+                        sendToLobby(playerLobby, "logs", playerLobby.getGame().getHistory().lastMove().toString()); // TODO pass color of log entry
                     }
-                    sendToLobby(playerLobby, getMoveResponse(playerLobby));
-                    sendToLobby(playerLobby, "logs", playerLobby.getGame().getHistory().lastMove().toString()); // pass color of log entry
                 } catch (IllegalArgumentException e) {
                     sendErrorMessageToClient(e.getMessage(), session, "error");
                 }
@@ -191,8 +229,14 @@ public class Websocket extends HttpServlet {
         }
     }
 
+    /**
+     * Build the response for the clients in order to what moves are possible and whose turn it is
+     *
+     * @param lobby the lobby to build the answer for
+     * @return the json response object
+     */
     @SuppressWarnings("unchecked")
-    private @NotNull JSONObject getMoveResponse(@NotNull Lobby lobby) {
+    private JSONObject getMoveResponse(@NotNull Lobby lobby) {
         JSONObject moveAnswer = buildAnswerTemplate();
 
         JSONObject answerValue = new JSONObject();
@@ -233,7 +277,14 @@ public class Websocket extends HttpServlet {
         return moveAnswer;
     }
 
-    private @NotNull JSONObject getPlayerNames(@NotNull Lobby lobby) {
+    /**
+     * Get the json answer for the player name list of a lobby
+     *
+     * @param lobby the lobby to build the answer for
+     * @return the json answer object
+     */
+    @SuppressWarnings("unchecked")
+    private JSONObject getPlayerNames(@NotNull Lobby lobby) {
         JSONArray nameArray = new JSONArray();
 
         Arrays.stream(lobby.getPlayers())
@@ -252,13 +303,16 @@ public class Websocket extends HttpServlet {
         return nameAnswer;
     }
 
-    @OnError
-    public void onError(Session session, Throwable e) throws IOException {
-        e.printStackTrace();
-        sendErrorMessageToClient(e.getMessage(), session, "error");
-    }
-
-    public void sendToLobby(@NotNull Lobby lobby, @NotNull String content, @NotNull String message) throws IOException {
+    /**
+     * Send a string message to all participants of a lobby
+     *
+     * @param lobby   the lobby to send the message to
+     * @param content the content field of the json message
+     * @param message the value field of the json message
+     * @throws IOException on send error to client
+     */
+    @SuppressWarnings("unchecked")
+    private void sendToLobby(@NotNull Lobby lobby, @NotNull String content, @NotNull String message) throws IOException {
         // build the JSON object
         JSONObject answer = buildAnswerTemplate();
         answer.put("content", content);
@@ -268,30 +322,62 @@ public class Websocket extends HttpServlet {
         sendToLobby(lobby, answer);
     }
 
-    public void sendToLobby(@NotNull Lobby lobby, @NotNull JSONObject jsonObject) throws IOException {
+    /**
+     * Send a json object to all participants of a lobby
+     *
+     * @param lobby      the lobby to send the object to
+     * @param jsonObject the json object to send
+     * @throws IOException on send error to client
+     */
+    private void sendToLobby(@NotNull Lobby lobby, @NotNull JSONObject jsonObject) throws IOException {
         // collect all sessions that are in the current lobby
         List<Session> lobbySessions = sessionToLobby.entrySet().stream()
                 .filter(entry -> entry.getValue() == lobby).map(Map.Entry::getKey).collect(Collectors.toList());
 
         // send the message to all sessions
         for (Session session : lobbySessions) {
-            session.getBasicRemote().sendText(jsonObject.toJSONString());
+            sendToSession(session, jsonObject);
         }
     }
 
-    public void sendToSession(@NotNull Session session, @NotNull String content, @NotNull String message) throws IOException {
+    /**
+     * Send a string message to a session
+     *
+     * @param session the session to send the message to
+     * @param content the content field of the json object
+     * @param message the value field of the json object
+     * @throws IOException on send error to client
+     */
+    @SuppressWarnings("unchecked")
+    private void sendToSession(@NotNull Session session, @NotNull String content, @NotNull String message) throws IOException {
         JSONObject answer = buildAnswerTemplate();
         answer.put("content", content);
         answer.put("value", message);
 
-        session.getBasicRemote().sendText(answer.toJSONString());
+        sendToSession(session, answer);
     }
 
-    public void sendToSession(@NotNull Session session, @NotNull JSONObject jsonObject) throws IOException {
+    /**
+     * Send a json object to a session
+     *
+     * @param session    the session to send the object to
+     * @param jsonObject the json object to send
+     * @throws IOException on send error to client
+     */
+    private void sendToSession(@NotNull Session session, @NotNull JSONObject jsonObject) throws IOException {
         logger.info("sending to client...");
         session.getBasicRemote().sendText(jsonObject.toJSONString());
     }
 
+    /**
+     * Send an error message to the client. If the type is fatal, the session gets closed
+     *
+     * @param message the message to send
+     * @param session the session to send the error to
+     * @param type    the type of the error
+     * @throws IOException on send error to client
+     */
+    @SuppressWarnings("unchecked")
     private void sendErrorMessageToClient(@NotNull String message, @NotNull Session session, @NotNull String type) throws IOException {
         System.out.println(message);
         JSONObject answer = JSONHandler.buildAnswerTemplate();
@@ -315,9 +401,9 @@ public class Websocket extends HttpServlet {
      * @param sessionID the HTTPServlet session ID of the user
      * @param lobbyID   the lobby ID the user wants to operate on
      * @return the {@link Lobby} of the request
-     * @throws IOException inherited from sendErrorMessageToClient()
+     * @throws IOException on send error to client
      */
-    private Lobby verifyRequest(@NotNull Session session, @Nullable String sessionID, @Nullable String lobbyID) throws IOException {
+    private @Nullable Lobby verifyRequest(@NotNull Session session, @Nullable String sessionID, @Nullable String lobbyID) throws IOException {
         if (sessionID == null || lobbyID == null) {
             sendErrorMessageToClient("Unallowed call to server", session, "fatal");
             return null;

@@ -5,6 +5,7 @@ import de.dhbw.tinf18b4.chess.backend.lobby.Lobby;
 import de.dhbw.tinf18b4.chess.backend.lobby.LobbyManager;
 import de.dhbw.tinf18b4.chess.backend.lobby.LobbyStatus;
 import de.dhbw.tinf18b4.chess.backend.user.User;
+import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,15 +17,26 @@ import java.io.IOException;
 ;
 
 /**
- * Controller for {@link Lobby}-related requests
- *
- * @author Leonhard Gahr
+ * Controller for {@link Lobby lobby-related} http requests
  */
 
 @WebServlet({"/lobby", "/lobby/*"})
 public class LobbyController extends HttpServlet {
+    /**
+     * Determine the action the user wants to proceed. Possible uri-paths are:
+     * <ul>
+     * <li>/lobby</li>
+     * <li>/lobby/{ID}/</li>
+     * <li>/lobby/{ID}/game</li>
+     * </ul>
+     * This controller forwards to the specific jsp page.
+     * If the user is not logged in, he gets redirected to the login page
+     *
+     * @param req  the user request
+     * @param resp the response to send back to the user
+     */
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+    protected void doGet(@NotNull HttpServletRequest req, @NotNull HttpServletResponse resp) throws IOException, ServletException {
         // validate that the user is authenticated
         User user = (User) req.getSession().getAttribute("user");
         if (user == null || !user.validateLogin()) {
@@ -42,7 +54,7 @@ public class LobbyController extends HttpServlet {
             // new lobby and redirect to it
             String lobbyID = LobbyManager.createLobby((User) req.getSession().getAttribute("user"));
             resp.sendRedirect("/lobby/" + lobbyID);
-        } else if(reqPath.matches("/.*/game/?")) {
+        } else if (reqPath.matches("/.*/game/?")) {
             String lobbyID = reqPath.split("/")[1];
             req.getRequestDispatcher("/game.jsp?id=" + lobbyID).forward(req, resp);
         } else {
@@ -54,7 +66,7 @@ public class LobbyController extends HttpServlet {
                 // user may not join if he already joined the lobby under another name
                 if (lobby.hasUser(user) && lobby.getPlayerByUser(user).getUser().getID().equals(user.getID())) {
                     // check whether the game has already started and redirect in that case
-                    if (lobby.getStatus() == LobbyStatus.GAME_STARTED ) {
+                    if (lobby.getStatus() == LobbyStatus.GAME_STARTED) {
                         resp.sendRedirect("/lobby" + reqPath + "/game");
                         return;
                     }

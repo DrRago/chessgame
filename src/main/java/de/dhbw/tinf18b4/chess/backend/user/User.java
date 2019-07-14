@@ -7,9 +7,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * A object holding a user, who wants to login or is logged in
- *
- * @author Leonhard Gahr
+ * A object holding a user, who wants to login or is logged in.<br>
+ * Performs functions like validate the 
  */
 @Getter
 @Setter

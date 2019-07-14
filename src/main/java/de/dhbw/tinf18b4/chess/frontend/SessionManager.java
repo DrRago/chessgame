@@ -6,8 +6,6 @@ import java.util.List;
 
 /**
  * static class to manage all http sessions to the server
- *
- * @author Leonhard Gahr
  */
 public class SessionManager {
     /**
