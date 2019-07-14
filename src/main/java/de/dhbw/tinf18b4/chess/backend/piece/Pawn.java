@@ -32,6 +32,7 @@ public class Pawn implements Piece {
      */
     @Getter
     @Setter
+    @NotNull
     private Position position;
 
     /**
@@ -45,6 +46,7 @@ public class Pawn implements Piece {
         this.position = position;
     }
 
+    @NotNull
     @Override
     public Stream<Position> getValidMoves(@NotNull Board board) {
         Position singleMove = white ? position.topNeighbor() : position.bottomNeighbor();
@@ -119,7 +121,8 @@ public class Pawn implements Piece {
      * @param board the current {@link Board chessboard}
      * @return the {@link Position} the pawn can possibly do an en passant to
      */
-    private @Nullable Position calculateEnPassantPossibility(@NotNull Board board) {
+    @Nullable
+    private Position calculateEnPassantPossibility(@NotNull Board board) {
         Move lastMove = board.getGame().getHistory().lastMove();
 
         // If there is no first move en passant is not possible

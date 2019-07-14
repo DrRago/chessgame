@@ -25,6 +25,7 @@ public class Queen implements Piece {
      */
     @Getter
     @Setter
+    @NotNull
     private Position position;
 
     /**

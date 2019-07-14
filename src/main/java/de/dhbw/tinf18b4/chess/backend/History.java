@@ -46,6 +46,7 @@ public class History {
      *
      * @return the moves
      */
+    @NotNull
     public Stream<Move> stream() {
         return history.stream();
     }

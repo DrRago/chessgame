@@ -116,7 +116,8 @@ public class Game {
      *
      * @return the {@link Player}
      */
-    public @NotNull Player whoseTurn() {
+    @NotNull
+    public Player whoseTurn() {
         Move lastMove = history.lastMove();
 
         // it's whites turn

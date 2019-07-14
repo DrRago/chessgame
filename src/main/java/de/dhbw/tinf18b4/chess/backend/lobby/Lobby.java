@@ -71,7 +71,8 @@ public class Lobby {
      * @param user the user (not null)
      * @return the {@link Player} that has been created
      */
-    public @Nullable Player join(@NotNull User user) {
+    @Nullable
+    public Player join(@NotNull User user) {
         if (players[0] == null) {
             players[0] = new Player(!players[1].isWhite(), user);
             return players[0];
@@ -121,7 +122,8 @@ public class Lobby {
      * @param user the {@link User} to get the player from
      * @return the {@link Player} or null, if the user doesn't have one
      */
-    public @Nullable Player getPlayerByUser(@NotNull User user) {
+    @Nullable
+    public Player getPlayerByUser(@NotNull User user) {
         return Arrays.stream(players)
                 .filter(Objects::nonNull)
                 .filter(player -> player.getUser().equals(user))

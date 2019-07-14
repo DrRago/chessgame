@@ -26,6 +26,7 @@ import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -117,7 +118,7 @@ public class Websocket extends HttpServlet {
      * @param session the closing session
      */
     @OnClose
-    public void onClose(Session session) {
+    public void onClose(@NotNull Session session) {
         logger.info(String.format("Close connection for %s (%s)", sessionToSessionID.get(session), sessionToLobbyID.get(session)));
 
         // remove identifiers
@@ -129,18 +130,12 @@ public class Websocket extends HttpServlet {
 
     /**
      * The onError websocket method
-     * <p>
-     * Inform the user over the error
-     * TODO remove for production purposes
      *
-     * @param session the session the error occurred in
-     * @param e       the error that occurred
-     * @throws IOException on send error to session
+     * @param e the error that occurred
      */
     @OnError
-    public void onError(@NotNull Session session, @NotNull Throwable e) throws IOException {
-        e.printStackTrace();
-        sendErrorMessageToClient(e.getMessage(), session, "error");
+    public void onError(@NotNull Throwable e) {
+        logger.log(Level.SEVERE, e.getMessage(), e);
     }
 
     /**
@@ -256,13 +251,11 @@ public class Websocket extends HttpServlet {
         answerValue.put("turn", game.whoseTurn().isWhite() ? "white" : "black"); // the color whose turn it is
 
         // get all possible moves for all pieces identified by it's position on the board
-        Map<Piece, Stream<Position>> moveMap = new HashMap<>();
-        Map<Piece, Stream<Position>> captureMoveMap = new HashMap<>();
-        game.getBoard().getPieces().forEach(piece -> {
-                    captureMoveMap.put(piece, piece.getValidCaptureMoves(game.getBoard()));
-                    moveMap.put(piece, piece.getValidMoves(game.getBoard()));
-                }
-        );
+        List<Map<Piece, Stream<Position>>> allMoves = lobby.getGame().getBoard().getAllPossibleMoves();
+        Map<Piece, Stream<Position>> moveMap = allMoves.get(0);
+        Map<Piece, Stream<Position>> captureMoveMap = allMoves.get(1);
+
+
         JSONArray possibilitiesArray = new JSONArray();
 
         moveMap.forEach((key, value) -> {

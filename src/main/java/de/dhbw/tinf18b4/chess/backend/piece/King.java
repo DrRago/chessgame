@@ -37,6 +37,7 @@ public class King implements Piece {
      */
     @Getter
     @Setter
+    @NotNull
     private Position position;
 
     /**
@@ -50,9 +51,10 @@ public class King implements Piece {
         this.position = position;
     }
 
+    @NotNull
     @Override
     public Stream<Position> getValidMoves(@NotNull Board board) {
-        return getPossibleMoves(board).filter(position -> board.findPieceByPosition(position) == null);
+        return getPossibleMoves(board).filter(board::isNotOccupied);
     }
 
     /**
@@ -61,18 +63,18 @@ public class King implements Piece {
      * @param board the board to find the castling possibility
      * @return the possible moves
      */
+    @NotNull
     private Stream<Position> getPossibleMoves(@NotNull Board board) {
         List<Position> castlingRookPositions = calculateCastlingPossibility(board).collect(Collectors.toList());
-        Stream.Builder<Position> castlingMoves = Stream.builder();
-        castlingRookPositions.stream()
-                // we don't bother checking where the rook is
-                // we just find the relative position and add it if it exists
+        // since castling is only possible with rooks at their initial position
+        // we don't bother checking where the rook is and just find the new position
+        // of the king and add it if it exists
+        Stream<Position> castlingMoves = castlingRookPositions.stream()
                 .map(rook -> Stream.of(
                         Stream.ofNullable(rook.leftNeighbor()).map(Position::leftNeighbor),
                         Stream.ofNullable(rook.rightNeighbor()).map(Position::rightNeighbor))
                         .flatMap(s -> s))
-                .flatMap(s -> s)
-                .forEach(castlingMoves);
+                .flatMap(s -> s);
 
         return Stream.of(
                 Stream.ofNullable(position.topNeighbor()),
@@ -83,7 +85,7 @@ public class King implements Piece {
                 Stream.ofNullable(position.upperLeftNeighbor()),
                 Stream.ofNullable(position.lowerRightNeighbor()),
                 Stream.ofNullable(position.lowerLeftNeighbor()),
-                castlingMoves.build())
+                castlingMoves)
                 .flatMap(s -> s);
     }
 
@@ -93,8 +95,9 @@ public class King implements Piece {
      * @param board the board
      * @return the rooks
      */
+    @NotNull
     private Stream<Position> calculateCastlingPossibility(@NotNull Board board) {
-        if (isInCheck(board) || !hasEverMoved(board.getGame())) {
+        if (isInCheck(board) || hasNeverMoved(board.getGame())) {
             return Stream.empty();
         }
 
@@ -115,17 +118,17 @@ public class King implements Piece {
         // find all position which are attackable by an enemy piece
         Supplier<Stream<Position>> capturePositions = () -> board.getPieces()
                 // consider only enemy pieces
-                .filter(piece -> piece.isWhite() != white)
+                .filter(this::isOwnedByEnemy)
                 // find all the position where they can move in a capture
                 .filter(piece -> !(piece instanceof King))
                 .map(piece -> piece.getValidCaptureMoves(board))
                 .flatMap(s -> s);
         boolean hasToPassThroughAnAttackedSquareLeft = Stream.iterate(position, Position::leftNeighbor)
                 .takeWhile(position -> position.getFile() != 'a')
-                .noneMatch(position -> capturePositions.get().anyMatch(capturePosition -> capturePosition.equals(position)));
+                .noneMatch(position -> capturePositions.get().anyMatch(position::equals));
         boolean hasToPassThroughAnAttackedSquareRight = Stream.iterate(position, Position::rightNeighbor)
                 .takeWhile(position -> position.getFile() != 'h')
-                .noneMatch(position -> capturePositions.get().anyMatch(capturePosition -> capturePosition.equals(position)));
+                .noneMatch(position -> capturePositions.get().anyMatch(position::equals));
 
         if (piecesLeft > 1 || hasToPassThroughAnAttackedSquareLeft) {
             left = null;
@@ -140,19 +143,20 @@ public class King implements Piece {
                 Stream.ofNullable(right))
                 .flatMap(s -> s)
                 .filter(Objects::nonNull)
-                .filter(piece -> !piece.hasEverMoved(board.getGame()))
-                .filter(piece -> white ? piece.getFenIdentifier() == 'R' : piece.getFenIdentifier() == 'r')
+                .filter(piece -> piece.hasNeverMoved(board.getGame()))
+                .filter(piece -> piece instanceof Rook)
                 .map(Piece::getPosition);
     }
 
-    @SuppressWarnings("ConstantConditions")
+    @NotNull
     @Override
     public Stream<Position> getValidCaptureMoves(@NotNull Board board) {
         return getPossibleMoves(board)
-                .filter(position -> board.findPieceByPosition(position) != null)
-                .filter(position -> board.findPieceByPosition(position).isBlack() == white);
+                // only consider moves to occupied squares
+                .filter(board::isOccupied)
+                // only enemy pieces can be captured
+                .filter(position -> isOwnedByEnemy(board.findPieceByPosition(position)));
     }
-
 
     @Override
     public char getFenIdentifier() {
@@ -170,7 +174,7 @@ public class King implements Piece {
         // find all position which are attackable by an enemy piece
         Stream<Position> capturePositions = board.getPieces()
                 // consider only enemy pieces
-                .filter(piece -> piece.isWhite() != white)
+                .filter(this::isOwnedByEnemy)
                 // find all the position where they can move in a capture
                 .filter(piece -> !(piece instanceof King))
                 .map(piece -> piece.getValidCaptureMoves(board))

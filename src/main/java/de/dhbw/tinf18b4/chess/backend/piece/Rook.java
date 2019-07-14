@@ -26,6 +26,7 @@ public class Rook implements Piece {
      */
     @Getter
     @Setter
+    @NotNull
     private Position position;
 
     /**
@@ -39,6 +40,7 @@ public class Rook implements Piece {
         this.position = position;
     }
 
+    @NotNull
     @Override
     public Stream<Position> getValidMoves(@NotNull Board board) {
         // The rook can move vertically or horizontally as far as he wants but he can't leap over other pieces.
@@ -51,6 +53,7 @@ public class Rook implements Piece {
                 .flatMap(s -> s);
     }
 
+    @NotNull
     @Override
     public Stream<Position> getValidCaptureMoves(@NotNull Board board) {
         // The rook can move vertically or horizontally as far as he wants but he can't leap over other pieces.

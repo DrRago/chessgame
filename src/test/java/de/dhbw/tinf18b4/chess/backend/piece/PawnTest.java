@@ -4,6 +4,7 @@ import de.dhbw.tinf18b4.chess.backend.Game;
 import de.dhbw.tinf18b4.chess.backend.Player;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 import de.dhbw.tinf18b4.chess.backend.user.User;
+import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;
@@ -15,9 +16,13 @@ import static org.junit.Assert.assertTrue;
  * @author Leonhard Gahr
  */
 public class PawnTest {
+    @NotNull
     private User user1 = new User("player1", "", "");
+    @NotNull
     private User user2 = new User("player2", "", "");
+    @NotNull
     private Player white = new Player(true, user1);
+    @NotNull
     private Player black = new Player(false, user2);
 
     @Test
