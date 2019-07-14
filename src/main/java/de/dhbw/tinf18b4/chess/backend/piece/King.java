@@ -72,7 +72,7 @@ public class King implements Piece {
                         Stream.ofNullable(rook.rightNeighbor()).map(Position::rightNeighbor))
                         .flatMap(s -> s))
                 .flatMap(s -> s)
-                .forEach(castlingMoves::accept);
+                .forEach(castlingMoves);
 
         return Stream.of(
                 Stream.ofNullable(position.topNeighbor()),
@@ -145,6 +145,7 @@ public class King implements Piece {
                 .map(Piece::getPosition);
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Override
     public Stream<Position> getValidCaptureMoves(@NotNull Board board) {
         return getPossibleMoves(board)
