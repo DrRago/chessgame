@@ -66,13 +66,13 @@ class Utils {
     }
 
     /**
-     * Get an {@link Optional<Position> optional position} of a direction from an initial {@link Position}
+     * Get an {@link Optional optional position} of a direction from an initial {@link Position}
      *
      * @param initialPiecePosition the initial {@link Position}
      * @param board                the {@link Board} to check whether a {@link Position} {@link Board#isOccupied(Position) is occupied}
      * @param white                whether the {@link Player} is white or not
      * @param direction            the direction to check
-     * @return the {@link Optional<Position> optional position}
+     * @return the {@link Optional optional position}
      */
     @SuppressWarnings("ConstantConditions")
     static Optional<Position> directionalIteratorFirstEnemy(Position initialPiecePosition, Board board, boolean white, UnaryOperator<Position> direction) {

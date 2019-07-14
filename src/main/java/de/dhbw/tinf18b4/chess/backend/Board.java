@@ -246,6 +246,8 @@ public class Board {
     /**
      * Build the {@link Move} according to a valid {@link Move} format defined in {@link #checkMoveFormat(String)}
      *
+     * @param move   the string representation of the move
+     * @param player the player who performed the move
      * @return the move
      */
     public @NotNull Move buildMove(@NotNull String move, @NotNull Player player) {

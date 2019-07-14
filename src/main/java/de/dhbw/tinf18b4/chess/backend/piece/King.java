@@ -58,6 +58,7 @@ public class King implements Piece {
     /**
      * Get the moves that are possible on any chessboard without considering other pieces
      *
+     * @param board the board to find the castling possibility
      * @return the possible moves
      */
     private Stream<Position> getPossibleMoves(@NotNull Board board) {
