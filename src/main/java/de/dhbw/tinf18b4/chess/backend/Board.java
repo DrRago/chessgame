@@ -223,13 +223,16 @@ public class Board {
      * set a specific piece of the game as null
      *
      * @param toRemove the piece to set as null on the board
+     * @return the index of the removed piece
      */
-    private void removePiece(@NotNull Piece toRemove) {
+    private int removePiece(@Nullable Piece toRemove) {
         for (int i = 0; i < pieces.length; i++) {
             if (pieces[i] == toRemove) {
                 pieces[i] = null;
+                return i;
             }
         }
+        return -1;
     }
 
     /**
@@ -305,11 +308,47 @@ public class Board {
 
         Map<Piece, Stream<Position>> moveMap = new HashMap<>();
         Map<Piece, Stream<Position>> captureMoveMap = new HashMap<>();
-        getPieces().forEach(piece -> {
+        getPieces()
+                .filter(piece -> getGame().whoseTurn().isWhite() ? piece.isWhite() : piece.isBlack())
+                .forEach(piece -> {
                     captureMoveMap.put(piece, piece.getValidCaptureMoves(this));
                     moveMap.put(piece, piece.getValidMoves(this));
                 }
         );
+
+        moveMap.entrySet()
+                .forEach(entry -> entry.setValue(entry.getValue().filter(position -> {
+                    Position prev = entry.getKey().getPosition();
+                    entry.getKey().setPosition(position);
+                    King king = entry.getKey().isWhite() ? getWhiteKing() : getBlackKing();
+                    boolean result = king != null && !king.isInCheck(this);
+                    entry.getKey().setPosition(prev);
+
+                    return result;
+                })));
+        captureMoveMap.entrySet()
+                .forEach(entry -> entry.setValue(entry.getValue().filter(position -> {
+                    Position prev = entry.getKey().getPosition();
+
+                    Piece capturePiece = findPieceByPosition(position);
+
+                    entry.getKey().setPosition(position);
+
+                    int i = removePiece(capturePiece);
+                    King king = entry.getKey().isWhite() ? getWhiteKing() : getBlackKing();
+                    boolean result = king != null && !king.isInCheck(this);
+
+                    entry.getKey().setPosition(prev);
+                    pieces[i] = capturePiece;
+
+                    if (!result) {
+                        System.out.println();
+                        System.out.println();
+                        System.out.println(entry.getKey().getClass().getSimpleName() + " cannot capture " + capturePiece.getClass().getSimpleName());
+                    }
+
+                    return result;
+                })));
 
         returnList.add(moveMap);
         returnList.add(captureMoveMap);
