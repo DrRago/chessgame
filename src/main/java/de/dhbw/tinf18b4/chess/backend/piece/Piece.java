@@ -2,14 +2,15 @@ package de.dhbw.tinf18b4.chess.backend.piece;
 
 import de.dhbw.tinf18b4.chess.backend.Board;
 import de.dhbw.tinf18b4.chess.backend.Game;
-import de.dhbw.tinf18b4.chess.backend.Player;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.Stream;
 
 /**
- * @author Leonhard.Gahr
+ * Interface of a piece on the {@link Board chessboard}
+ * <p>
+ * Every real piece implements this interface
  */
 public interface Piece {
 
@@ -66,17 +67,6 @@ public interface Piece {
     }
 
     /**
-     * Get the capture state of the piece
-     *
-     * @return whether the piece has been captured or not
-     */
-    boolean isCaptured();
-
-    default boolean isNotCaptured() {
-        return !isCaptured();
-    }
-
-    /**
      * Get the FEN identifier of the piece
      *
      * @return the FEN identifier
@@ -84,11 +74,11 @@ public interface Piece {
     char getFenIdentifier();
 
     default boolean hasNeverMoved(@NotNull Game game) {
-        return 0 != numberOfMoves(game);
+        return 0 == numberOfMoves(game);
     }
 
     default boolean hasEverMoved(@NotNull Game game) {
-        return 0 == numberOfMoves(game);
+        return 0 != numberOfMoves(game);
     }
 
     default int numberOfMoves(@NotNull Game game) {
@@ -125,5 +115,25 @@ public interface Piece {
 
     default boolean isOwnedByEnemy(@NotNull Player player) {
         return isWhite() != player.isWhite();
+    }
+
+    /**
+     * Move the piece perspectively backwards, so move it down if it is white and up if it's black.
+     * <p>
+     * Do nothing if the destination is offboard
+     *
+     * @return the perspectively back position
+     */
+    default Position getBackwardsPosition() {
+        return isWhite() ? getPosition().bottomNeighbor() : getPosition().topNeighbor();
+    }
+
+    /**
+     * Return the name of the piece
+     *
+     * @return the name
+     */
+    default String toPieceName() {
+        return getClass().getSimpleName();
     }
 }

@@ -12,17 +12,35 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
- * @author Leonhard Gahr
+ * The pawn implementation of the chess {@link Piece}
+ * <p>
+ * The pawn moves a single square, but the first time a pawn moves,
+ * it has the option of advancing two squares but not jump over an occupied square.
+ * He cannot move backwards.
+ * <p>
+ * Also he is only allowed to capture an enemy diagonally left or right.
  */
 public class Pawn implements Piece {
+    /**
+     * whether the pawn is white or not
+     */
     @Getter
     private final boolean white;
 
+    /**
+     * The current {@link Position} of the pawn
+     */
     @Getter
     @Setter
     @NotNull
     private Position position;
 
+    /**
+     * Initialize the pawn with a {@link Position} and whether it is white
+     *
+     * @param white    whether the pawn is white
+     * @param position the {@link Position}
+     */
     public Pawn(boolean white, @NotNull Position position) {
         this.white = white;
         this.position = position;
@@ -36,7 +54,7 @@ public class Pawn implements Piece {
 
         // if this pawn has not moved allow moving two fields forward
         // allow a moving two fields at once
-        if (hasEverMoved(board.getGame())) {
+        if (hasNeverMoved(board.getGame())) {
             if (white) {
                 doubleMove = Optional.ofNullable(singleMove)
                         .map(Position::topNeighbor)
@@ -68,6 +86,12 @@ public class Pawn implements Piece {
         return Stream.concat(Stream.ofNullable(calculateEnPassantPossibility(board)), capturePositions);
     }
 
+
+    /**
+     * Get all possible moves of a pawn on a {@link Board chessboard} without considering any other {@link Piece}
+     *
+     * @return all move possibilities
+     */
     @NotNull
     private Stream<Position> getPossibleCaptureMoves() {
         Stream<Position> captureLeft;
@@ -86,8 +110,19 @@ public class Pawn implements Piece {
         return Stream.concat(captureLeft, captureRight);
     }
 
+
+    /**
+     * The pawn has a special capture move called en passant.
+     * This move allows a pawn to capture another pawn,
+     * if this pawn just moved next to him with a two-square move.
+     * <p>
+     * This pawn then walks diagonally behind the enemy pawn and the enemy pawn is then considered as captured.
+     *
+     * @param board the current {@link Board chessboard}
+     * @return the {@link Position} the pawn can possibly do an en passant to
+     */
     @Nullable
-    private Position calculateEnPassantPossibility(@NotNull Board board) {
+    public Position calculateEnPassantPossibility(@NotNull Board board) {
         Move lastMove = board.getGame().getHistory().lastMove();
 
         // If there is no first move en passant is not possible
@@ -123,12 +158,12 @@ public class Pawn implements Piece {
     }
 
     @Override
-    public boolean isCaptured() {
-        return false;
+    public char getFenIdentifier() {
+        return white ? 'P' : 'p';
     }
 
     @Override
-    public char getFenIdentifier() {
-        return white ? 'P' : 'p';
+    public String toString() {
+        return toPieceName();
     }
 }

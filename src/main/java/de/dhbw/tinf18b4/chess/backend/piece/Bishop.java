@@ -11,17 +11,31 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
- * @author Leonhard Gahr
+ * The bishop implementation of the chess {@link Piece}
+ * <p>
+ * The bishop moves diagonally, through any number of unoccupied squares
  */
 public class Bishop implements Piece {
+    /**
+     * whether the bishop is white or not
+     */
     @Getter
     private final boolean white;
 
+    /**
+     * The current {@link Position} of the bishop
+     */
     @Getter
     @Setter
     @NotNull
     private Position position;
 
+    /**
+     * Initialize the bishop with a {@link Position} and whether it is white
+     *
+     * @param white    whether the bishop is white
+     * @param position the {@link Position}
+     */
     public Bishop(boolean white, @NotNull Position position) {
         this.white = white;
         this.position = position;
@@ -55,12 +69,12 @@ public class Bishop implements Piece {
     }
 
     @Override
-    public boolean isCaptured() {
-        return false;
+    public char getFenIdentifier() {
+        return white ? 'B' : 'b';
     }
 
     @Override
-    public char getFenIdentifier() {
-        return white ? 'B' : 'b';
+    public String toString() {
+        return toPieceName();
     }
 }

@@ -8,8 +8,6 @@ import java.sql.SQLException;
 
 /**
  * Some utility functions for the user
- *
- * @author Leonhard Gahr
  */
 public class UserUtility {
     /**

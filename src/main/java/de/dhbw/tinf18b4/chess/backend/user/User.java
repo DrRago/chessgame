@@ -7,9 +7,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * A object holding a user, who wants to login or is logged in
- *
- * @author Leonhard Gahr
+ * A object holding a user, who wants to login or is logged in.<br>
+ * Performs functions like validate the 
  */
 @Getter
 @Setter
@@ -25,7 +24,7 @@ public class User {
         this(username, password, ID, Permission.USER);
     }
 
-    public User(@NotNull String username, @NotNull String password, @NotNull String ID, @NotNull Permission permission) {
+    private User(@NotNull String username, @NotNull String password, @NotNull String ID, @NotNull Permission permission) {
         this.username = username;
         this.displayName = username; // TODO change this
         this.password = password;

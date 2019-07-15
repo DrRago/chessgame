@@ -42,7 +42,15 @@ public class Move {
     @Getter
     final private Piece piece;
 
-    public Move(@NotNull Player player, @NotNull Position origin, @NotNull Position destination, @NotNull Piece piece) {
+    /**
+     * Create a new Move instance from the {@link Player}, origin {@link Position}, destination {@link Position} and the {@link Piece}
+     *
+     * @param player      the {@link Player} who wants to perform the move operation
+     * @param origin      the origin {@link Position}
+     * @param destination the destination {@link Position}
+     * @param piece       the {@link Piece} to move
+     */
+    private Move(@NotNull Player player, @NotNull Position origin, @NotNull Position destination, @NotNull Piece piece) {
         if (player.isWhite() != piece.isWhite()) {
             String message = String.format("Player %s can't move piece %s of another player %s", player, piece, player);
             throw new IllegalArgumentException(message);
@@ -54,10 +62,28 @@ public class Move {
         this.piece = piece;
     }
 
+    /**
+     * Create a new Move instance from the {@link Player}, origin {@link Position}, destination {@link Position} and {@link Board}
+     *
+     * @param player      the {@link Player} who wants to perform the move operation
+     * @param origin      the origin {@link Position}
+     * @param destination the destination {@link Position}
+     * @param board       the {@link Board}
+     */
     public Move(@NotNull Player player, @NotNull Position origin, @NotNull Position destination, @NotNull Board board) {
         this(player, origin, destination, getPiece(player, origin, destination, board));
     }
 
+    /**
+     * Get the {@link Piece} at a {@link Position} from a {@link Board}.
+     * Throws {@link IllegalArgumentException} if there is not piece at the origin {@link Position}
+     *
+     * @param player      the {@link Player} who want's to move the {@link Piece}
+     * @param origin      the origin {@link Position} of the {@link Piece} to move
+     * @param destination the destination {@link Position} to move the {@link Piece} to
+     * @param board       the {@link Board} to perform the {@link Move} on
+     * @return the {@link Piece} that shall be moved
+     */
     @NotNull
     private static Piece getPiece(@NotNull Player player, @NotNull Position origin, @NotNull Position destination, @NotNull Board board) {
         Piece piece = board.findPieceByPosition(origin);
@@ -68,6 +94,6 @@ public class Move {
 
     @Override
     public String toString() {
-        return String.format("%s moved %s to %s", player.getUser().getDisplayName(), piece.getClass().getSimpleName(), destination);
+        return String.format("%s moved %s from %s to %s", player.getUser().getDisplayName(), piece.getClass().getSimpleName(), origin, destination);
     }
 }

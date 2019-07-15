@@ -8,33 +8,64 @@ import de.dhbw.tinf18b4.chess.backend.piece.Piece;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
- * @author Leonhard Gahr
+ * The Game is the main entrance point for someone to use the backend of this chess game.<br>
+ * This class provides the functionality to play the game and provides the {@link Board}
+ * which is used for operations like building a {@link Move}.<br>
+ * The Game class also provides checks if the game is over (checkmate or draw)
+ * and an export of the current game state as
+ * <a href="https://en.wikipedia.org/wiki/Forsyth%E2%80%93Edwards_Notation">FEN</a> string
  */
 
 public class Game {
     /**
-     * The Board instance modeling the state of the Game
+     * The {@link Board} instance modeling the state of the Game
      */
     @NotNull
     @Getter
     private final Board board;
+    /**
+     * The move {@link History} containing all applied moves
+     */
     @Getter
     private final History history = new History();
     private Player player1;
     private Player player2;
 
+    /**
+     * {@link Player} 1 of the game
+     */
+    private final Player player1;
+    /**
+     * {@link Player} 2 of the game
+     */
+    private final Player player2;
+
+    /**
+     * Initialize a game with the default {@link Board} layout
+     *
+     * @param player1 {@link Player} 1
+     * @param player2 {@link Player} 2
+     */
     public Game(@NotNull Player player1, @NotNull Player player2) {
         board = new Board(this);
         this.player1 = player1;
         this.player2 = player2;
     }
 
+    /**
+     * Initialize the game with a custom {@link Board} layout
+     *
+     * @param player1 {@link Player} 1
+     * @param player2 {@link Player} 2
+     * @param pieces  the {@link Board} layout
+     */
     public Game(@NotNull Player player1, @NotNull Player player2, @NotNull Piece[] pieces) {
         board = new Board(this, pieces);
         this.player1 = player1;
@@ -117,8 +148,9 @@ public class Game {
 
         // build a 8x8 board with pieces as char name
         char[][] fenBoard = new char[8][8];
-        board.getPieces().forEach(piece -> {
-            if (piece.isCaptured()) return;
+        board.getPieces()
+                .filter(Objects::nonNull)
+                .forEach(piece -> {
             int y = piece.getPosition().getRank() - 1;
             int x = piece.getPosition().getFile() - 'a';
 
@@ -160,21 +192,16 @@ public class Game {
      * <li>insufficient material</li>
      * </ul>
      * <p>
-     * TODO check if is checkmate
      *
      * @return whether the game is a draw or not
      */
     public boolean isDraw() {
+        if (isCheckmate() != null) return false;
+
         Supplier<Stream<Piece>> pieces = () -> getBoard().getPieces().filter(Objects::nonNull);
 
         // check if is stalemate
-        final Move lastMove = getHistory().lastMove(); // the player whose turn is now
-        final Player currentPlayer;
-        if (lastMove == null) {
-            currentPlayer = player1.isWhite() ? player1 : player2;
-        } else {
-            currentPlayer = lastMove.getPlayer() == player1 ? player2 : player1;
-        }
+        final Player currentPlayer = whoseTurn();
 
         // stalemate: when the player is not able to perform any valid move and the king is not in check
         King king = currentPlayer.isWhite() ? getBoard().whiteKing : getBoard().blackKing;
@@ -214,5 +241,38 @@ public class Game {
         }
 
         return stalemate || isKingVsKing || isKingBishopVsKing || isKingKnightVsKing | isKingBishopVsKingBishop;
+    }
+
+    /**
+     * Check if the game is over.<br>
+     * A player is checkmate if he is in check, it's his turn and he can not make legal move to escape the check
+     *
+     * @return the player who won or null
+     */
+    @Nullable Player isCheckmate() {
+        Player currentPlayer = whoseTurn();
+        King playersKing = currentPlayer.isWhite() ? getBoard().getWhiteKing() : getBoard().getBlackKing();
+
+        long possibleMoves = getBoard().getPieces()
+                .map(piece -> Stream.concat(piece.getValidCaptureMoves(board), piece.getValidMoves(board)))
+                .flatMap(s -> s).count();
+
+        if (playersKing.isInCheck(board) && possibleMoves == 0) {
+            // return the winning player
+            return player1.equals(currentPlayer) ? player2 : player1;
+        }
+
+        // neither player is in check
+        return null;
+    }
+
+    /**
+     * Return whether the color of a square is white or not (has nothing to do with the {@link Player players} color)
+     *
+     * @param p the {@link Position} to check
+     * @return whether the square is white or not
+     */
+    private static boolean isWhiteSquare(@NotNull Position p) {
+        return (p.getFile() * 35 + p.getRank()) % 2 == 0;
     }
 }

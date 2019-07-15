@@ -6,16 +6,18 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
- * @author Leonhard Gahr
+ * Handles some basic functionality for the JSON communication with the client via the websocket
  */
 public class JSONHandler {
 
     /**
-     * build the template string according to
-     * The template should be edited before sending
+     * build the template string according to the template
+     * <p>
+     * should be edited before sending
      *
      * @return the JSONObject template
      */
+    @SuppressWarnings("unchecked")
     @NotNull
     public static JSONObject buildAnswerTemplate() {
         JSONObject template = new JSONObject();
@@ -26,18 +28,15 @@ public class JSONHandler {
         return template;
     }
 
+    /**
+     * Parse a json string to a json object
+     *
+     * @param message the json string
+     * @return the json object
+     * @throws ParseException on invalid format
+     */
     @NotNull
-    public static JSONObject buildAnswerTemplate(String content, String value) {
-        JSONObject template = new JSONObject();
-
-        template.put("content", content);
-        template.put("value", value);
-
-        return template;
-    }
-
-    @NotNull
-    public static JSONObject parseMessage(String message) throws ParseException {
+    public static JSONObject parseMessage(@NotNull String message) throws ParseException {
         JSONParser parser = new JSONParser();
         return (JSONObject) parser.parse(message);
     }

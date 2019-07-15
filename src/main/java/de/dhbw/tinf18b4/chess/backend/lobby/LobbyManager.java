@@ -17,8 +17,6 @@ import java.util.stream.Collectors;
  * <li>generate a new {@link Lobby}</li>
  * <li>remove a {@link Lobby}</li>
  * </ul>
- *
- * @author Leonhard Gahr
  */
 public class LobbyManager {
     /**
@@ -78,7 +76,7 @@ public class LobbyManager {
      *
      * @param ID the ID of the {@link Lobby} to be removed
      */
-    public static void removeLobby(@NotNull String ID) {
+    static void removeLobby(@NotNull String ID) {
         lobbies.remove(ID);
     }
 

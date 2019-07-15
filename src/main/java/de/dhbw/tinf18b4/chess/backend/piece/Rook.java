@@ -10,17 +10,31 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
- * @author Leonhard Gahr
+ * The rook implementation of the chess {@link Piece}
+ * <p>
+ * The rook moves horizontally or vertically, through any number of unoccupied squares
  */
 public class Rook implements Piece {
+    /**
+     * whether the rook is white or not
+     */
     @Getter
     private final boolean white;
 
+    /**
+     * The current {@link Position} of the rook
+     */
     @Getter
     @Setter
     @NotNull
     private Position position;
 
+    /**
+     * Initialize the rook with a {@link Position} and whether it is white
+     *
+     * @param white    whether the rook is white
+     * @param position the {@link Position}
+     */
     public Rook(boolean white, @NotNull Position position) {
         this.white = white;
         this.position = position;
@@ -53,13 +67,14 @@ public class Rook implements Piece {
                 .flatMap(Optional::stream);
     }
 
-    @Override
-    public boolean isCaptured() {
-        return false;
-    }
 
     @Override
     public char getFenIdentifier() {
         return white ? 'R' : 'r';
+    }
+
+    @Override
+    public String toString() {
+        return toPieceName();
     }
 }

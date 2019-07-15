@@ -9,17 +9,31 @@ import org.jetbrains.annotations.NotNull;
 import java.util.stream.Stream;
 
 /**
- * @author Leonhard Gahr
+ * The queen implementation of the chess {@link Piece}
+ * <p>
+ * The queen moves horizontally, vertically or diagonally, through any number of unoccupied squares
  */
 public class Queen implements Piece {
+    /**
+     * whether the queen is white or not
+     */
     @Getter
     private final boolean white;
 
+    /**
+     * The current {@link Position} of the queen
+     */
     @Getter
     @Setter
     @NotNull
     private Position position;
 
+    /**
+     * Initialize the queen with a {@link Position} and whether it is white
+     *
+     * @param white    whether the queen is white
+     * @param position the {@link Position}
+     */
     public Queen(boolean white, @NotNull Position position) {
         this.white = white;
         this.position = position;
@@ -38,12 +52,12 @@ public class Queen implements Piece {
     }
 
     @Override
-    public boolean isCaptured() {
-        return false;
+    public char getFenIdentifier() {
+        return white ? 'Q' : 'q';
     }
 
     @Override
-    public char getFenIdentifier() {
-        return white ? 'Q' : 'q';
+    public String toString() {
+        return toPieceName();
     }
 }

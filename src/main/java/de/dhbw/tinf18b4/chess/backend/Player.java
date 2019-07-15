@@ -7,15 +7,31 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
+/**
+ * The player of a game <br>
+ * The player has an associated {@link User} which may be the guest {@link User}
+ * and whether he plays as white or not
+ */
 public class Player {
+    /**
+     * Whether tha player plays white or not
+     */
     @Getter
-    private boolean isWhite;
-
+    private boolean white;
+    /**
+     * The {@link User} who plays this player
+     */
     @Getter
     private User user;
 
-    public Player(boolean isWhite, @NotNull User user) {
-        this.isWhite = isWhite;
+    /**
+     * Create a new player instance
+     *
+     * @param white whether the player plays white
+     * @param user  the {@link User} who plays this player
+     */
+    public Player(boolean white, @NotNull User user) {
+        this.white = white;
         this.user = user;
     }
 
@@ -34,6 +50,6 @@ public class Player {
 
     @Override
     public String toString() {
-        return String.format("%s (%s)", user.getUsername(), isWhite ? "W" : "B");
+        return String.format("%s (%s)", user.getUsername(), white ? "W" : "B");
     }
 }

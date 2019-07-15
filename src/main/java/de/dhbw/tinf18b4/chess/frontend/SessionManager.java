@@ -8,15 +8,13 @@ import java.util.List;
 
 /**
  * static class to manage all http sessions to the server
- *
- * @author Leonhard Gahr
  */
 public class SessionManager {
     /**
      * the list holding all logged in sessions
      */
     @NotNull
-    private static List<HttpSession> sessions = new ArrayList<>();
+    private static final List<HttpSession> sessions = new ArrayList<>();
 
     /**
      * Add a session to the list

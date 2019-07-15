@@ -20,8 +20,6 @@ import java.util.Objects;
  * <li>disallow join of a {@link User}</li>
  * <li>start a {@link Game}</li>
  * </ul>
- *
- * @author Leonhard Gahr
  */
 public class Lobby {
 
@@ -68,23 +66,6 @@ public class Lobby {
     }
 
     /**
-     * Let a {@link Player} join the {@link Lobby}
-     *
-     * @param player the {@link Player} to join (not null)
-     * @return whether the join procedure was successful (false if {@link Lobby} is full)
-     */
-    public boolean join(@NotNull Player player) {
-        if (players[0] == null) {
-            players[0] = player;
-        } else if (players[1] == null) {
-            players[1] = player;
-        } else {
-            return false;
-        }
-        return true;
-    }
-
-    /**
      * Let a new {@link User} join the {@link Lobby}
      *
      * @param user the user (not null)
@@ -92,7 +73,10 @@ public class Lobby {
      */
     @Nullable
     public Player join(@NotNull User user) {
-        if (players[0] == null) {
+        if (players[0] == null && players[1] == null) {
+            players[0] = new Player(true, user);
+            return players[0];
+        } else if (players[0] == null) {
             players[0] = new Player(!players[1].isWhite(), user);
             return players[0];
         } else if (players[1] == null) {

@@ -9,24 +9,52 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.stream.Stream;
 
+/**
+ * The board represents the status of the pieces and manages the {@link Move moves} on the it
+ */
 public class Board {
-    final private Piece @NotNull [] pieces;
+    /**
+     * A representation of the current {@link Piece pieces} placed on the board. <br>
+     * The {@link Position positions} are stored in the {@link Piece pieces} itself,
+     * so the array could have null values or less than 32 entries
+     */
+    final private Piece[] pieces;
+    /**
+     * A reference back to the {@link Game} object of this board
+     */
     @NotNull
     @Getter
     final private Game game;
 
+    /**
+     * The white {@link King}
+     */
     @Nullable
     @Getter
     King whiteKing = null;
+    /**
+     * The black {@link King}
+     */
     @Nullable
     @Getter
     King blackKing = null;
 
+    /**
+     * Create a new board instance with the initial setup of a chessgame
+     *
+     * @param game the {@link Game} of the board
+     */
     public Board(@NotNull Game game) {
         this(game, initialSetup());
     }
 
-    public Board(@NotNull Game game, Piece @NotNull [] pieces) {
+    /**
+     * Create a new board instance with a custom {@link Piece} layout
+     *
+     * @param game   the {@link Game} of this board
+     * @param pieces the custom {@link Piece} layout
+     */
+    public Board(@NotNull Game game, @NotNull Piece[] pieces) {
         this.pieces = pieces;
         this.game = game;
 
@@ -75,7 +103,8 @@ public class Board {
      *
      * @return the pieces
      */
-    private static Piece @NotNull [] initialSetup() {
+    @NotNull
+    private static Piece[] initialSetup() {
         return new Piece[]{
                 // white pieces
                 new Pawn(true, new Position('a', 2)),
@@ -115,6 +144,85 @@ public class Board {
         };
     }
 
+    @Override
+    public String toString() {
+        char[][] board = new char[8][8];
+        getPieces()
+                .filter(Objects::nonNull)
+                .forEach(piece -> {
+                    int y = piece.getPosition().getRank() - 1;
+                    int x = piece.getPosition().getFile() - 'a';
+
+                    board[y][x] = piece.getFenIdentifier();
+                });
+
+        String whiteSquare = "⬜";
+        String blackSquare = "⬛";
+        String whiteKing = "♔";
+        String whiteQueen = "♕";
+        String whiteRook = "♖";
+        String whiteBishop = "♗";
+        String whiteKnight = "♘";
+        String whitePawn = "♙";
+        String blackKing = "♚";
+        String blackQueen = "♛";
+        String blackRook = "♜";
+        String blackBishop = "♝";
+        String blackKnight = "♞";
+        String blackPawn = "♟";
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 7; i >= 0; i--) {
+            for (int j = 0; j < 8; j++) {
+                switch (board[i][j]) {
+                    case 'P':
+                        stringBuilder.append(whitePawn);
+                        break;
+                    case 'K':
+                        stringBuilder.append(whiteKing);
+                        break;
+                    case 'Q':
+                        stringBuilder.append(whiteQueen);
+                        break;
+                    case 'N':
+                        stringBuilder.append(whiteKnight);
+                        break;
+                    case 'R':
+                        stringBuilder.append(whiteRook);
+                        break;
+                    case 'B':
+                        stringBuilder.append(whiteBishop);
+                        break;
+                    case 'p':
+                        stringBuilder.append(blackPawn);
+                        break;
+                    case 'k':
+                        stringBuilder.append(blackKing);
+                        break;
+                    case 'q':
+                        stringBuilder.append(blackQueen);
+                        break;
+                    case 'n':
+                        stringBuilder.append(blackKnight);
+                        break;
+                    case 'r':
+                        stringBuilder.append(blackRook);
+                        break;
+                    case 'b':
+                        stringBuilder.append(blackBishop);
+                        break;
+                    default:
+                        stringBuilder.append((i + j) % 2 == 0 ? blackSquare : whiteSquare);
+                        stringBuilder.append(' ');
+                }
+            }
+
+            stringBuilder.append("\n");
+        }
+
+        return "Board{\n" + stringBuilder.toString() + "}";
+    }
+
     /**
      * Check whether a move is allowed on this board
      * <p>
@@ -125,16 +233,16 @@ public class Board {
     boolean checkMove(@NotNull Move move) {
         // a piece is captured if it doesn't exist on this board anymore
         boolean isCaptured = getPieces().noneMatch(piece -> piece.equals(move.getPiece()));
-        boolean isAllowedMovement = move.getPiece()
-                .getValidMoves(this)
-                .anyMatch(position -> position.equals(move.getDestination()));
-        boolean isAllowedCaptureMove = move.getPiece()
-                .getValidCaptureMoves(this)
-                .anyMatch(position -> position.equals(move.getDestination()));
+        boolean isAllowedMovement = getAllPossibleMoves().parallelStream()
+                .anyMatch(map -> map.entrySet().stream()
+                        .filter(Objects::nonNull)
+                        .filter(entry -> entry.getKey().equals(move.getPiece()))
+                        .map(Map.Entry::getValue)
+                        .anyMatch(positions -> positions.anyMatch(p -> p.equals(move.getDestination()))
+                        )
+                );
 
-        return !isCaptured
-                && (isAllowedMovement
-                || isAllowedCaptureMove);
+        return !isCaptured && isAllowedMovement;
     }
 
     /**
@@ -153,7 +261,7 @@ public class Board {
      * @return The positions
      */
     @NotNull
-    Stream<Position> getOccupiedPositions() {
+    private Stream<Position> getOccupiedPositions() {
         return getPieces().map(Piece::getPosition);
     }
 
@@ -194,13 +302,16 @@ public class Board {
      * set a specific piece of the game as null
      *
      * @param toRemove the piece to set as null on the board
+     * @return the index of the removed piece
      */
-    private void removePiece(Piece toRemove) {
+    private int removePiece(@Nullable Piece toRemove) {
         for (int i = 0; i < pieces.length; i++) {
             if (pieces[i] == toRemove) {
                 pieces[i] = null;
+                return i;
             }
         }
+        return -1;
     }
 
     /**
@@ -213,8 +324,9 @@ public class Board {
                 .filter(piece -> piece.equals(move.getPiece()))
                 .findFirst()
                 .orElseThrow();
-        if (findPieceByPosition(move.getDestination()) != null) {
-            removePiece(findPieceByPosition(move.getDestination()));
+        Piece target = findPieceByPosition(move.getDestination());
+        if (target != null) {
+            removePiece(target);
         }
         movedPiece.setPosition(move.getDestination());
 
@@ -227,11 +339,27 @@ public class Board {
                 }
             }
         }
+        // check whether an en passant capture was made
+        else if (movedPiece instanceof Pawn) {
+            Pawn movedPawn = (Pawn) movedPiece;
+
+            // check if the move was an en passant, so we have to move the pawn temporarily back
+            movedPawn.setPosition(move.getOrigin());
+            Position enPassant = movedPawn.calculateEnPassantPossibility(this);
+            movedPawn.setPosition(move.getDestination());
+
+            if (target == null && enPassant != null && enPassant.equals(move.getDestination())) {
+                // can't be null because an en passant wouldn't be possible then
+                removePiece(findPieceByPosition(movedPawn.getBackwardsPosition()));
+            }
+        }
     }
 
     /**
      * Build the {@link Move} according to a valid {@link Move} format defined in {@link #checkMoveFormat(String)}
      *
+     * @param move   the string representation of the move
+     * @param player the player who performed the move
      * @return the move
      */
     @NotNull
@@ -247,21 +375,58 @@ public class Board {
      * Get all possible moves and capture moves in a list with two maps,
      * the first is always the map with the moves and the second is
      * always the map with the capture moves
-     * <p>
-     * TODO filter moves that would get the king into check
      *
      * @return the list with the maps with all possible moves
      */
-    public @NotNull List<Map<Piece, Stream<Position>>> getAllPossibleMoves() {
+    @NotNull
+    public List<Map<Piece, Stream<Position>>> getAllPossibleMoves() {
         List<Map<Piece, Stream<Position>>> returnList = new ArrayList<>();
 
+        // differentiate normal moves and capture moves for performance reasons
         Map<Piece, Stream<Position>> moveMap = new HashMap<>();
         Map<Piece, Stream<Position>> captureMoveMap = new HashMap<>();
-        getPieces().forEach(piece -> {
-                    captureMoveMap.put(piece, piece.getValidCaptureMoves(this));
-                    moveMap.put(piece, piece.getValidMoves(this));
-                }
-        );
+        getPieces()
+                .filter(piece -> getGame().whoseTurn().isWhite() ? piece.isWhite() : piece.isBlack())
+                .forEach(piece -> {
+                            captureMoveMap.put(piece, piece.getValidCaptureMoves(this));
+                            moveMap.put(piece, piece.getValidMoves(this));
+                        }
+                );
+
+        // filter whether the king would be in check after this move is applied
+        moveMap.entrySet()
+                .forEach(entry -> entry.setValue(entry.getValue().filter(position -> {
+                    // get the current position to reapply
+                    Position prev = entry.getKey().getPosition();
+                    entry.getKey().setPosition(position);
+
+                    // check if the king is in check
+                    King king = entry.getKey().isWhite() ? getWhiteKing() : getBlackKing();
+                    boolean result = king != null && !king.isInCheck(this);
+
+                    // reset the position
+                    entry.getKey().setPosition(prev);
+
+                    return result;
+                })));
+        captureMoveMap.entrySet()
+                .forEach(entry -> entry.setValue(entry.getValue().filter(position -> {
+                    // get the current position to reapply
+                    Position prev = entry.getKey().getPosition();
+
+                    Piece capturePiece = findPieceByPosition(position);
+
+                    entry.getKey().setPosition(position);
+
+                    int i = removePiece(capturePiece);
+                    King king = entry.getKey().isWhite() ? getWhiteKing() : getBlackKing();
+                    boolean result = king != null && !king.isInCheck(this);
+
+                    entry.getKey().setPosition(prev);
+                    pieces[i] = capturePiece;
+
+                    return result;
+                })));
 
         returnList.add(moveMap);
         returnList.add(captureMoveMap);

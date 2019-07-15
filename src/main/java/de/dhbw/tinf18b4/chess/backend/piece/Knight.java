@@ -11,17 +11,34 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 /**
- * @author Leonhard Gahr
+ * The knight implementation of the chess {@link Piece}
+ * <p>
+ * It moves to a square two squares away horizontally and one
+ * square vertically, or two squares vertically and one square horizontally.
+ * <p>
+ * Additionally he can jump over {@link Piece pieces}, meaning he doesn't care about other {@link Piece pieces} on his move
  */
 public class Knight implements Piece {
+    /**
+     * whether the knight is white or not
+     */
     @Getter
     private final boolean white;
 
+    /**
+     * The current {@link Position} of the knight
+     */
     @Getter
     @Setter
     @NotNull
     private Position position;
 
+    /**
+     * Initialize the knight with a {@link Position} and whether it is white
+     *
+     * @param white    whether the knight is white
+     * @param position the {@link Position}
+     */
     public Knight(boolean white, @NotNull Position position) {
         this.white = white;
         this.position = position;
@@ -34,9 +51,9 @@ public class Knight implements Piece {
     }
 
     /**
-     * Get the moves that are possible on any chessboard without considering other pieces
+     * Get all possible moves of a knight on a {@link Board chessboard} without considering any other {@link Piece}
      *
-     * @return the possible moves
+     * @return all move possibilities
      */
     @NotNull
     private Stream<Position> getPossibleMoves() {
@@ -94,12 +111,12 @@ public class Knight implements Piece {
     }
 
     @Override
-    public boolean isCaptured() {
-        return false;
+    public char getFenIdentifier() {
+        return white ? 'N' : 'n';
     }
 
     @Override
-    public char getFenIdentifier() {
-        return white ? 'N' : 'n';
+    public String toString() {
+        return toPieceName();
     }
 }
