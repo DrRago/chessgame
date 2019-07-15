@@ -2,6 +2,7 @@ package de.dhbw.tinf18b4.chess.backend.piece;
 
 import de.dhbw.tinf18b4.chess.backend.Board;
 import de.dhbw.tinf18b4.chess.backend.Game;
+import de.dhbw.tinf18b4.chess.backend.Player;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 import org.jetbrains.annotations.NotNull;
 

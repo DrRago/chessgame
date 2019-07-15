@@ -35,8 +35,6 @@ public class Game {
      */
     @Getter
     private final History history = new History();
-    private Player player1;
-    private Player player2;
 
     /**
      * {@link Player} 1 of the game
@@ -70,10 +68,6 @@ public class Game {
         board = new Board(this, pieces);
         this.player1 = player1;
         this.player2 = player2;
-    }
-
-    private static boolean isWhiteSquare(@NotNull Position p) {
-        return (p.getFile() * 35 + p.getRank()) % 2 == 0;
     }
 
     /**
