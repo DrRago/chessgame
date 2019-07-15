@@ -144,6 +144,85 @@ public class Board {
         };
     }
 
+    @Override
+    public String toString() {
+        char[][] board = new char[8][8];
+        getPieces()
+                .filter(Objects::nonNull)
+                .forEach(piece -> {
+                    int y = piece.getPosition().getRank() - 1;
+                    int x = piece.getPosition().getFile() - 'a';
+
+                    board[y][x] = piece.getFenIdentifier();
+                });
+
+        String whiteSquare = "⬜";
+        String blackSquare = "⬛";
+        String whiteKing = "♔";
+        String whiteQueen = "♕";
+        String whiteRook = "♖";
+        String whiteBishop = "♗";
+        String whiteKnight = "♘";
+        String whitePawn = "♙";
+        String blackKing = "♚";
+        String blackQueen = "♛";
+        String blackRook = "♜";
+        String blackBishop = "♝";
+        String blackKnight = "♞";
+        String blackPawn = "♟";
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 7; i >= 0; i--) {
+            for (int j = 0; j < 8; j++) {
+                switch (board[i][j]) {
+                    case 'P':
+                        stringBuilder.append(whitePawn);
+                        break;
+                    case 'K':
+                        stringBuilder.append(whiteKing);
+                        break;
+                    case 'Q':
+                        stringBuilder.append(whiteQueen);
+                        break;
+                    case 'N':
+                        stringBuilder.append(whiteKnight);
+                        break;
+                    case 'R':
+                        stringBuilder.append(whiteRook);
+                        break;
+                    case 'B':
+                        stringBuilder.append(whiteBishop);
+                        break;
+                    case 'p':
+                        stringBuilder.append(blackPawn);
+                        break;
+                    case 'k':
+                        stringBuilder.append(blackKing);
+                        break;
+                    case 'q':
+                        stringBuilder.append(blackQueen);
+                        break;
+                    case 'n':
+                        stringBuilder.append(blackKnight);
+                        break;
+                    case 'r':
+                        stringBuilder.append(blackRook);
+                        break;
+                    case 'b':
+                        stringBuilder.append(blackBishop);
+                        break;
+                    default:
+                        stringBuilder.append((i + j) % 2 == 0 ? blackSquare : whiteSquare);
+                        stringBuilder.append(' ');
+                }
+            }
+
+            stringBuilder.append("\n");
+        }
+
+        return "Board{\n" + stringBuilder.toString() + "}";
+    }
+
     /**
      * Check whether a move is allowed on this board
      * <p>
