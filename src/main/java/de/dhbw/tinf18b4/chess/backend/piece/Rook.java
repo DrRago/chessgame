@@ -72,4 +72,9 @@ public class Rook implements Piece {
     public char getFenIdentifier() {
         return white ? 'R' : 'r';
     }
+
+    @Override
+    public String toString() {
+        return toPieceName();
+    }
 }

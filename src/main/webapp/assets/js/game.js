@@ -84,9 +84,10 @@ function onMouseoverSquare(square, piece) {
         if (value.piece === square && value.color === myColor && isTurn) {
             let i;
             let moves = value.possibilities;
+            const captureMoves = value.capturePossibilities;
 
             // exit if there are no moves available for this square
-            if (moves.length === 0) return;
+            if (moves.length === 0 && captureMoves.length === 0) return;
 
             // highlight the square they moused over
             greySquare(square);
@@ -96,9 +97,8 @@ function onMouseoverSquare(square, piece) {
                 greySquare(moves[i])
             }
 
-            const captueMoves = value.capturePossibilities;
-            for (i = 0; i < captueMoves.length; i++) {
-                redSquare(captueMoves[i])
+            for (i = 0; i < captureMoves.length; i++) {
+                redSquare(captureMoves[i])
             }
         }
     });

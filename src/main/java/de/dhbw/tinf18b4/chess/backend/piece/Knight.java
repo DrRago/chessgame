@@ -114,4 +114,9 @@ public class Knight implements Piece {
     public char getFenIdentifier() {
         return white ? 'N' : 'n';
     }
+
+    @Override
+    public String toString() {
+        return toPieceName();
+    }
 }

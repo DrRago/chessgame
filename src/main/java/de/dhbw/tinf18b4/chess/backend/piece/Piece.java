@@ -109,4 +109,13 @@ public interface Piece {
     default Position getBackwardsPosition() {
         return isWhite() ? getPosition().bottomNeighbor() : getPosition().topNeighbor();
     }
+
+    /**
+     * Return the name of the piece
+     *
+     * @return the name
+     */
+    default String toPieceName() {
+        return getClass().getSimpleName();
+    }
 }

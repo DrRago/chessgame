@@ -154,16 +154,16 @@ public class Board {
     boolean checkMove(@NotNull Move move) {
         // a piece is captured if it doesn't exist on this board anymore
         boolean isCaptured = getPieces().noneMatch(piece -> piece.equals(move.getPiece()));
-        boolean isAllowedMovement = move.getPiece()
-                .getValidMoves(this)
-                .anyMatch(position -> position.equals(move.getDestination()));
-        boolean isAllowedCaptureMove = move.getPiece()
-                .getValidCaptureMoves(this)
-                .anyMatch(position -> position.equals(move.getDestination()));
+        boolean isAllowedMovement = getAllPossibleMoves().parallelStream()
+                .anyMatch(map -> map.entrySet().stream()
+                        .filter(Objects::nonNull)
+                        .filter(entry -> entry.getKey().equals(move.getPiece()))
+                        .map(Map.Entry::getValue)
+                        .anyMatch(positions -> positions.anyMatch(p -> p.equals(move.getDestination()))
+                        )
+                );
 
-        return !isCaptured
-                && (isAllowedMovement
-                || isAllowedCaptureMove);
+        return !isCaptured && isAllowedMovement;
     }
 
     /**
@@ -271,7 +271,6 @@ public class Board {
 
             if (target == null && enPassant != null && enPassant.equals(move.getDestination())) {
                 // can't be null because an en passant wouldn't be possible then
-                //noinspection ConstantConditions
                 removePiece(findPieceByPosition(movedPawn.getBackwardsPosition()));
             }
         }
@@ -297,8 +296,6 @@ public class Board {
      * Get all possible moves and capture moves in a list with two maps,
      * the first is always the map with the moves and the second is
      * always the map with the capture moves
-     * <p>
-     * TODO filter moves that would get the king into check
      *
      * @return the list with the maps with all possible moves
      */
@@ -306,28 +303,36 @@ public class Board {
     public List<Map<Piece, Stream<Position>>> getAllPossibleMoves() {
         List<Map<Piece, Stream<Position>>> returnList = new ArrayList<>();
 
+        // differentiate normal moves and capture moves for performance reasons
         Map<Piece, Stream<Position>> moveMap = new HashMap<>();
         Map<Piece, Stream<Position>> captureMoveMap = new HashMap<>();
         getPieces()
                 .filter(piece -> getGame().whoseTurn().isWhite() ? piece.isWhite() : piece.isBlack())
                 .forEach(piece -> {
-                    captureMoveMap.put(piece, piece.getValidCaptureMoves(this));
-                    moveMap.put(piece, piece.getValidMoves(this));
-                }
-        );
+                            captureMoveMap.put(piece, piece.getValidCaptureMoves(this));
+                            moveMap.put(piece, piece.getValidMoves(this));
+                        }
+                );
 
+        // filter whether the king would be in check after this move is applied
         moveMap.entrySet()
                 .forEach(entry -> entry.setValue(entry.getValue().filter(position -> {
+                    // get the current position to reapply
                     Position prev = entry.getKey().getPosition();
                     entry.getKey().setPosition(position);
+
+                    // check if the king is in check
                     King king = entry.getKey().isWhite() ? getWhiteKing() : getBlackKing();
                     boolean result = king != null && !king.isInCheck(this);
+
+                    // reset the position
                     entry.getKey().setPosition(prev);
 
                     return result;
                 })));
         captureMoveMap.entrySet()
                 .forEach(entry -> entry.setValue(entry.getValue().filter(position -> {
+                    // get the current position to reapply
                     Position prev = entry.getKey().getPosition();
 
                     Piece capturePiece = findPieceByPosition(position);
@@ -340,12 +345,6 @@ public class Board {
 
                     entry.getKey().setPosition(prev);
                     pieces[i] = capturePiece;
-
-                    if (!result) {
-                        System.out.println();
-                        System.out.println();
-                        System.out.println(entry.getKey().getClass().getSimpleName() + " cannot capture " + capturePiece.getClass().getSimpleName());
-                    }
 
                     return result;
                 })));

@@ -181,4 +181,9 @@ public class King implements Piece {
 
         return capturePositions.anyMatch(position -> position.equals(getPosition()));
     }
+
+    @Override
+    public String toString() {
+        return toPieceName();
+    }
 }

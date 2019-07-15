@@ -55,4 +55,9 @@ public class Queen implements Piece {
     public char getFenIdentifier() {
         return white ? 'Q' : 'q';
     }
+
+    @Override
+    public String toString() {
+        return toPieceName();
+    }
 }

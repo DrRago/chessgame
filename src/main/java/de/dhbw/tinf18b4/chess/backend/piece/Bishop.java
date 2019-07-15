@@ -72,4 +72,9 @@ public class Bishop implements Piece {
     public char getFenIdentifier() {
         return white ? 'B' : 'b';
     }
+
+    @Override
+    public String toString() {
+        return toPieceName();
+    }
 }

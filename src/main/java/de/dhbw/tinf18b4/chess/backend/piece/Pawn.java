@@ -161,4 +161,9 @@ public class Pawn implements Piece {
     public char getFenIdentifier() {
         return white ? 'P' : 'p';
     }
+
+    @Override
+    public String toString() {
+        return toPieceName();
+    }
 }
