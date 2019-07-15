@@ -54,7 +54,7 @@ public class Pawn implements Piece {
 
         // if this pawn has not moved allow moving two fields forward
         // allow a moving two fields at once
-        if (hasEverMoved(board.getGame())) {
+        if (hasNeverMoved(board.getGame())) {
             if (white) {
                 doubleMove = Optional.ofNullable(singleMove)
                         .map(Position::topNeighbor)

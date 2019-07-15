@@ -64,11 +64,11 @@ public interface Piece {
     char getFenIdentifier();
 
     default boolean hasNeverMoved(@NotNull Game game) {
-        return 0 != numberOfMoves(game);
+        return 0 == numberOfMoves(game);
     }
 
     default boolean hasEverMoved(@NotNull Game game) {
-        return 0 == numberOfMoves(game);
+        return 0 != numberOfMoves(game);
     }
 
     default int numberOfMoves(@NotNull Game game) {
