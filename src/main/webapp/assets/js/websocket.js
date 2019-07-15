@@ -130,6 +130,8 @@ $(() => {
             case "connect":
                 playerConnect(msgObj.value);
                 break;
+            case "lobbyPrivacy":
+                $("#settingsTable #privacy > input").prop("checked", msgObj.value === "true")
         }
     };
 

@@ -195,8 +195,11 @@ public class Websocket extends HttpServlet {
                     if (!game.makeMove(move)) {
                         logger.info("Invalid move");
                     } else {
-                        // cant be null due to successful make move result
-                        sendToLobby(playerLobby, "logs", moveToJSON(move).toJSONString());
+                        JSONObject answer = buildAnswerTemplate();
+                        answer.put("content", "logs");
+                        answer.put("value", moveToJSON(move));
+
+                        sendToLobby(playerLobby, answer);
                     }
                     sendToLobby(playerLobby, getMoveResponse(playerLobby));
                 } catch (IllegalArgumentException e) {
@@ -238,6 +241,7 @@ public class Websocket extends HttpServlet {
                 break;
             case "lobbyPrivacy":
                 playerLobby.setPublicLobby(!(boolean) parsedMessage.get("value"));
+                sendToLobby(playerLobby, "lobbyPrivacy", String.valueOf(parsedMessage.get("value")));
                 break;
             default:
                 sendErrorMessageToClient("Operation " + contentType + " not found", session, "error");
