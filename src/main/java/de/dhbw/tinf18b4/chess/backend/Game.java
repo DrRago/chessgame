@@ -41,6 +41,10 @@ public class Game {
         this.player2 = player2;
     }
 
+    private static boolean isWhiteSquare(@NotNull Position p) {
+        return (p.getFile() * 35 + p.getRank()) % 2 == 0;
+    }
+
     /**
      * Attempt to perform a move on the board
      *
@@ -174,8 +178,8 @@ public class Game {
 
         // stalemate: when the player is not able to perform any valid move and the king is not in check
         final boolean stalemate = pieces.get()
-                .filter(piece -> piece.isWhite() == currentPlayer.isWhite())
-                .allMatch(piece -> Stream.concat(piece.getValidMoves(getBoard()), piece.getValidCaptureMoves(getBoard())).count() == 0)
+                .filter(piece -> piece.isOwnedBySamePlayer(currentPlayer))
+                .allMatch(piece -> piece.canMakeValidMove(board) && piece.canMakeValidCaptureMove(board))
 
                 && !(currentPlayer.isWhite() ? getBoard().whiteKing : getBoard().blackKing).isInCheck(getBoard());
 
@@ -183,21 +187,22 @@ public class Game {
         final boolean onlyKingAndBishop = pieces.get().allMatch(piece -> piece instanceof King || piece instanceof Bishop);
 
         // king vs king
-        final boolean isKingVsKing = pieces.get().count() == 2;
+        final long piecesLeft = pieces.get().count();
+        final boolean isKingVsKing = piecesLeft == 2;
 
         // king and bishop vs king
-        final boolean isKingBishopVsKing = onlyKingAndBishop && pieces.get().count() == 3;
+        final boolean isKingBishopVsKing = onlyKingAndBishop && piecesLeft == 3;
 
         // king and knight vs king
         final boolean isKingKnightVsKing = pieces.get()
                 .allMatch(piece -> piece instanceof King || piece instanceof Knight)
-                && pieces.get().count() == 3;
+                && piecesLeft == 3;
 
         // king and bishop vs king and bishop with bishops of the same color
         final boolean isKingBishopVsKingBishop;
         if (!onlyKingAndBishop) {
             isKingBishopVsKingBishop = false;
-        } else if (pieces.get().count() != 4) {
+        } else if (piecesLeft != 4) {
             isKingBishopVsKingBishop = false;
         } else {
             isKingBishopVsKingBishop = pieces.get().filter(piece -> piece instanceof Bishop)
@@ -207,9 +212,5 @@ public class Game {
         }
 
         return stalemate || isKingVsKing || isKingBishopVsKing || isKingKnightVsKing | isKingBishopVsKingBishop;
-    }
-
-    private static boolean isWhiteSquare(@NotNull Position p) {
-        return (p.getFile() * 35 + p.getRank()) % 2 == 0;
     }
 }

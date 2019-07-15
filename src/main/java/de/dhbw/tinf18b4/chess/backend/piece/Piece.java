@@ -2,6 +2,7 @@ package de.dhbw.tinf18b4.chess.backend.piece;
 
 import de.dhbw.tinf18b4.chess.backend.Board;
 import de.dhbw.tinf18b4.chess.backend.Game;
+import de.dhbw.tinf18b4.chess.backend.Player;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 import org.jetbrains.annotations.NotNull;
 
@@ -36,6 +37,10 @@ public interface Piece {
     @NotNull
     Stream<Position> getValidMoves(@NotNull Board board);
 
+    default boolean canMakeValidMove(@NotNull Board board) {
+        return getValidMoves(board).count() > 0;
+    }
+
     /**
      * Get a list of all possible capture options
      *
@@ -44,6 +49,10 @@ public interface Piece {
      */
     @NotNull
     Stream<Position> getValidCaptureMoves(@NotNull Board board);
+
+    default boolean canMakeValidCaptureMove(@NotNull Board board) {
+        return getValidCaptureMoves(board).count() > 0;
+    }
 
     /**
      * Get the color of the piece
@@ -100,6 +109,10 @@ public interface Piece {
         return isWhite() == piece.isWhite();
     }
 
+    default boolean isOwnedBySamePlayer(@NotNull Player player) {
+        return isWhite() == player.isWhite();
+    }
+
     /**
      * Check whether this piece and another are owned by different players
      *
@@ -108,5 +121,9 @@ public interface Piece {
      */
     default boolean isOwnedByEnemy(@NotNull Piece piece) {
         return isBlack() == piece.isWhite();
+    }
+
+    default boolean isOwnedByEnemy(@NotNull Player player) {
+        return isWhite() != player.isWhite();
     }
 }
