@@ -1,19 +1,20 @@
 package de.dhbw.tinf18b4.chess.frontend;
 
+import org.jetbrains.annotations.NotNull;
+
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * static class to manage all http sessions to the server
- *
- * @author Leonhard Gahr
  */
 public class SessionManager {
     /**
      * the list holding all logged in sessions
      */
-    private static List<HttpSession> sessions = new ArrayList<>();
+    @NotNull
+    private static final List<HttpSession> sessions = new ArrayList<>();
 
     /**
      * Add a session to the list

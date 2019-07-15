@@ -17,13 +17,12 @@ import java.util.stream.Collectors;
  * <li>generate a new {@link Lobby}</li>
  * <li>remove a {@link Lobby}</li>
  * </ul>
- *
- * @author Leonhard Gahr
  */
 public class LobbyManager {
     /**
      * A {@link HashMap} with all active lobbies
      */
+    @NotNull
     @Getter
     static Map<String, Lobby> lobbies = new HashMap<>();
 
@@ -33,6 +32,7 @@ public class LobbyManager {
      * @param creator the {@link User} who created the lobby
      * @return the ID of {@link Lobby} that has been created
      */
+    @NotNull
     public static String createLobby(@NotNull User creator) {
         String lobbyID;
 
@@ -52,6 +52,7 @@ public class LobbyManager {
      *
      * @return the {@link Map} of all public lobbies
      */
+    @NotNull
     public static Map<String, Lobby> getPublicLobbies() {
         return lobbies.entrySet().stream()
                 .filter(entry -> entry.getValue().isPublicLobby())
@@ -63,6 +64,7 @@ public class LobbyManager {
      *
      * @return the {@link Map} of all public lobbies
      */
+    @NotNull
     public static Map<String, Lobby> getPublicNotFullLobbies() {
         return getPublicLobbies().entrySet().stream()
                 .filter(entry -> Arrays.stream(entry.getValue().getPlayers()).anyMatch(Objects::isNull))
@@ -74,7 +76,7 @@ public class LobbyManager {
      *
      * @param ID the ID of the {@link Lobby} to be removed
      */
-    public static void removeLobby(@NotNull String ID) {
+    static void removeLobby(@NotNull String ID) {
         lobbies.remove(ID);
     }
 
@@ -92,6 +94,7 @@ public class LobbyManager {
      *
      * @return the random {@link String}
      */
+    @NotNull
     private static String generateRandomString() {
         SecureRandom secureRandom = new SecureRandom();
         byte[] token = new byte[7];

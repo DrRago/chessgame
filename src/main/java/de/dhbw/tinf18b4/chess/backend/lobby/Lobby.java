@@ -20,8 +20,6 @@ import java.util.Objects;
  * <li>disallow join of a {@link User}</li>
  * <li>start a {@link Game}</li>
  * </ul>
- *
- * @author Leonhard Gahr
  */
 public class Lobby {
 
@@ -41,12 +39,14 @@ public class Lobby {
     /**
      * The {@link Game} that will be played
      */
+    @Nullable
     @Getter
     private Game game = null;
 
     /**
      * The current status of the {@link Game} (may be WAITING or STARTED, no errors)
      */
+    @NotNull
     @Getter
     private LobbyStatus status = LobbyStatus.WAITING_FOR_START;
 
@@ -54,7 +54,8 @@ public class Lobby {
         this.players[0] = new Player(true, creator);
     }
 
-    public @NotNull LobbyStatus startGame() {
+    @NotNull
+    public LobbyStatus startGame() {
         if (Arrays.stream(players).anyMatch(Objects::isNull)) {
             return LobbyStatus.NOT_ENOUGH_PLAYERS;
         }
@@ -65,29 +66,13 @@ public class Lobby {
     }
 
     /**
-     * Let a {@link Player} join the {@link Lobby}
-     *
-     * @param player the {@link Player} to join (not null)
-     * @return whether the join procedure was successful (false if {@link Lobby} is full)
-     */
-    public boolean join(@NotNull Player player) {
-        if (players[0] == null) {
-            players[0] = player;
-        } else if (players[1] == null) {
-            players[1] = player;
-        } else {
-            return false;
-        }
-        return true;
-    }
-
-    /**
      * Let a new {@link User} join the {@link Lobby}
      *
      * @param user the user (not null)
      * @return the {@link Player} that has been created
      */
-    public @Nullable Player join(@NotNull User user) {
+    @Nullable
+    public Player join(@NotNull User user) {
         if (players[0] == null) {
             players[0] = new Player(!players[1].isWhite(), user);
             return players[0];
@@ -137,7 +122,8 @@ public class Lobby {
      * @param user the {@link User} to get the player from
      * @return the {@link Player} or null, if the user doesn't have one
      */
-    public @Nullable Player getPlayerByUser(@NotNull User user) {
+    @Nullable
+    public Player getPlayerByUser(@NotNull User user) {
         return Arrays.stream(players)
                 .filter(Objects::nonNull)
                 .filter(player -> player.getUser().equals(user))

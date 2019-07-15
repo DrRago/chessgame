@@ -6,17 +6,67 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Stream;
 
+/**
+ * The board represents the status of the pieces and manages the {@link Move moves} on the it
+ */
 public class Board {
-    final private Piece[] pieces = initialSetup();
+    /**
+     * A representation of the current {@link Piece pieces} placed on the board. <br>
+     * The {@link Position positions} are stored in the {@link Piece pieces} itself,
+     * so the array could have null values or less than 32 entries
+     */
+    final private Piece[] pieces;
+    /**
+     * A reference back to the {@link Game} object of this board
+     */
+    @NotNull
     @Getter
     final private Game game;
 
+    /**
+     * The white {@link King}
+     */
+    @Nullable
+    @Getter
+    King whiteKing = null;
+    /**
+     * The black {@link King}
+     */
+    @Nullable
+    @Getter
+    King blackKing = null;
+
+    /**
+     * Create a new board instance with the initial setup of a chessgame
+     *
+     * @param game the {@link Game} of the board
+     */
     public Board(@NotNull Game game) {
+        this(game, initialSetup());
+    }
+
+    /**
+     * Create a new board instance with a custom {@link Piece} layout
+     *
+     * @param game   the {@link Game} of this board
+     * @param pieces the custom {@link Piece} layout
+     */
+    public Board(@NotNull Game game, @NotNull Piece[] pieces) {
+        this.pieces = pieces;
         this.game = game;
+
+        for (Piece piece : pieces) {
+            if (piece instanceof King) {
+                if (piece.isWhite()) {
+                    whiteKing = (King) piece;
+                } else {
+                    blackKing = (King) piece;
+                }
+            }
+        }
     }
 
     /**
@@ -53,7 +103,8 @@ public class Board {
      *
      * @return the pieces
      */
-    private Piece[] initialSetup() {
+    @NotNull
+    private static Piece[] initialSetup() {
         return new Piece[]{
                 // white pieces
                 new Pawn(true, new Position('a', 2)),
@@ -120,6 +171,7 @@ public class Board {
      *
      * @return The pieces
      */
+    @NotNull
     public Stream<Piece> getPieces() {
         return Stream.of(pieces).filter(Objects::nonNull);
     }
@@ -129,7 +181,8 @@ public class Board {
      *
      * @return The positions
      */
-    Stream<Position> getOccupiedPositions() {
+    @NotNull
+    private Stream<Position> getOccupiedPositions() {
         return getPieces().map(Piece::getPosition);
     }
 
@@ -144,11 +197,22 @@ public class Board {
     }
 
     /**
+     * Determine whether there is no piece on the provided position
+     *
+     * @param position The position to check
+     * @return true if the position is not occupied
+     */
+    public boolean isNotOccupied(@NotNull Position position) {
+        return getOccupiedPositions().noneMatch(position::equals);
+    }
+
+    /**
      * Find the piece on the given position
      *
      * @param position The position
      * @return The found piece or null if there is none
      */
+    @Nullable
     public Piece findPieceByPosition(@NotNull Position position) {
         return getPieces().filter(piece -> piece.getPosition().equals(position))
                 .findFirst()
@@ -160,7 +224,7 @@ public class Board {
      *
      * @param toRemove the piece to set as null on the board
      */
-    private void removePiece(Piece toRemove) {
+    private void removePiece(@NotNull Piece toRemove) {
         for (int i = 0; i < pieces.length; i++) {
             if (pieces[i] == toRemove) {
                 pieces[i] = null;
@@ -178,8 +242,9 @@ public class Board {
                 .filter(piece -> piece.equals(move.getPiece()))
                 .findFirst()
                 .orElseThrow();
-        if (findPieceByPosition(move.getDestination()) != null) {
-            removePiece(findPieceByPosition(move.getDestination()));
+        Piece target = findPieceByPosition(move.getDestination());
+        if (target != null) {
+            removePiece(target);
         }
         movedPiece.setPosition(move.getDestination());
 
@@ -197,13 +262,43 @@ public class Board {
     /**
      * Build the {@link Move} according to a valid {@link Move} format defined in {@link #checkMoveFormat(String)}
      *
+     * @param move   the string representation of the move
+     * @param player the player who performed the move
      * @return the move
      */
-    public @NotNull Move buildMove(String move, Player player) {
+    @NotNull
+    public Move buildMove(@NotNull String move, @NotNull Player player) {
         String[] moveArray = move.split("-");
         Position origin = new Position(moveArray[0]);
         Position destination = new Position(moveArray[1]);
 
         return new Move(player, origin, destination, this);
+    }
+
+    /**
+     * Get all possible moves and capture moves in a list with two maps,
+     * the first is always the map with the moves and the second is
+     * always the map with the capture moves
+     * <p>
+     * TODO filter moves that would get the king into check
+     *
+     * @return the list with the maps with all possible moves
+     */
+    @NotNull
+    public List<Map<Piece, Stream<Position>>> getAllPossibleMoves() {
+        List<Map<Piece, Stream<Position>>> returnList = new ArrayList<>();
+
+        Map<Piece, Stream<Position>> moveMap = new HashMap<>();
+        Map<Piece, Stream<Position>> captureMoveMap = new HashMap<>();
+        getPieces().forEach(piece -> {
+                    captureMoveMap.put(piece, piece.getValidCaptureMoves(this));
+                    moveMap.put(piece, piece.getValidMoves(this));
+                }
+        );
+
+        returnList.add(moveMap);
+        returnList.add(captureMoveMap);
+
+        return returnList;
     }
 }
