@@ -122,7 +122,7 @@ public class Pawn implements Piece {
      * @return the {@link Position} the pawn can possibly do an en passant to
      */
     @Nullable
-    private Position calculateEnPassantPossibility(@NotNull Board board) {
+    public Position calculateEnPassantPossibility(@NotNull Board board) {
         Move lastMove = board.getGame().getHistory().lastMove();
 
         // If there is no first move en passant is not possible
