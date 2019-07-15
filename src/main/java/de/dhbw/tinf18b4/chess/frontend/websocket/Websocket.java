@@ -119,7 +119,7 @@ public class Websocket extends HttpServlet {
      * @param session the closing session
      */
     @OnClose
-    public void onClose(@NotNull Session session) {
+    public void onClose(@NotNull Session session) throws IOException {
         logger.info(String.format("Closed connection for %s (%s)", sessionToSessionID.get(session), sessionToLobbyID.get(session)));
 
         // remove identifiers
@@ -369,7 +369,7 @@ public class Websocket extends HttpServlet {
      * @param message the value field of the json message
      */
     @SuppressWarnings("unchecked")
-    private void sendToLobby(@NotNull Lobby lobby, @NotNull String content, @NotNull String message) {
+    private void sendToLobby(@NotNull Lobby lobby, @NotNull String content, @NotNull String message) throws IOException {
         // build the JSON object
         JSONObject answer = buildAnswerTemplate();
         answer.put("content", content);
@@ -385,7 +385,7 @@ public class Websocket extends HttpServlet {
      * @param lobby      the lobby to send the object to
      * @param jsonObject the json object to send
      */
-    private void sendToLobby(@NotNull Lobby lobby, @NotNull JSONObject jsonObject) {
+    private void sendToLobby(@NotNull Lobby lobby, @NotNull JSONObject jsonObject) throws IOException {
         // collect all sessions that are in the current lobby
         List<Session> lobbySessions = sessionToLobby.entrySet().stream()
                 .filter(entry -> entry.getValue() == lobby).map(Map.Entry::getKey).collect(Collectors.toList());
@@ -404,7 +404,7 @@ public class Websocket extends HttpServlet {
      * @param message the value field of the json object
      */
     @SuppressWarnings("unchecked")
-    private void sendToSession(@NotNull Session session, @NotNull String content, @NotNull String message) {
+    private void sendToSession(@NotNull Session session, @NotNull String content, @NotNull String message) throws IOException {
         JSONObject answer = buildAnswerTemplate();
         answer.put("content", content);
         answer.put("value", message);
@@ -418,10 +418,10 @@ public class Websocket extends HttpServlet {
      * @param session    the session to send the object to
      * @param jsonObject the json object to send
      */
-    private void sendToSession(@NotNull Session session, @NotNull JSONObject jsonObject) {
+    private synchronized void sendToSession(@NotNull Session session, @NotNull JSONObject jsonObject) throws IOException {
         if (!session.isOpen()) return;
         logger.info(String.format("sending to client %s (%s)", sessionToSessionID.get(session), sessionToLobbyID.get(session)));
-        session.getAsyncRemote().sendText(jsonObject.toJSONString());
+        session.getBasicRemote().sendText(jsonObject.toJSONString());
     }
 
     /**
