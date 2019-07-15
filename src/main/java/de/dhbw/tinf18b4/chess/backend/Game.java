@@ -177,11 +177,13 @@ public class Game {
         }
 
         // stalemate: when the player is not able to perform any valid move and the king is not in check
+        King king = currentPlayer.isWhite() ? getBoard().whiteKing : getBoard().blackKing;
+        Objects.requireNonNull(king, "Couldn't determine draw: king is null");
         final boolean stalemate = pieces.get()
                 .filter(piece -> piece.isOwnedBySamePlayer(currentPlayer))
                 .allMatch(piece -> piece.canMakeValidMove(board) && piece.canMakeValidCaptureMove(board))
 
-                && !(currentPlayer.isWhite() ? getBoard().whiteKing : getBoard().blackKing).isInCheck(getBoard());
+                && !king.isInCheck(getBoard());
 
         // draw by insufficient material is when one of these combinations occur
         final boolean onlyKingAndBishop = pieces.get().allMatch(piece -> piece instanceof King || piece instanceof Bishop);
