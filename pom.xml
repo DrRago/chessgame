@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.dhbw.karlsruhe.chess</groupId>
-    <artifactId>chess</artifactId>
+    <artifactId>chess_game</artifactId>
     <version>0.1</version>
     <packaging>war</packaging>
 
