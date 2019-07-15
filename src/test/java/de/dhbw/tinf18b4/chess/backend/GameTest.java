@@ -101,4 +101,22 @@ public class GameTest {
         Game game = new Game(white, black, checkmate);
         assertEquals("White player should have won", white, game.isCheckmate());
     }
+
+    @Test
+    public void initialSetupTest() {
+        Game game = new Game(white, black);
+
+        game.getBoard().getPieces()
+                .filter(piece -> piece instanceof Rook || piece instanceof Bishop || piece instanceof King || piece instanceof Queen)
+                .forEach(piece -> {
+                    assertEquals(0, piece.getValidMoves(game.getBoard()).count());
+                    assertEquals(0, piece.getValidCaptureMoves(game.getBoard()).count());
+                });
+        game.getBoard().getPieces()
+                .filter(piece -> piece instanceof Knight || piece instanceof Pawn)
+                .forEach(piece -> {
+                    assertEquals(2, piece.getValidMoves(game.getBoard()).count());
+                    assertEquals(0, piece.getValidCaptureMoves(game.getBoard()).count());
+                });
+    }
 }
