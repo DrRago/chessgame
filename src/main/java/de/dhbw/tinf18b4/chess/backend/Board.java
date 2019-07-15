@@ -257,6 +257,21 @@ public class Board {
                 }
             }
         }
+        // check whether an en passant capture was made
+        else if (movedPiece instanceof Pawn) {
+            Pawn movedPawn = (Pawn) movedPiece;
+
+            // check if the move was an en passant, so we have to move the pawn temporarily back
+            movedPawn.setPosition(move.getOrigin());
+            Position enPassant = movedPawn.calculateEnPassantPossibility(this);
+            movedPawn.setPosition(move.getDestination());
+
+            if (target == null && enPassant != null && enPassant.equals(move.getDestination())) {
+                // can't be null because an en passant wouldn't be possible then
+                //noinspection ConstantConditions
+                removePiece(findPieceByPosition(movedPawn.getBackwardsPosition()));
+            }
+        }
     }
 
     /**

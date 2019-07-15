@@ -73,7 +73,10 @@ public class Lobby {
      */
     @Nullable
     public Player join(@NotNull User user) {
-        if (players[0] == null) {
+        if (players[0] == null && players[1] == null) {
+            players[0] = new Player(true, user);
+            return players[0];
+        } else if (players[0] == null) {
             players[0] = new Player(!players[1].isWhite(), user);
             return players[0];
         } else if (players[1] == null) {

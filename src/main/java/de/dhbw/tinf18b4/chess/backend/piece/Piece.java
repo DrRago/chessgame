@@ -98,4 +98,15 @@ public interface Piece {
     default boolean isOwnedByEnemy(@NotNull Piece piece) {
         return isBlack() == piece.isWhite();
     }
+
+    /**
+     * Move the piece perspectively backwards, so move it down if it is white and up if it's black.
+     * <p>
+     * Do nothing if the destination is offboard
+     *
+     * @return the perspectively back position
+     */
+    default Position getBackwardsPosition() {
+        return isWhite() ? getPosition().bottomNeighbor() : getPosition().topNeighbor();
+    }
 }

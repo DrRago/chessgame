@@ -7,7 +7,12 @@ const blackSquareGrey = '#696969';
 const redSquareColor = '#ff7979';
 
 const addLog = message => {
-    $("#logs > table").append(`<tr><td>${message}</td></tr>`);
+    if (!Array.isArray(message)) message = [message];
+
+    for (let logEntry in message) {
+        $("#logs > table").append(`<tr class="${message[logEntry].player}"><td>${message[logEntry].entry}</td></tr>`);
+    }
+
     const objDiv = document.getElementById("logs");
     objDiv.scrollTop = objDiv.scrollHeight;
 
@@ -52,11 +57,11 @@ const handleMove = message => {
     possibilities = message.possibilities;
 };
 
-function removeGreySquares () {
+function removeGreySquares() {
     $('#board1 .square-55d63').css('background', '')
 }
 
-function greySquare (square) {
+function greySquare(square) {
     var $square = $('#board1 .square-' + square);
 
     var background = whiteSquareGrey;
@@ -67,13 +72,13 @@ function greySquare (square) {
     $square.css('background', background)
 }
 
-function redSquare (square) {
-    var $square = $('#board1 .square-' + square);
+function redSquare(square) {
+    const $square = $('#board1 .square-' + square);
 
     $square.css('background', redSquareColor)
 }
 
-function onMouseoverSquare (square, piece) {
+function onMouseoverSquare(square, piece) {
     // get list of possible moves for this square
     possibilities.forEach(value => {
         if (value.piece === square && value.color === myColor && isTurn) {
@@ -101,6 +106,6 @@ function onMouseoverSquare (square, piece) {
 
 }
 
-function onMouseoutSquare (square, piece) {
+function onMouseoutSquare(square, piece) {
     removeGreySquares()
 }

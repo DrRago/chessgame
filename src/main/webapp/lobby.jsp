@@ -29,7 +29,7 @@
         </div>
     </div>
     <div class="row mt-4">
-        <div class="col">
+        <div class="col-lg-3 col-sm-5">
             <div class="card">
                 <div class="card-header"><h4>Players</h4></div>
                 <div class="card-body">
@@ -50,8 +50,13 @@
                     <table class="table table-striped" id="settingsTable">
                         <tbody>
                         <tr>
-                            <td><input type="checkbox" id="checkbox1"> <label for="checkbox1">Checkbox, check it if you
-                                want</label></td>
+                            <td>
+                                <label class="switch" id="privacy">
+                                    <input type="checkbox">
+                                    <span class="slider round"></span>
+                                </label>
+                                <label class="center align-items-center">Private Lobby</label>
+                            </td>
                         </tr>
                         <tr>
                             <td><input type="checkbox" id="checkbox2"> <label for="checkbox2">Checkbox, check it if you
