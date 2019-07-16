@@ -6,6 +6,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.stream.Stream;
 
@@ -230,10 +231,10 @@ public class Board {
      * @param move The move
      * @return whether is possible to make the move
      */
-    boolean checkMove(@NotNull Move move) {
+    synchronized boolean checkMove(@NotNull Move move) {
         // a piece is captured if it doesn't exist on this board anymore
         boolean isCaptured = getPieces().noneMatch(piece -> piece.equals(move.getPiece()));
-        boolean isAllowedMovement = getAllPossibleMoves().parallelStream()
+        boolean isAllowedMovement = getAllPossibleMoves().stream()
                 .anyMatch(map -> map.entrySet().stream()
                         .filter(Objects::nonNull)
                         .filter(entry -> entry.getKey().equals(move.getPiece()))
@@ -304,9 +305,9 @@ public class Board {
      * @param toRemove the piece to set as null on the board
      * @return the index of the removed piece
      */
-    private int removePiece(@Nullable Piece toRemove) {
+    private synchronized int removePiece(@Nullable Piece toRemove) {
         for (int i = 0; i < pieces.length; i++) {
-            if (pieces[i] == toRemove) {
+            if (pieces[i] != null && pieces[i].equals(toRemove)) {
                 pieces[i] = null;
                 return i;
             }
@@ -319,7 +320,7 @@ public class Board {
      *
      * @param move The move
      */
-    void applyMove(@NotNull Move move) {
+    synchronized void applyMove(@NotNull Move move) {
         Piece movedPiece = getPieces()
                 .filter(piece -> piece.equals(move.getPiece()))
                 .findFirst()
@@ -374,22 +375,24 @@ public class Board {
     /**
      * Get all possible moves and capture moves in a list with two maps,
      * the first is always the map with the moves and the second is
-     * always the map with the capture moves
+     * always the map with the capture moves.
+     * <p>
+     * To prevent interferes with multithreaded methods the moves gets
+     * applied on a temporary board which is an exact copy of this board
      *
      * @return the list with the maps with all possible moves
      */
     @NotNull
-    public List<Map<Piece, Stream<Position>>> getAllPossibleMoves() {
-        List<Map<Piece, Stream<Position>>> returnList = new ArrayList<>();
-
+    public synchronized List<Map<Piece, Stream<Position>>> getAllPossibleMoves() {
+        Board tempBoard = this.copy();
         // differentiate normal moves and capture moves for performance reasons
         Map<Piece, Stream<Position>> moveMap = new HashMap<>();
         Map<Piece, Stream<Position>> captureMoveMap = new HashMap<>();
-        getPieces()
-                .filter(piece -> getGame().whoseTurn().isWhite() ? piece.isWhite() : piece.isBlack())
+        tempBoard.getPieces()
+                .filter(piece -> tempBoard.getGame().whoseTurn().isWhite() ? piece.isWhite() : piece.isBlack())
                 .forEach(piece -> {
-                            captureMoveMap.put(piece, piece.getValidCaptureMoves(this));
-                            moveMap.put(piece, piece.getValidMoves(this));
+                            captureMoveMap.put(piece, piece.getValidCaptureMoves(tempBoard));
+                            moveMap.put(piece, piece.getValidMoves(tempBoard));
                         }
                 );
 
@@ -401,8 +404,8 @@ public class Board {
                     entry.getKey().setPosition(position);
 
                     // check if the king is in check
-                    King king = entry.getKey().isWhite() ? getWhiteKing() : getBlackKing();
-                    boolean result = king != null && !king.isInCheck(this);
+                    King king = entry.getKey().isWhite() ? tempBoard.getWhiteKing() : tempBoard.getBlackKing();
+                    boolean result = king != null && !king.isInCheck(tempBoard);
 
                     // reset the position
                     entry.getKey().setPosition(prev);
@@ -413,24 +416,41 @@ public class Board {
                 .forEach(entry -> entry.setValue(entry.getValue().filter(position -> {
                     // get the current position to reapply
                     Position prev = entry.getKey().getPosition();
-
-                    Piece capturePiece = findPieceByPosition(position);
-
+                    Piece capturePiece = tempBoard.findPieceByPosition(position);
                     entry.getKey().setPosition(position);
 
-                    int i = removePiece(capturePiece);
-                    King king = entry.getKey().isWhite() ? getWhiteKing() : getBlackKing();
-                    boolean result = king != null && !king.isInCheck(this);
+                    // check whether the king is in check
+                    int i = tempBoard.removePiece(capturePiece);
+                    King king = entry.getKey().isWhite() ? tempBoard.getWhiteKing() : tempBoard.getBlackKing();
+                    boolean result = king != null && !king.isInCheck(tempBoard);
 
+                    // reapply the captured piece and the moved piece's position
                     entry.getKey().setPosition(prev);
-                    pieces[i] = capturePiece;
+                    tempBoard.pieces[i] = capturePiece;
 
                     return result;
                 })));
 
-        returnList.add(moveMap);
-        returnList.add(captureMoveMap);
+        return List.of(moveMap, captureMoveMap);
+    }
 
-        return returnList;
+    /**
+     * Create a copy of this board and reinitialize all pieces with the same position
+     *
+     * @return a copy of this board
+     */
+    @NotNull
+    private Board copy() {
+        Piece[] pieces = getPieces().map(piece -> {
+            try {
+                return (Piece) piece.getClass().getDeclaredConstructors()[0].newInstance(piece.isWhite(), piece.getPosition());
+            } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }).toArray(Piece[]::new);
+
+        return new Board(game, pieces);
     }
 }

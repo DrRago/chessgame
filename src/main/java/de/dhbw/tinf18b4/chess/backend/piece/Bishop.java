@@ -69,6 +69,13 @@ public class Bishop implements Piece {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Bishop)) return false;
+        Piece piece = (Piece) obj;
+        return piece.getPosition() == position && piece.isWhite() == white;
+    }
+
+    @Override
     public char getFenIdentifier() {
         return white ? 'B' : 'b';
     }

@@ -36,7 +36,7 @@ const initGame = color => {
     myColor = color;
 
     const config = {
-        position: 'start',
+        position: '',
         pieceTheme: '/assets/img/chesspieces/wikipedia/{piece}.png',
         draggable: true,
         orientation: myColor,

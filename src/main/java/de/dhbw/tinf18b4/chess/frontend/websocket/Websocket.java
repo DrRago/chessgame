@@ -77,7 +77,7 @@ public class Websocket extends HttpServlet {
      * @throws IOException on session send error
      */
     @OnOpen
-    public void onOpen(@PathParam("lobbyID") String lobbyID, @PathParam("sessionID") String sessionID, @NotNull Session session) throws IOException {
+    public synchronized void onOpen(@PathParam("lobbyID") String lobbyID, @PathParam("sessionID") String sessionID, @NotNull Session session) throws IOException {
         logger.info(String.format("Incoming socket connection from %s (%s)...", sessionID, lobbyID));
 
         Lobby playerLobby;
@@ -160,7 +160,7 @@ public class Websocket extends HttpServlet {
      * @throws IOException    on send error to client
      */
     @OnMessage
-    public void onMessage(@NotNull Session session, @NotNull String message) throws ParseException, IOException {
+    public synchronized void onMessage(@NotNull Session session, @NotNull String message) throws ParseException, IOException {
         logger.info(String.format("Got message from client %s (%s):", sessionToSessionID.get(session), sessionToLobbyID.get(session)));
         logger.info(message);
         JSONObject parsedMessage = parseMessage(message);
@@ -292,7 +292,7 @@ public class Websocket extends HttpServlet {
      */
     @NotNull
     @SuppressWarnings("unchecked")
-    private JSONObject getMoveResponse(@NotNull Lobby lobby) {
+    private synchronized JSONObject getMoveResponse(@NotNull Lobby lobby) {
         JSONObject moveAnswer = buildAnswerTemplate();
 
         JSONObject answerValue = new JSONObject();
@@ -420,8 +420,13 @@ public class Websocket extends HttpServlet {
      */
     private synchronized void sendToSession(@NotNull Session session, @NotNull JSONObject jsonObject) throws IOException {
         if (!session.isOpen()) return;
-        logger.info(String.format("sending to client %s (%s)", sessionToSessionID.get(session), sessionToLobbyID.get(session)));
-        session.getBasicRemote().sendText(jsonObject.toJSONString());
+        try {
+            session.getBasicRemote().sendText(jsonObject.toJSONString());
+            logger.info(String.format("sent message to client %s (%s):", sessionToSessionID.get(session), sessionToLobbyID.get(session)));
+            logger.info(jsonObject.toJSONString());
+        } catch (IllegalStateException ignored) {
+            logger.warning("tried to send message to closed session");
+        }
     }
 
     /**
@@ -433,7 +438,8 @@ public class Websocket extends HttpServlet {
      * @throws IOException on send error to client
      */
     @SuppressWarnings("unchecked")
-    private void sendErrorMessageToClient(@NotNull String message, @NotNull Session session, @NotNull String type) throws IOException {
+    private void sendErrorMessageToClient(@NotNull String message, @NotNull Session session, @NotNull String type) throws
+            IOException {
         System.out.println(message);
         JSONObject answer = JSONHandler.buildAnswerTemplate();
         answer.put("content", type);
@@ -458,7 +464,8 @@ public class Websocket extends HttpServlet {
      * @return the {@link Lobby} of the request
      * @throws IOException on send error to client
      */
-    private @Nullable Lobby verifyRequest(@NotNull Session session, @Nullable String sessionID, @Nullable String lobbyID) throws IOException {
+    private @Nullable Lobby verifyRequest(@NotNull Session session, @Nullable String sessionID, @Nullable String
+            lobbyID) throws IOException {
         if (sessionID == null || lobbyID == null) {
             sendErrorMessageToClient("Unallowed call to server", session, "fatal");
             return null;

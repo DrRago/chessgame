@@ -67,6 +67,12 @@ public class Rook implements Piece {
                 .flatMap(Optional::stream);
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Rook)) return false;
+        Piece piece = (Piece) obj;
+        return piece.getPosition() == position && piece.isWhite() == white;
+    }
 
     @Override
     public char getFenIdentifier() {

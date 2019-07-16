@@ -183,6 +183,13 @@ public class King implements Piece {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof King)) return false;
+        Piece piece = (Piece) obj;
+        return piece.getPosition() == position && piece.isWhite() == white;
+    }
+
+    @Override
     public String toString() {
         return toPieceName();
     }

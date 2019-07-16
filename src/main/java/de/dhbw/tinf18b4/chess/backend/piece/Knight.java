@@ -111,6 +111,13 @@ public class Knight implements Piece {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof Knight)) return false;
+        Piece piece = (Piece) obj;
+        return piece.getPosition() == position && piece.isWhite() == white;
+    }
+
+    @Override
     public char getFenIdentifier() {
         return white ? 'N' : 'n';
     }
