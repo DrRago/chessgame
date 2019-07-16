@@ -405,7 +405,7 @@ public class Board {
 
                     // check if the king is in check
                     King king = entry.getKey().isWhite() ? tempBoard.getWhiteKing() : tempBoard.getBlackKing();
-                    boolean result = king != null && !king.isInCheck(tempBoard);
+                    boolean result = king == null || !king.isInCheck(tempBoard);
 
                     // reset the position
                     entry.getKey().setPosition(prev);
@@ -422,7 +422,7 @@ public class Board {
                     // check whether the king is in check
                     int i = tempBoard.removePiece(capturePiece);
                     King king = entry.getKey().isWhite() ? tempBoard.getWhiteKing() : tempBoard.getBlackKing();
-                    boolean result = king != null && !king.isInCheck(tempBoard);
+                    boolean result = king == null || !king.isInCheck(tempBoard);
 
                     // reapply the captured piece and the moved piece's position
                     entry.getKey().setPosition(prev);
