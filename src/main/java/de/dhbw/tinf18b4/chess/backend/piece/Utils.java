@@ -13,24 +13,6 @@ import java.util.stream.Stream;
 class Utils {
 
     /**
-     * I don't really know how this function actually works.
-     *
-     * @param initialPiecePosition the {@link Position} to start the iterator
-     * @param board                the {@link Board} to check whether a {@link Position} {@link Board#isOccupied(Position) is occupied}
-     * @param directions           the directions where to move the iterator
-     * @return the positions the iterator found
-     */
-    @SafeVarargs
-    @NotNull
-    static Stream<Position> directionalIterator(Position initialPiecePosition, @NotNull Board board, UnaryOperator<Position>... directions) {
-        return Stream.of(directions)
-                .map(f -> directionalIteratorUntilEdge(initialPiecePosition, f)
-                        // or when we reach another piece
-                        .takeWhile(board::isNotOccupied))
-                .flatMap(s -> s);
-    }
-
-    /**
      * Get all {@link Position positions} from an initial {@link Position} in a direction until the {@link Board} ends
      *
      * @param initialPiecePosition the initial {@link Position}
