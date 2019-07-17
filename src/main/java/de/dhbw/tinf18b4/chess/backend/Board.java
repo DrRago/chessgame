@@ -354,6 +354,41 @@ public class Board {
                 removePiece(findPieceByPosition(movedPawn.getBackwardsPosition()));
             }
         }
+        // check whether a castling move was made
+        else if (movedPiece instanceof King) {
+            King movedKing = (King) movedPiece;
+
+            int rankDistance = move.getOrigin().getFile() - move.getDestination().getFile();
+            if (Math.abs(rankDistance) == 2) {
+                Position newRookPosition = movedKing.getPosition();
+                String initialPosition;
+
+                if (movedKing.isWhite()) {
+                    // right rook
+                    if (Math.abs(rankDistance) == rankDistance) {
+                        newRookPosition = newRookPosition.rightNeighbor();
+                        initialPosition = "a1";
+                    } else {
+                        newRookPosition = newRookPosition.leftNeighbor();
+                        initialPosition = "h1";
+                    }
+                } else {
+                    // left rook
+                    if (Math.abs(rankDistance) == rankDistance) {
+                        newRookPosition = newRookPosition.rightNeighbor();
+                        initialPosition = "a8";
+                    } else {
+                        newRookPosition = newRookPosition.leftNeighbor();
+                        initialPosition = "h8";
+                    }
+                }
+
+                Position oldRookPosition = new Position(initialPosition);
+                Rook rook = (Rook) findPieceByPosition(oldRookPosition);
+                Objects.requireNonNull(rook, "castling performed but can't find rook at position " + oldRookPosition)
+                        .setPosition(Objects.requireNonNull(newRookPosition, "castling performed but can't move rook to an offboard position"));
+            }
+        }
     }
 
     /**

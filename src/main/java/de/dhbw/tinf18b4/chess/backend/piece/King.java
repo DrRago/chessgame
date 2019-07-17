@@ -6,10 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -54,16 +52,7 @@ public class King implements Piece {
     @NotNull
     @Override
     public Stream<Position> getValidMoves(@NotNull Board board) {
-        List<Position> castlingRookPositions = calculateCastlingPossibility(board).collect(Collectors.toList());
-        // since castling is only possible with rooks at their initial position
-        // we don't bother checking where the rook is and just find the new position
-        // of the king and add it if it exists
-        Stream<Position> castlingMoves = castlingRookPositions.stream()
-                .map(rook -> Stream.of(
-                        Stream.ofNullable(rook.leftNeighbor()).map(Position::leftNeighbor),
-                        Stream.ofNullable(rook.rightNeighbor()).map(Position::rightNeighbor))
-                        .flatMap(s -> s))
-                .flatMap(s -> s);
+        Stream<Position> castlingMoves = calculateCastlingPossibility(board);
         return Stream.concat(castlingMoves, getPossibleMoves())
                 .filter(board::isNotOccupied);
     }
@@ -102,14 +91,36 @@ public class King implements Piece {
         Piece left = board.findPieceByPosition(new Position('a', white ? 1 : 8));
         Piece right = board.findPieceByPosition(new Position('h', white ? 1 : 8));
 
-        int piecesLeft = Math.toIntExact(Stream.iterate(position, Position::leftNeighbor)
+        if (left == null && right == null) {
+            return Stream.empty();
+        } else if (!(left instanceof Rook)) {
+            left = null;
+        } else if (!(right instanceof Rook)) {
+            right = null;
+        }
+
+        if (left != null && left.hasEverMoved(board.getGame())) {
+            left = null;
+        } else if (right != null && right.hasEverMoved(board.getGame())) {
+            right = null;
+        }
+
+        // count how many pieces are left of the king including the king
+        long piecesLeft = Stream.iterate(position, Position::leftNeighbor)
                 .takeWhile(position -> position.getFile() != 'a')
                 .filter(position -> board.findPieceByPosition(position) != null)
-                .count());
-        int piecesRight = Math.toIntExact(Stream.iterate(position, Position::rightNeighbor)
+                .count();
+        // count how many pieces are right of the king including the king
+        long piecesRight = Stream.iterate(position, Position::rightNeighbor)
                 .takeWhile(position -> position.getFile() != 'h')
                 .filter(position -> board.findPieceByPosition(position) != null)
-                .count());
+                .count();
+
+        if (piecesLeft > 1) {
+            left = null;
+        } else if (piecesRight > 1) {
+            right = null;
+        }
 
         // find all position which are attackable by an enemy piece
         Supplier<Stream<Position>> capturePositions = () -> board.getPieces()
@@ -127,22 +138,27 @@ public class King implements Piece {
                 .takeWhile(position -> position.getFile() != 'h')
                 .anyMatch(position -> capturePositions.get().anyMatch(position::equals));
 
-        if (piecesLeft > 1 || hasToPassThroughAnAttackedSquareLeft) {
+        if (hasToPassThroughAnAttackedSquareLeft) {
             left = null;
-        }
-
-        if (piecesRight > 1 || hasToPassThroughAnAttackedSquareRight) {
+        } else if (hasToPassThroughAnAttackedSquareRight) {
             right = null;
         }
 
-        return Stream.of(
-                Stream.ofNullable(left),
-                Stream.ofNullable(right))
-                .flatMap(s -> s)
-                .filter(Objects::nonNull)
-                .filter(piece -> piece.hasNeverMoved(board.getGame()))
-                .filter(piece -> piece instanceof Rook)
-                .map(Piece::getPosition);
+        Stream<Position> newKingPositionLeft = left == null
+                ? Stream.empty()
+                : Optional.of(getPosition())
+                .map(Position::leftNeighbor)
+                .map(Position::leftNeighbor)
+                .stream();
+
+        Stream<Position> newKingPositionRight = right == null
+                ? Stream.empty()
+                : Optional.of(getPosition())
+                .map(Position::rightNeighbor)
+                .map(Position::rightNeighbor)
+                .stream();
+
+        return Stream.concat(newKingPositionLeft, newKingPositionRight);
     }
 
     @NotNull
