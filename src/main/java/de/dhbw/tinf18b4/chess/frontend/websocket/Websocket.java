@@ -240,6 +240,10 @@ public class Websocket extends HttpServlet {
                             LobbyManager.removeLobby(playerLobby);
                         }
                         break;
+                    case "backToLobby":
+                        playerLobby.endGame();
+                        sendToLobby(playerLobby, "redirect", "/lobby/" + lobbyID);
+                        break;
                 }
                 break;
             case "lobbyPrivacy":

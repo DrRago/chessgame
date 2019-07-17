@@ -27,7 +27,10 @@
     <h2 class="text-center">Game</h2>
     <div class="row">
         <div class="col">
-            <a href="javascript:leaveLobby()" class="btn btn-outline-danger float-right">Leave</a>
+            <div class="btn-group float-right">
+                <a href="javascript:backToLobby()" class="btn btn-outline-warning ">Back to Lobby</a>
+                <a href="javascript:leaveLobby()" class="btn btn-outline-danger">Leave</a>
+            </div>
         </div>
     </div>
     <div class="row mt-4">

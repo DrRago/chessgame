@@ -190,3 +190,19 @@ const leaveLobby = () => {
         sendToSocket("lobbyAction", "leave");
     }
 };
+
+const backToLobby = () => {
+    $.confirm({
+        title: 'Caution!',
+        content: 'The game will end. This can not be reverted!',
+        theme: 'material',
+        type: 'orange',
+        buttons: {
+            confirm: () => {
+                sendToSocket("lobbyAction", "backToLobby");
+            },
+            cancel: () => {
+            }
+        }
+    });
+};
