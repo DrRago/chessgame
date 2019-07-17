@@ -48,6 +48,10 @@
                     <div>
                         <h4 class="float-left">Chess</h4>
                         <div class="btn-group float-right">
+                            <label>
+                                Autochess
+                                <input type="checkbox" id="autochess">
+                            </label>
                             <a href="javascript:backToLobby()" class="btn btn-outline-warning ">Back to Lobby</a>
                             <a href="javascript:leaveLobby()" class="btn btn-outline-danger">Leave</a>
                         </div>
