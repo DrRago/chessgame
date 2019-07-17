@@ -132,6 +132,11 @@ $(() => {
                 break;
             case "lobbyPrivacy":
                 $("#settingsTable #privacy > input").prop("checked", msgObj.value === "true")
+                break;
+            case "gameState":
+                alert(msgObj.value);
+                finished = true;
+                break;
         }
     };
 
