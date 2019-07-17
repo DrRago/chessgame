@@ -14,6 +14,10 @@
     margin-right: 10px;
 }
 
+#playerCol {
+    max-width: 300px;
+}
+
 #logs > table .black {
     text-align: right !important;
 }
