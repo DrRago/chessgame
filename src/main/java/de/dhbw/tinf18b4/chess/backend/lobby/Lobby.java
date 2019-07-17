@@ -133,6 +133,11 @@ public class Lobby {
                 .findFirst().orElse(null);
     }
 
+    public void endGame() {
+        game = null;
+        status = LobbyStatus.WAITING_FOR_START;
+    }
+
     @Override
     public String toString() {
         return String.format("Lobby (%d/%d) - %s", Arrays.stream(players).filter(Objects::isNull).count(), 2, status);

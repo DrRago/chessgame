@@ -68,6 +68,7 @@ public class LobbyController extends HttpServlet {
             if (lobby != null) {
                 // lobby exists
                 // user may not join if he already joined the lobby under another name
+                //noinspection ConstantConditions
                 if (lobby.hasUser(user) && lobby.getPlayerByUser(user).getUser().getID().equals(user.getID())) {
                     // check whether the game has already started and redirect in that case
                     if (lobby.getStatus() == LobbyStatus.GAME_STARTED) {
