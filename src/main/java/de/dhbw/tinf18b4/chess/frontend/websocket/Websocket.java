@@ -13,6 +13,7 @@ import de.dhbw.tinf18b4.chess.backend.position.Position;
 import de.dhbw.tinf18b4.chess.backend.user.User;
 import de.dhbw.tinf18b4.chess.frontend.JSON.JSONHandler;
 import de.dhbw.tinf18b4.chess.frontend.SessionManager;
+import de.dhbw.tinf18b4.chess.states.GameState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONArray;
@@ -192,9 +193,11 @@ public class Websocket extends HttpServlet {
                     if (game == null) return;
                     Move move = game.getBoard().buildMove(moveString, currentPlayer);
 
-                    if (!game.makeMove(move)) {
+                    Optional<GameState> gameState = game.makeMove(move);
+                    if (gameState.isEmpty()) {
                         logger.info("Invalid move");
                     } else {
+                        // TODO: do
                         JSONObject answer = buildAnswerTemplate();
                         answer.put("content", "logs");
                         answer.put("value", moveToJSON(move));

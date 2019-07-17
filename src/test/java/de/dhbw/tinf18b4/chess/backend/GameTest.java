@@ -3,13 +3,11 @@ package de.dhbw.tinf18b4.chess.backend;
 import de.dhbw.tinf18b4.chess.backend.piece.*;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 import de.dhbw.tinf18b4.chess.backend.user.User;
-import junit.framework.AssertionFailedError;
+import de.dhbw.tinf18b4.chess.states.GameState;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 /**
  * Test cases for the {@link Game} implementation
@@ -37,19 +35,18 @@ public class GameTest {
     public void drawFalseTest() {
 
         Game game = new Game(white, black);
-        assertFalse("Game shouldn't be in draw", game.isDraw());
+        assertFalse(game.evaluateGame().isDraw());
     }
 
-    // this test may fail due to incomplete implementation of getValidMoves
-    @Test(expected = AssertionFailedError.class)
+    @Test
     public void stalemateTest() {
         Piece[] pieces = new Piece[]{
-                new King(false, new Position("d8")),
-                new Pawn(true, new Position("d7")),
-                new King(true, new Position("d6"))
+                new King(true, new Position("e1")),
+                new Pawn(false, new Position("e2")),
+                new King(false, new Position("e3"))
         };
         Game game = new Game(white, black, pieces);
-        assertTrue("Game should be in stalemate", game.isDraw());
+        assertSame("Game should be in stalemate", GameState.STALEMATE, game.evaluateGame());
     }
 
     @Test
@@ -60,7 +57,7 @@ public class GameTest {
         };
         Game game = new Game(white, black, kingVsKing);
 
-        assertTrue("Game should be in draw - king vs king", game.isDraw());
+        assertSame("Game should be in draw - king vs king", GameState.KING_VS_KING, game.evaluateGame());
 
         Piece[] kingBishopVsKing = new Piece[]{
                 new King(false, new Position("a1")),
@@ -68,7 +65,7 @@ public class GameTest {
                 new King(true, new Position("a8"))
         };
         game = new Game(white, black, kingBishopVsKing);
-        assertTrue("Game should be in draw - king and bishop vs king", game.isDraw());
+        assertSame("Game should be in draw - king and bishop vs king", GameState.KING_BISHOP_VS_KING, game.evaluateGame());
 
         Piece[] kingKnightVsKing = new Piece[]{
                 new King(false, new Position("a1")),
@@ -76,7 +73,7 @@ public class GameTest {
                 new King(true, new Position("a8"))
         };
         game = new Game(white, black, kingKnightVsKing);
-        assertTrue("Game should be in draw - king and knight vs king", game.isDraw());
+        assertSame("Game should be in draw - king and knight vs king", GameState.KING_KNIGHT_VS_KING, game.evaluateGame());
 
         Piece[] kingBishopVsKingBishop = new Piece[]{
                 new King(false, new Position("a1")),
@@ -86,7 +83,7 @@ public class GameTest {
                 new Bishop(true, new Position("b1"))
         };
         game = new Game(white, black, kingBishopVsKingBishop);
-        assertTrue("Game should be in draw - king and bishop vs king and bishop", game.isDraw());
+        assertSame("Game should be in draw - king and bishop vs king and bishop", GameState.KING_BISHOP_VS_KING_BISHOP, game.evaluateGame());
     }
 
     @Test(expected = AssertionError.class)

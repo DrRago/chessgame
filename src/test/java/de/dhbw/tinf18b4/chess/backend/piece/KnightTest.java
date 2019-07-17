@@ -22,10 +22,10 @@ public class KnightTest {
     public void moveTest() {
         Game game = new Game(white, black);
 
-        assertTrue("Could not move Rb1", game.makeMove(game.getBoard().buildMove("b1-c3", white)));
-        assertTrue("Could not move Rg8", game.makeMove(game.getBoard().buildMove("g8-f6", black)));
+        assertTrue("Could not move Rb1", game.makeMove(game.getBoard().buildMove("b1-c3", white)).isPresent());
+        assertTrue("Could not move Rg8", game.makeMove(game.getBoard().buildMove("g8-f6", black)).isPresent());
 
-        assertTrue("Could not move Rc3", game.makeMove(game.getBoard().buildMove("c3-d5", white)));
-        assertTrue("Could not move Rh6", game.makeMove(game.getBoard().buildMove("f6-d5", black)));
+        assertTrue("Could not move Rc3", game.makeMove(game.getBoard().buildMove("c3-d5", white)).isPresent());
+        assertTrue("Could not move Rh6", game.makeMove(game.getBoard().buildMove("f6-d5", black)).isPresent());
     }
 }

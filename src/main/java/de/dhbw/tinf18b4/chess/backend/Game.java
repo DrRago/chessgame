@@ -6,11 +6,13 @@ import de.dhbw.tinf18b4.chess.backend.piece.King;
 import de.dhbw.tinf18b4.chess.backend.piece.Knight;
 import de.dhbw.tinf18b4.chess.backend.piece.Piece;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
+import de.dhbw.tinf18b4.chess.states.GameState;
 import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -71,12 +73,25 @@ public class Game {
     }
 
     /**
-     * Attempt to perform a move on the board
+     * Return whether the color of a square is white or not (has nothing to do with the {@link Player players} color)
+     *
+     * @param p the {@link Position} to check
+     * @return whether the square is white or not
+     */
+    private static boolean isWhiteSquare(@NotNull Position p) {
+        return (p.getFile() * 35 + p.getRank()) % 2 == 0;
+    }
+
+    /**
+     * Attempt to perform a move on the board. Returns an optional.
+     * If a move could be made the optional contains the resulting state of the game.
+     * Otherwise the move was deemed invalid and the state of the game doesn't change
+     * which will be indicated by a empty value.
      *
      * @param move The move
-     * @return whether it the move was applied
+     * @return an optional
      */
-    public boolean makeMove(@NotNull Move move) {
+    public Optional<GameState> makeMove(@NotNull Move move) {
         Move lastMove = history.lastMove();
 
         // Prevent player from making a move if they ...
@@ -84,18 +99,18 @@ public class Game {
         // ... don't belong in this game, ...
         if (!(player1.equals(move.getPlayer())
                 || player2.equals(move.getPlayer()))) {
-            return false;
+            return Optional.empty();
 
         }
 
         // ... is not the white player when making the first move or ...
         if (lastMove == null && !move.getPlayer().isWhite()) {
-            return false;
+            return Optional.empty();
         }
 
         // ... have just made a move
         if (lastMove != null && move.getPlayer().equals(lastMove.getPlayer())) {
-            return false;
+            return Optional.empty();
         }
 
         // Otherwise check if their move is possible
@@ -105,10 +120,10 @@ public class Game {
 
             history.addMove(move);
 
-            return true;
+            return Optional.of(evaluateGame());
         }
 
-        return false;
+        return Optional.empty();
     }
 
     /**
@@ -145,11 +160,11 @@ public class Game {
         board.getPieces()
                 .filter(Objects::nonNull)
                 .forEach(piece -> {
-            int y = piece.getPosition().getRank() - 1;
-            int x = piece.getPosition().getFile() - 'a';
+                    int y = piece.getPosition().getRank() - 1;
+                    int x = piece.getPosition().getFile() - 'a';
 
-            fenBoard[y][x] = piece.getFenIdentifier();
-        });
+                    fenBoard[y][x] = piece.getFenIdentifier();
+                });
 
         // iterate backwards from 8 to 1
         for (int y = 7; y >= 0; y--) {
@@ -180,7 +195,7 @@ public class Game {
     }
 
     /**
-     * Check if the game is a draw. The following rules are implemented:
+     * Check if the game is a draw, has been won or neither. The following draw rules are implemented:
      * <ul>
      * <li>stalemate</li>
      * <li>insufficient material</li>
@@ -189,22 +204,11 @@ public class Game {
      *
      * @return whether the game is a draw or not
      */
-    public boolean isDraw() {
-        if (isCheckmate() != null) return false;
+    public GameState evaluateGame() {
+        GameState.winner = isCheckmate();
+        if (GameState.winner != null) return GameState.WON;
 
         Supplier<Stream<Piece>> pieces = () -> getBoard().getPieces().filter(Objects::nonNull);
-
-        // check if is stalemate
-        final Player currentPlayer = whoseTurn();
-
-        // stalemate: when the player is not able to perform any valid move and the king is not in check
-        King king = currentPlayer.isWhite() ? getBoard().whiteKing : getBoard().blackKing;
-        Objects.requireNonNull(king, "Couldn't determine draw: king is null");
-        final boolean stalemate = pieces.get()
-                .filter(piece -> piece.isOwnedBySamePlayer(currentPlayer))
-                .allMatch(piece -> piece.canMakeValidMove(board) && piece.canMakeValidCaptureMove(board))
-
-                && !king.isInCheck(getBoard());
 
         // draw by insufficient material is when one of these combinations occur
         final boolean onlyKingAndBishop = pieces.get().allMatch(piece -> piece instanceof King || piece instanceof Bishop);
@@ -212,14 +216,23 @@ public class Game {
         // king vs king
         final long piecesLeft = pieces.get().count();
         final boolean isKingVsKing = piecesLeft == 2;
+        if (isKingVsKing) {
+            return GameState.KING_VS_KING;
+        }
 
         // king and bishop vs king
         final boolean isKingBishopVsKing = onlyKingAndBishop && piecesLeft == 3;
+        if (isKingBishopVsKing) {
+            return GameState.KING_BISHOP_VS_KING;
+        }
 
         // king and knight vs king
         final boolean isKingKnightVsKing = pieces.get()
                 .allMatch(piece -> piece instanceof King || piece instanceof Knight)
                 && piecesLeft == 3;
+        if (isKingKnightVsKing) {
+            return GameState.KING_KNIGHT_VS_KING;
+        }
 
         // king and bishop vs king and bishop with bishops of the same color
         final boolean isKingBishopVsKingBishop;
@@ -234,7 +247,24 @@ public class Game {
                     .distinct().count() == 1;
         }
 
-        return stalemate || isKingVsKing || isKingBishopVsKing || isKingKnightVsKing | isKingBishopVsKingBishop;
+        if (isKingBishopVsKingBishop) {
+            return GameState.KING_BISHOP_VS_KING_BISHOP;
+        }
+
+        // check if is stalemate
+        final Player currentPlayer = whoseTurn();
+
+        // stalemate: when the player is not able to perform any valid move and the king is not in check
+        King king = currentPlayer.isWhite() ? getBoard().whiteKing : getBoard().blackKing;
+        Objects.requireNonNull(king, "Couldn't determine draw: king is null");
+        boolean canMove = board.getAllPossibleMoves().stream()
+                .mapToLong(pieceStreamMap -> pieceStreamMap.values().stream().flatMap(s -> s).count()).sum() > 0;
+        final boolean stalemate = !canMove && !king.isInCheck(getBoard());
+        if (stalemate) {
+            return GameState.STALEMATE;
+        }
+
+        return GameState.ONGOING;
     }
 
     /**
@@ -258,15 +288,5 @@ public class Game {
 
         // neither player is in check
         return null;
-    }
-
-    /**
-     * Return whether the color of a square is white or not (has nothing to do with the {@link Player players} color)
-     *
-     * @param p the {@link Position} to check
-     * @return whether the square is white or not
-     */
-    private static boolean isWhiteSquare(@NotNull Position p) {
-        return (p.getFile() * 35 + p.getRank()) % 2 == 0;
     }
 }
