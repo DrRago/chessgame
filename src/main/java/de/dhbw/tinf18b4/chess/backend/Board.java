@@ -421,6 +421,11 @@ public class Board {
 
                     // check whether the king is in check
                     int i = tempBoard.removePiece(capturePiece);
+                    if (i < 0) {
+                        Position enPassant = entry.getKey().getBackwardsPosition();
+                        capturePiece = tempBoard.findPieceByPosition(enPassant);
+                        i = tempBoard.removePiece(capturePiece);
+                    }
                     King king = entry.getKey().isWhite() ? tempBoard.getWhiteKing() : tempBoard.getBlackKing();
                     boolean result = king == null || !king.isInCheck(tempBoard);
 
