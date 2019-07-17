@@ -95,7 +95,7 @@ public class King implements Piece {
      */
     @NotNull
     private Stream<Position> calculateCastlingPossibility(@NotNull Board board) {
-        if (isInCheck(board) || hasNeverMoved(board.getGame())) {
+        if (isInCheck(board) || hasEverMoved(board.getGame())) {
             return Stream.empty();
         }
 
@@ -119,12 +119,13 @@ public class King implements Piece {
                 .filter(piece -> !(piece instanceof King))
                 .map(piece -> piece.getValidCaptureMoves(board))
                 .flatMap(s -> s);
+
         boolean hasToPassThroughAnAttackedSquareLeft = Stream.iterate(position, Position::leftNeighbor)
                 .takeWhile(position -> position.getFile() != 'a')
-                .noneMatch(position -> capturePositions.get().anyMatch(position::equals));
+                .anyMatch(position -> capturePositions.get().anyMatch(position::equals));
         boolean hasToPassThroughAnAttackedSquareRight = Stream.iterate(position, Position::rightNeighbor)
                 .takeWhile(position -> position.getFile() != 'h')
-                .noneMatch(position -> capturePositions.get().anyMatch(position::equals));
+                .anyMatch(position -> capturePositions.get().anyMatch(position::equals));
 
         if (piecesLeft > 1 || hasToPassThroughAnAttackedSquareLeft) {
             left = null;
