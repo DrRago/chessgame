@@ -11,6 +11,7 @@
                     <a class="nav-link" href="${pageContext.request.contextPath}/imprint.jsp">Imprint</a>
                 </li>
             </ul>
+            <h3 class="mx-auto"><c:out value="${pageTitle}"/></h3>
             <c:if test="${sessionScope.user.getUsername() == 'guest'}">
                 <form class="form-inline my-2 my-lg-0" action="${pageContext.request.contextPath}/DoLoginOrRegister" method="post">
                     <input class="form-control mr-sm-2" type="text" name="username" placeholder="Username" aria-label="Username">

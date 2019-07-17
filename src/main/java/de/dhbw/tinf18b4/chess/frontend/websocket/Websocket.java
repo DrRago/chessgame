@@ -238,8 +238,8 @@ public class Websocket extends HttpServlet {
                         }
                         break;
                     case "backToLobby":
-                        playerLobby.endGame();
                         sendToLobby(playerLobby, "redirect", "/lobby/" + lobbyID);
+                        playerLobby.endGame();
                         break;
                 }
                 break;

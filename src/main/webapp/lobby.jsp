@@ -21,13 +21,11 @@
 
 </head>
 <body>
-<div class="container mt-5 pt-5">
-    <h2 class="text-center">Lobby</h2>
+
+<c:set value="Lobby" var="pageTitle"/>
+<%@include file="parts/nav.jsp" %>
+<div class="container mt-2 pt-5">
     <div class="row">
-        <div class="col">
-        </div>
-    </div>
-    <div class="row mt-4">
         <div class="col" id="playerCol">
             <div class="card">
                 <div class="card-header"><h4>Players</h4></div>
