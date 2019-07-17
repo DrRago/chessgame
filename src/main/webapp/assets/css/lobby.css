@@ -14,7 +14,15 @@
     margin-right: 10px;
 }
 
-#logs > table .black {
+#playerCol {
+    max-width: 300px;
+}
+
+#logs .card-body {
+    height: calc(21px * 7) !important;
+}
+
+#logs table .black {
     text-align: right !important;
 }
 
@@ -80,4 +88,18 @@ input:checked + .slider:before {
 
 .slider.round:before {
     border-radius: 50%;
+}
+
+*[role="button"]:hover {
+    cursor: pointer;
+}
+
+.fa-angle-double-down {
+    transition-duration: .7s
+}
+.rotate-180 {
+    -moz-transform: rotate(-180deg);
+    -webkit-transform: rotate(-180deg);
+    -o-transform: rotate(-180deg);
+    -ms-transform: rotate(-180deg);
 }

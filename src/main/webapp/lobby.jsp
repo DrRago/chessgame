@@ -21,15 +21,12 @@
 
 </head>
 <body>
-<div class="container mt-5 pt-5">
-    <h2 class="text-center">Lobby</h2>
+
+<c:set value="Lobby" var="pageTitle"/>
+<%@include file="parts/nav.jsp" %>
+<div class="container mt-2 pt-5">
     <div class="row">
-        <div class="col">
-            <a href="javascript:leaveLobby()" class="btn btn-outline-danger float-right">Leave</a>
-        </div>
-    </div>
-    <div class="row mt-4">
-        <div class="col-lg-3 col-sm-5">
+        <div class="col" id="playerCol">
             <div class="card">
                 <div class="card-header"><h4>Players</h4></div>
                 <div class="card-body">
@@ -43,28 +40,25 @@
                 </div>
             </div>
         </div>
-        <div class="col-9">
+        <div class="col">
             <div class="card">
-                <div class="card-header"><h4>Current Settings</h4></div>
+                <div class="card-header">
+                    <div>
+                        <h4 class="float-left">Current Settings</h4>
+                        <a href="javascript:leaveLobby()" class="btn btn-outline-danger float-right">Leave Lobby</a>
+                    </div>
+                </div>
                 <div class="card-body" id="settings">
                     <table class="table table-striped" id="settingsTable">
                         <tbody>
                         <tr>
-                            <td>
-                                <label class="switch" id="privacy">
+                            <td class="align-items-center row">
+                                <label class="switch my-auto" id="privacy">
                                     <input type="checkbox">
                                     <span class="slider round"></span>
                                 </label>
-                                <label class="center align-items-center">Private Lobby</label>
+                                <div class="center ml-3">Private Lobby</div>
                             </td>
-                        </tr>
-                        <tr>
-                            <td><input type="checkbox" id="checkbox2"> <label for="checkbox2">Checkbox, check it if you
-                                want</label></td>
-                        </tr>
-                        <tr>
-                            <td><input type="checkbox" id="checkbox3"> <label for="checkbox3">Checkbox, check it if you
-                                want</label></td>
                         </tr>
                         </tbody>
                     </table>

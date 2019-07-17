@@ -11,16 +11,24 @@
                     <a class="nav-link" href="${pageContext.request.contextPath}/imprint.jsp">Imprint</a>
                 </li>
             </ul>
-            <div class="row ml-auto">
-                <div class="my-2 my-lg-0">
-
-                    <a class="btn btn-outline-danger my-sm-0 my-2" title="logout"
-                       href="${pageContext.request.contextPath}/logout.jsp">
-                        <i class="fas fa-sign-out-alt"></i>
-                    </a>
-
+            <h3 class="mx-auto"><c:out value="${pageTitle}"/></h3>
+            <c:if test="${sessionScope.user.getUsername() == 'guest'}">
+                <form class="form-inline my-2 my-lg-0" action="${pageContext.request.contextPath}/DoLoginOrRegister" method="post">
+                    <input class="form-control mr-sm-2" type="text" name="username" placeholder="Username" aria-label="Username">
+                    <input class="form-control mr-sm-2" type="password" name="password" placeholder="Password" aria-label="Password">
+                    <button class="btn btn-outline-success my-2 my-sm-0" name="function" value="login" type="submit">Login</button>
+                </form>
+            </c:if>
+            <c:if test="${sessionScope.user.getUsername() ne 'guest'}">
+                <div class="row ml-auto">
+                    <div class="my-2 my-lg-0">
+                        <a class="btn btn-outline-danger my-sm-0 my-2" title="logout"
+                           href="${pageContext.request.contextPath}/logout.jsp">
+                            <i class="fas fa-sign-out-alt"></i>
+                        </a>
+                    </div>
                 </div>
-            </div>
+            </c:if>
         </div>
     </div>
 </nav>

@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <html lang="en">
@@ -11,6 +12,7 @@
 </head>
 <body>
 
+<c:set var="pageTitle" value="Imprint"/>
 <%@include file="parts/nav.jsp" %>
 <div class="container mt-5 pt-5">
     <div class="bs-docs-section mb-4">

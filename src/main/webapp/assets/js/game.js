@@ -10,11 +10,12 @@ const addLog = message => {
     if (!Array.isArray(message)) message = [message];
 
     for (let logEntry in message) {
-        $("#logs > table").append(`<tr class="${message[logEntry].player}"><td>${message[logEntry].entry}</td></tr>`);
+        $("#logs table").prepend(`<tr class="${message[logEntry].player}"><td>${message[logEntry].entry}</td></tr>`);
     }
 
-    const objDiv = document.getElementById("logs");
-    objDiv.scrollTop = objDiv.scrollHeight;
+    $('#lastLog').text(`(${message.slice(-1).pop().entry})`);
+
+    $('#logs .card-body').animate({scrollTop: 0}, "fast");
 
 };
 
@@ -28,6 +29,7 @@ const onDragStart = (source, piece, position, orientation) => {
 
 const onDrop = (source, target) => {
     removeGreySquares();
+    if (target === "offboard" || source === target) return false;
     sendToSocket('move', `${source}-${target}`);
 };
 
