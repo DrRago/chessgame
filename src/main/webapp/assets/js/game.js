@@ -2,9 +2,17 @@ let myColor;
 let board;
 let isTurn;
 let possibilities;
+let autoPlay = false;
 const whiteSquareGrey = '#a9a9a9';
 const blackSquareGrey = '#696969';
 const redSquareColor = '#ff7979';
+let finished = false;
+
+$(() => {
+    $('#autochess').change(() => {
+        autoPlay = !autoPlay;
+    });
+});
 
 const addLog = message => {
     if (!Array.isArray(message)) message = [message];
@@ -29,7 +37,7 @@ const onDragStart = (source, piece, position, orientation) => {
 
 const onDrop = (source, target) => {
     removeGreySquares();
-    if (target === "offboard" || source === target) return false;
+    if (target === "offboard" || source === target || finished) return false;
     sendToSocket('move', `${source}-${target}`);
 };
 
@@ -57,6 +65,33 @@ const handleMove = message => {
     board.position(fen);
 
     possibilities = message.possibilities;
+
+    function getRandomInt(max) {
+        return Math.floor(Math.random() * Math.floor(max));
+    }
+
+    let moves = [];
+    let captures = [];
+    possibilities.forEach(piece => {
+        if (piece.color === myColor) {
+            piece.possibilities.forEach(target => {
+                moves = [...moves, `${piece.piece}-${target}`]
+            });
+            piece.capturePossibilities.forEach(target => {
+                captures = [...captures, `${piece.piece}-${target}`]
+            });
+        }
+    });
+    if (isTurn && autoPlay && (moves.length !== 0 || captures.length !== 0)) {
+        setTimeout(() => {
+            if (captures.length !== 0 && getRandomInt(4) > 0) {
+                sendToSocket('move', captures[getRandomInt(captures.length)])
+            } else {
+                sendToSocket('move', moves[getRandomInt(moves.length)])
+            }
+
+        }, 150);
+    }
 };
 
 function removeGreySquares() {
