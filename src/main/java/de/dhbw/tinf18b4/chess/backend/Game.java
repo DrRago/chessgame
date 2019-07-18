@@ -273,13 +273,12 @@ public class Game {
      *
      * @return the player who won or null
      */
-    @Nullable Player isCheckmate() {
+    @Nullable
+    Player isCheckmate() {
         Player currentPlayer = whoseTurn();
         King playersKing = currentPlayer.isWhite() ? getBoard().getWhiteKing() : getBoard().getBlackKing();
 
-        long possibleMoves = getBoard().getPieces()
-                .map(piece -> Stream.concat(piece.getValidCaptureMoves(board), piece.getValidMoves(board)))
-                .flatMap(s -> s).count();
+        long possibleMoves = getBoard().getAllPossibleMoves().stream().mapToLong(map -> map.values().stream().mapToLong(Stream::count).sum()).sum();
 
         if (playersKing.isInCheck(board) && possibleMoves == 0) {
             // return the winning player

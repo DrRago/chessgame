@@ -9,10 +9,42 @@ const redSquareColor = '#ff7979';
 let finished = false;
 
 $(() => {
-    $('#autochess').change(() => {
+    $('#autochess').click(() => {
         autoPlay = !autoPlay;
+        if (isTurn && !finished) {
+            makeRandomMove(possibilities);
+        }
     });
 });
+
+const makeRandomMove = possibilities => {
+    function getRandomInt(max) {
+        return Math.floor(Math.random() * Math.floor(max));
+    }
+
+    let moves = [];
+    let captures = [];
+    possibilities.forEach(piece => {
+        if (piece.color === myColor) {
+            piece.possibilities.forEach(target => {
+                moves = [...moves, `${piece.piece}-${target}`]
+            });
+            piece.capturePossibilities.forEach(target => {
+                captures = [...captures, `${piece.piece}-${target}`]
+            });
+        }
+    });
+    if (moves.length !== 0 || captures.length !== 0) {
+        setTimeout(() => {
+            if (captures.length !== 0 && getRandomInt(4) > 0) {
+                sendToSocket('move', captures[getRandomInt(captures.length)])
+            } else {
+                sendToSocket('move', moves[getRandomInt(moves.length)])
+            }
+
+        }, 150);
+    }
+};
 
 const addLog = message => {
     if (!Array.isArray(message)) message = [message];
@@ -30,7 +62,7 @@ const addLog = message => {
 const onDragStart = (source, piece, position, orientation) => {
     // only pick up pieces for the side to move
     if ((myColor.startsWith('w') && piece.search(/^b/) !== -1) ||
-        (myColor.startsWith('b') && piece.search(/^w/) !== -1) || !isTurn) {
+        (myColor.startsWith('b') && piece.search(/^w/) !== -1) || !isTurn || finished) {
         return false
     }
 };
@@ -66,32 +98,10 @@ const handleMove = message => {
 
     possibilities = message.possibilities;
 
-    function getRandomInt(max) {
-        return Math.floor(Math.random() * Math.floor(max));
+    if (autoPlay && isTurn && !finished) {
+        makeRandomMove(possibilities);
     }
 
-    let moves = [];
-    let captures = [];
-    possibilities.forEach(piece => {
-        if (piece.color === myColor) {
-            piece.possibilities.forEach(target => {
-                moves = [...moves, `${piece.piece}-${target}`]
-            });
-            piece.capturePossibilities.forEach(target => {
-                captures = [...captures, `${piece.piece}-${target}`]
-            });
-        }
-    });
-    if (isTurn && autoPlay && (moves.length !== 0 || captures.length !== 0)) {
-        setTimeout(() => {
-            if (captures.length !== 0 && getRandomInt(4) > 0) {
-                sendToSocket('move', captures[getRandomInt(captures.length)])
-            } else {
-                sendToSocket('move', moves[getRandomInt(moves.length)])
-            }
-
-        }, 150);
-    }
 };
 
 function removeGreySquares() {

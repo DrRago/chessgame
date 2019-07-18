@@ -48,6 +48,7 @@ public class Lobby {
      */
     @NotNull
     @Getter
+    @Setter
     private LobbyStatus status = LobbyStatus.WAITING_FOR_START;
 
     public Lobby(@NotNull User creator) {

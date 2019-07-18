@@ -64,7 +64,7 @@ public class Websocket extends HttpServlet {
      * mapper from websocket session to http session ID
      */
     @NotNull
-    private static final Map<Session, User> sessionToUser = new HashMap<>();
+    private static final Map<Session, Player> sessionToPlayer = new HashMap<>();
 
     /**
      * The onOpen method of a websocket
@@ -98,7 +98,7 @@ public class Websocket extends HttpServlet {
         sessionToSessionID.put(session, sessionID);
         sessionToLobby.put(session, playerLobby);
         sessionToLobbyID.put(session, lobbyID);
-        sessionToUser.put(session, currentPlayer.getUser());
+        sessionToPlayer.put(session, currentPlayer);
 
         // send new player list to to complete lobby
         sendToLobby(playerLobby, getPlayerNames(playerLobby));
@@ -127,15 +127,15 @@ public class Websocket extends HttpServlet {
         sessionToSessionID.remove(session);
         Lobby lobby = sessionToLobby.remove(session);
         sessionToLobbyID.remove(session);
-        User user = sessionToUser.remove(session);
+        Player player = sessionToPlayer.remove(session);
 
         if (lobby != null && lobby.getStatus() == LobbyStatus.GAME_STARTED) {
             // send other clients the disconnect message
-            sendToLobby(lobby, "disconnect", user.getDisplayName());
+            sendToLobby(lobby, "disconnect", player.getUser().getDisplayName());
         }
         // leave the lobby if the game hasn't started yet
-        if (lobby != null && lobby.getStatus() != LobbyStatus.GAME_STARTED) {
-            lobby.leave(user);
+        if (lobby != null && lobby.getStatus() != LobbyStatus.GAME_STARTED && lobby.getGame() == null) {
+            lobby.leave(player.getUser());
             sendToLobby(lobby, getPlayerNames(lobby));
         }
     }
@@ -171,7 +171,7 @@ public class Websocket extends HttpServlet {
 
         Lobby playerLobby = sessionToLobby.get(session);
         String lobbyID = sessionToLobbyID.get(session);
-        User currentUser = sessionToUser.get(session);
+        Player currentPlayer = sessionToPlayer.get(session);
 
 
         switch (contentType) {
@@ -183,7 +183,6 @@ public class Websocket extends HttpServlet {
                     return;
                 }
                 try {
-                    Player currentPlayer = playerLobby.getPlayerByUser(currentUser);
                     if (currentPlayer == null) {
                         sendErrorMessageToClient("Not in lobby anymore", session, "fatal");
                         return;
@@ -206,10 +205,20 @@ public class Websocket extends HttpServlet {
                     if (gameState.isPresent()) {
                         GameState state = gameState.get();
                         sendToLobby(playerLobby, getMoveResponse(playerLobby));
-                        if (state.isWon()) {
-                            sendToLobby(playerLobby, "gameState", "WON");
-                        } else if (state.isDraw()) {
-                            sendToLobby(playerLobby, "gameState", "DRAW");
+                        if (state.isDraw()) {
+                            sendToLobby(playerLobby, "gameState", state.name());
+                        } else if (state.isWon()) {
+                            Player winner = state.getWinner();
+                            Session player2 = sessionToPlayer.entrySet().stream().filter(entry -> !entry.getValue().equals(currentPlayer)).findAny().orElseThrow().getKey();
+
+
+                            if (currentPlayer == winner) {
+                                sendToSession(session, "gameState", "WON!");
+                                sendToSession(player2, "gameState", "You Loose!");
+                            } else {
+                                sendToSession(session, "gameState", "You Loose!");
+                                sendToSession(player2, "gameState", "WON!");
+                            }
                         }
                     }
                 } catch (IllegalArgumentException e) {
@@ -234,7 +243,7 @@ public class Websocket extends HttpServlet {
                         // the rest will be removed on connection close
                         sessionToLobby.remove(session);
 
-                        if (playerLobby.leave(currentUser)) {
+                        if (playerLobby.leave(currentPlayer.getUser())) {
                             sendToLobby(playerLobby, "redirect", "/lobby/" + lobbyID);
                         } else {
                             // send new player list to to complete lobby
@@ -249,7 +258,7 @@ public class Websocket extends HttpServlet {
                         break;
                     case "backToLobby":
                         sendToLobby(playerLobby, "redirect", "/lobby/" + lobbyID);
-                        playerLobby.endGame();
+                        playerLobby.setStatus(LobbyStatus.WAITING_FOR_START);
                         break;
                 }
                 break;
