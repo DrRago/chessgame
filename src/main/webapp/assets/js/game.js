@@ -36,7 +36,7 @@ const makeRandomMove = possibilities => {
     });
     if (moves.length !== 0 || captures.length !== 0) {
         setTimeout(() => {
-            if (captures.length !== 0 && getRandomInt(4) > 0) {
+            if (moves.length === 0 || (captures.length !== 0 && getRandomInt(4) > 0)) {
                 sendToSocket('move', captures[getRandomInt(captures.length)])
             } else {
                 sendToSocket('move', moves[getRandomInt(moves.length)])
