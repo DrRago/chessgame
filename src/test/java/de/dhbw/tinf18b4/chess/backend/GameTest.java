@@ -8,6 +8,11 @@ import org.intellij.lang.annotations.RegExp;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -128,9 +133,72 @@ public class GameTest {
                 });
     }
 
+    @Test
+    public void completeMatchesTest() {
+        File kingbase2019E60E90 = Paths.get("src/test/resources/KingBase2019-A80-A99.pgn").toFile();
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(kingbase2019E60E90))) {
+            for (String match : readAllMatches(reader)) {
+                PgnParser pgnParser = new PgnParser(match);
+                Map<String, String> headers = pgnParser.parseHeader();
+                System.out.print(headers.get("Site") + " " + headers.get("White") + " vs " + headers.get("Black") + ", Result: " + headers.get("Result") + ": ");
+                try {
+                    pgnParser.parseMoves().forEach(move -> {
+                        System.out.print(move);
+                        System.out.print(". ");
+                    });
+                    System.out.print("Successful.");
+                } catch (PgnParser.CastlingNotImplementedException ignored) {
+                    System.out.print("Aborting test due to castling.");
+                } catch (PgnParser.ErroneousInputException e) {
+                    System.out.print("Invalid PGN.");
+                } catch (PgnParser.WrongImplementationException e) {
+                    fail(e.getMessage());
+                }
+                System.out.println();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private List<String> readAllMatches(BufferedReader reader) {
+        return Stream.generate(() -> readNextDocument(reader))
+                .takeWhile(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    private String readNextDocument(BufferedReader reader) {
+        StringBuilder stringBuilder = new StringBuilder();
+        try {
+            for (int i = 0; i < 2; i++) {
+                while (true) {
+                    String line = reader.readLine();
+
+                    if (line == null) {
+                        return null;
+                    }
+
+                    stringBuilder.append(line).append("\n");
+                    if (line.isEmpty()) {
+                        break;
+                    }
+                }
+            }
+
+        } catch (IOException e) {
+            return null;
+        }
+
+        return stringBuilder.toString();
+    }
+
     static class PgnParser {
+        /**
+         * Don't even look at me wrong...
+         */
         @RegExp
-        private final static String moveText = "(\\d+)[ \\n]*\\.[ \\n]*((?:[QNKRBxabcdefgh]+\\d\\+?)|O-O|O-O-O)[ \\n]*((?:[QNKRBxabcdefgh]+\\d\\+?)|O-O|O-O-O)?(1-0|0-1|1/2-1/2)?";
+        private final static String moveTextPattern = "(\\d+)[ \\n]*\\.[ \\n]*((?:(?:[QNKRBxabcdefgh]?\\d?[QNKRBxabcdefgh]+\\d(?:=[QNKRBP])?)|(?:O-O(?:-O)?))[+#]?)[ \\n]*((?:(?:[QNKRBxabcdefgh]?\\d?[QNKRBxabcdefgh]+\\d(?:=[QNKRBP])?)|(?:O-O(?:-O)?))[+#]?)?(1-0|0-1|1/2-1/2)?";
         @RegExp
         private final static String movePattern = "([QNKRBP])?([abcdefgh])?(\\d)?([abcdefgh])(\\d)(?:=([QNKRBP]))?([+#])?";
         @RegExp
@@ -139,9 +207,9 @@ public class GameTest {
         private final String document;
         private Player player1;
         private Player player2;
-        private Board board;
+        private Game game;
 
-        PgnParser(String document) {
+        PgnParser(@NotNull String document) {
             this.document = document;
         }
 
@@ -179,8 +247,8 @@ public class GameTest {
                     "9.Bf2 Qb4+ 10.Nc3 Nc6 11.a3 Qxb2 12.Nge2 Nxe5 13.Bd4 Nd3+ 14.Qxd3 Qxa1+ \n" +
                     "15.Nd1 Qa2 16.Nc1 1-0";
             try {
-                new PgnParser(gameWithoutCastling).moveStream().forEach(System.out::println);
-            } catch (CastlingNotImplementedException | ErroneousInputException e) {
+                new PgnParser(gameWithoutCastling).parseMoves().forEach(System.out::println);
+            } catch (CastlingNotImplementedException | ErroneousInputException | WrongImplementationException e) {
                 e.printStackTrace();
             }
         }
@@ -188,7 +256,7 @@ public class GameTest {
         private void reset() {
             player1 = new Player(true, new User("user1", "", ""));
             player2 = new Player(false, new User("user2", "", ""));
-            board = new Board(new Game(player1, player2));
+            game = new Game(player1, player2);
         }
 
         /**
@@ -196,6 +264,7 @@ public class GameTest {
          *
          * @return the header mapping
          */
+        @NotNull
         Map<String, String> parseHeader() {
             Pattern pattern = Pattern.compile(headerEntryPattern, Pattern.MULTILINE);
             Matcher matcher = pattern.matcher(document);
@@ -210,7 +279,8 @@ public class GameTest {
          * @throws CastlingNotImplementedException castling is not yet supported
          * @throws ErroneousInputException         a parsing error occurred
          */
-        Stream<Move> moveStream() throws CastlingNotImplementedException, ErroneousInputException {
+        @NotNull
+        Stream<Move> parseMoves() throws CastlingNotImplementedException, ErroneousInputException, WrongImplementationException {
             reset();
 
             String beginMarker = "]\n\n1.";
@@ -221,7 +291,7 @@ public class GameTest {
             }
 
             bodyBegin += 3;
-            Pattern pattern = Pattern.compile(moveText);
+            Pattern pattern = Pattern.compile(moveTextPattern);
             Matcher matcher = pattern.matcher(document.substring(bodyBegin));
 
             String headerMatchResult = parseHeader().get("Result");
@@ -265,15 +335,15 @@ public class GameTest {
          * @throws ErroneousInputException         if the move is not recognized
          */
         @NotNull
-        private Move parseMove(String moveToken, boolean white) throws CastlingNotImplementedException, ErroneousInputException {
+        private Move parseMove(String moveToken, boolean white) throws CastlingNotImplementedException, ErroneousInputException, WrongImplementationException {
             boolean isCapture = moveToken.contains("x");
             String token = moveToken.replaceAll("x", "");
 
-            if (token.equals("O-O")) { // kingside castling
+            if (token.contains("O-O")) { // kingside castling
                 int rookFile = white ? 1 : 8;
                 Position rookPosition = new Position(rookFile, 'h');
                 throw new CastlingNotImplementedException("castling support not implemented");
-            } else if (token.equals("O-O-O")) { // queenside castling
+            } else if (token.contains("O-O-O")) { // queenside castling
                 int rookFile = white ? 1 : 8;
                 Position rookPosition = new Position(rookFile, 'a');
                 throw new CastlingNotImplementedException("castling support not implemented");
@@ -295,13 +365,13 @@ public class GameTest {
             try {
                 destination = new Position(destinationFile + destinationRank);
                 if (originFile == null || originRank == null) {
-                    Stream<Piece> pieces = board.getPieces()
+                    Stream<Piece> pieces = game.getBoard().getPieces()
                             // find all pieces of the given type
                             .filter(p -> Character.toString(p.getFenIdentifier()).toUpperCase().equals(fenIdentifier))
                             .filter(p -> p.isWhite() == white)
                             // find only pieces which can reach the destination
                             .filter(p -> {
-                                Stream<Position> destinations = isCapture ? p.getValidCaptureMoves(board) : p.getValidMoves(board);
+                                Stream<Position> destinations = isCapture ? p.getValidCaptureMoves(game.getBoard()) : p.getValidMoves(game.getBoard());
                                 return destinations.anyMatch(pos -> pos.equals(destination));
                             });
 
@@ -315,22 +385,28 @@ public class GameTest {
 
                     List<Piece> pieceList = pieces.collect(Collectors.toList());
 
-                    if (pieceList.size() != 1) {
-                        throw new ErroneousInputException("Invalid pgn token token: ambiguous token encountered in " + moveToken + " " + pieceList);
+                    if (pieceList.size() > 1) {
+                        String message = String.format("Invalid pgn token token: ambiguous token encountered in %s %s", moveToken, pieceList);
+                        throw new ErroneousInputException(message);
+                    } else if (pieceList.size() < 1) {
+                        String moveType = isCapture ? "Capture move" : "Move";
+                        String player = white ? "white" : "black";
+                        String message = String.format("%s %s not recognized by player %s on board (%s) %s", moveType, moveToken, player, game.asFen(), game.getBoard().toString());
+                        throw new WrongImplementationException(message);
                     }
 
                     piece = pieceList.get(0);
                     origin = piece.getPosition();
                 } else {
                     origin = new Position(originFile + originRank);
-                    piece = Objects.requireNonNull(board.findPieceByPosition(origin));
+                    piece = Objects.requireNonNull(game.getBoard().findPieceByPosition(origin));
                 }
             } catch (IllegalArgumentException e) {
                 throw new ErroneousInputException(e);
             }
 
             Move move = new Move(player1.isWhite() == white ? player1 : player2, origin, destination, piece);
-            board.applyMove(move);
+            game.makeMove(move);
             return move;
         }
 
@@ -346,6 +422,12 @@ public class GameTest {
 
         static class CastlingNotImplementedException extends Throwable {
             CastlingNotImplementedException(String s) {
+                super(s);
+            }
+        }
+
+        static class WrongImplementationException extends Throwable {
+            WrongImplementationException(String s) {
                 super(s);
             }
         }
