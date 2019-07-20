@@ -50,7 +50,7 @@ public class Move {
      * @param destination the destination {@link Position}
      * @param piece       the {@link Piece} to move
      */
-    private Move(@NotNull Player player, @NotNull Position origin, @NotNull Position destination, @NotNull Piece piece) {
+    public Move(@NotNull Player player, @NotNull Position origin, @NotNull Position destination, @NotNull Piece piece) {
         if (player.isWhite() != piece.isWhite()) {
             String message = String.format("Player %s can't move piece %s of another player %s", player, piece, player);
             throw new IllegalArgumentException(message);
