@@ -1,5 +1,8 @@
 package de.dhbw.tinf18b4.chess.backend;
 
+import de.dhbw.tinf18b4.chess.backend.moves.CastlingMove;
+import de.dhbw.tinf18b4.chess.backend.moves.EnPassantMove;
+import de.dhbw.tinf18b4.chess.backend.moves.Move;
 import de.dhbw.tinf18b4.chess.backend.piece.*;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 import lombok.Getter;
@@ -339,55 +342,12 @@ public class Board {
                     pieces[i] = newPiece;
                 }
             }
-        }
-        // check whether an en passant capture was made
-        else if (movedPiece instanceof Pawn) {
-            Pawn movedPawn = (Pawn) movedPiece;
-
-            // check if the move was an en passant, so we have to move the pawn temporarily back
-            movedPawn.setPosition(move.getOrigin());
-            Position enPassant = movedPawn.calculateEnPassantPossibility(this);
-            movedPawn.setPosition(move.getDestination());
-
-            if (target == null && enPassant != null && enPassant.equals(move.getDestination())) {
-                // can't be null because an en passant wouldn't be possible then
-                removePiece(findPieceByPosition(movedPawn.getBackwardsPosition()));
-            }
-        }
-        // check whether a castling move was made
-        else if (movedPiece instanceof King) {
-            King movedKing = (King) movedPiece;
-
-            int rankDistance = move.getOrigin().getFile() - move.getDestination().getFile();
-            if (Math.abs(rankDistance) == 2) {
-                Position newRookPosition = movedKing.getPosition();
-                String initialPosition;
-
-                if (movedKing.isWhite()) {
-                    // right rook
-                    if (Math.abs(rankDistance) == rankDistance) {
-                        newRookPosition = newRookPosition.rightNeighbor();
-                        initialPosition = "a1";
-                    } else {
-                        newRookPosition = newRookPosition.leftNeighbor();
-                        initialPosition = "h1";
-                    }
-                } else {
-                    // left rook
-                    if (Math.abs(rankDistance) == rankDistance) {
-                        newRookPosition = newRookPosition.rightNeighbor();
-                        initialPosition = "a8";
-                    } else {
-                        newRookPosition = newRookPosition.leftNeighbor();
-                        initialPosition = "h8";
-                    }
-                }
-
-                Position oldRookPosition = new Position(initialPosition);
-                Rook rook = (Rook) findPieceByPosition(oldRookPosition);
-                Objects.requireNonNull(rook, "castling performed but can't find rook at position " + oldRookPosition)
-                        .setPosition(Objects.requireNonNull(newRookPosition, "castling performed but can't move rook to an offboard position"));
-            }
+        } else if (move instanceof EnPassantMove) {
+            EnPassantMove enPassantMove = (EnPassantMove) move;
+            removePiece(enPassantMove.getCapturedPawn());
+        } else if (move instanceof CastlingMove) {
+            CastlingMove castlingMove = (CastlingMove) move;
+            castlingMove.getRook().setPosition(castlingMove.getRookDestination());
         }
     }
 
@@ -403,6 +363,18 @@ public class Board {
         String[] moveArray = move.split("-");
         Position origin = new Position(moveArray[0]);
         Position destination = new Position(moveArray[1]);
+
+        try {
+            return new CastlingMove(player, origin, destination, this);
+        } catch (Exception ignored) {
+
+        }
+
+        try {
+            return new EnPassantMove(player, origin, destination, this);
+        } catch (Exception ignored) {
+
+        }
 
         return new Move(player, origin, destination, this);
     }

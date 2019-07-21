@@ -1,5 +1,7 @@
-package de.dhbw.tinf18b4.chess.backend;
+package de.dhbw.tinf18b4.chess.backend.moves;
 
+import de.dhbw.tinf18b4.chess.backend.Board;
+import de.dhbw.tinf18b4.chess.backend.Player;
 import de.dhbw.tinf18b4.chess.backend.piece.Piece;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 import lombok.Getter;
@@ -50,7 +52,7 @@ public class Move {
      * @param destination the destination {@link Position}
      * @param piece       the {@link Piece} to move
      */
-    private Move(@NotNull Player player, @NotNull Position origin, @NotNull Position destination, @NotNull Piece piece) {
+    Move(@NotNull Player player, @NotNull Position origin, @NotNull Position destination, @NotNull Piece piece) {
         if (player.isWhite() != piece.isWhite()) {
             String message = String.format("Player %s can't move piece %s of another player %s", player, piece, player);
             throw new IllegalArgumentException(message);
@@ -85,7 +87,7 @@ public class Move {
      * @return the {@link Piece} that shall be moved
      */
     @NotNull
-    private static Piece getPiece(@NotNull Player player, @NotNull Position origin, @NotNull Position destination, @NotNull Board board) {
+    static Piece getPiece(@NotNull Player player, @NotNull Position origin, @NotNull Position destination, @NotNull Board board) {
         Piece piece = board.findPieceByPosition(origin);
         Objects.requireNonNull(piece, String.format("Player %s can't move a piece from origin position %s to destination %s: there is no piece at the origin", player, origin, destination));
 

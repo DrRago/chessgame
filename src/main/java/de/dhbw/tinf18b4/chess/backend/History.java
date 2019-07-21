@@ -1,5 +1,6 @@
 package de.dhbw.tinf18b4.chess.backend;
 
+import de.dhbw.tinf18b4.chess.backend.moves.Move;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

@@ -1,7 +1,7 @@
 package de.dhbw.tinf18b4.chess.backend.piece;
 
 import de.dhbw.tinf18b4.chess.backend.Board;
-import de.dhbw.tinf18b4.chess.backend.Move;
+import de.dhbw.tinf18b4.chess.backend.moves.Move;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 import lombok.Getter;
 import lombok.Setter;
