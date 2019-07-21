@@ -132,6 +132,11 @@ $(() => {
                 break;
             case "lobbyPrivacy":
                 $("#settingsTable #privacy > input").prop("checked", msgObj.value === "true")
+                break;
+            case "gameState":
+                alert(msgObj.value);
+                finished = true;
+                break;
         }
     };
 
@@ -189,4 +194,20 @@ const leaveLobby = () => {
     } else {
         sendToSocket("lobbyAction", "leave");
     }
+};
+
+const backToLobby = () => {
+    $.confirm({
+        title: 'Caution!',
+        content: 'The game will end. This can not be reverted!',
+        theme: 'material',
+        type: 'orange',
+        buttons: {
+            confirm: () => {
+                sendToSocket("lobbyAction", "backToLobby");
+            },
+            cancel: () => {
+            }
+        }
+    });
 };

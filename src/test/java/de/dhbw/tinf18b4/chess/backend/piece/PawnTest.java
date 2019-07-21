@@ -31,11 +31,11 @@ public class PawnTest {
 
         Pawn black7b = (Pawn) game.getBoard().findPieceByPosition(new Position("b7"));
 
-        assertTrue("Could not move P7b", game.makeMove(game.getBoard().buildMove("b2-b3", white)));
-        assertTrue("Could not move P7b", game.makeMove(game.getBoard().buildMove("b7-b5", black)));
-        assertTrue("Could not move P7b", game.makeMove(game.getBoard().buildMove("c2-c3", white)));
-        assertTrue("Could not move P7b", game.makeMove(game.getBoard().buildMove("b5-b4", black)));
-        assertTrue("Could not move P7b", game.makeMove(game.getBoard().buildMove("a2-a4", white)));
+        assertTrue("Could not move P7b", game.makeMove(game.getBoard().buildMove("b2-b3", white)).isPresent());
+        assertTrue("Could not move P7b", game.makeMove(game.getBoard().buildMove("b7-b5", black)).isPresent());
+        assertTrue("Could not move P7b", game.makeMove(game.getBoard().buildMove("c2-c3", white)).isPresent());
+        assertTrue("Could not move P7b", game.makeMove(game.getBoard().buildMove("b5-b4", black)).isPresent());
+        assertTrue("Could not move P7b", game.makeMove(game.getBoard().buildMove("a2-a4", white)).isPresent());
 
         Position capturePosition = new Position("a3");
         assertTrue("En passant not recognized", black7b.getValidCaptureMoves(game.getBoard())
@@ -46,57 +46,57 @@ public class PawnTest {
     public void moveOneForwardTest() {
         Game game = new Game(white, black);
 
-        assertTrue("Could not move P2a one square forward", game.makeMove(game.getBoard().buildMove("a2-a3", white)));
-        assertTrue("Could not move P7a one square forward", game.makeMove(game.getBoard().buildMove("a7-a6", black)));
+        assertTrue("Could not move P2a one square forward", game.makeMove(game.getBoard().buildMove("a2-a3", white)).isPresent());
+        assertTrue("Could not move P7a one square forward", game.makeMove(game.getBoard().buildMove("a7-a6", black)).isPresent());
     }
 
     @Test
     public void moveTwoForwardTest() {
         Game game = new Game(white, black);
 
-        assertTrue("Could not move P2a two squares forward", game.makeMove(game.getBoard().buildMove("a2-a4", white)));
-        assertTrue("Could not move P7a two squares forward", game.makeMove(game.getBoard().buildMove("a7-a5", black)));
+        assertTrue("Could not move P2a two squares forward", game.makeMove(game.getBoard().buildMove("a2-a4", white)).isPresent());
+        assertTrue("Could not move P7a two squares forward", game.makeMove(game.getBoard().buildMove("a7-a5", black)).isPresent());
 
         // test case against jumping over another piece
         game = new Game(white, black);
 
-        assertTrue("Could not move N1a", game.makeMove(game.getBoard().buildMove("b1-a3", white)));
-        assertTrue("Could not move P7a", game.makeMove(game.getBoard().buildMove("a7-a6", black)));
-        assertFalse("Could move P2a", game.makeMove(game.getBoard().buildMove("a2-a3", white)));
+        assertTrue("Could not move N1a", game.makeMove(game.getBoard().buildMove("b1-a3", white)).isPresent());
+        assertTrue("Could not move P7a", game.makeMove(game.getBoard().buildMove("a7-a6", black)).isPresent());
+        assertFalse("Could move P2a", game.makeMove(game.getBoard().buildMove("a2-a3", white)).isPresent());
     }
 
     @Test
     public void moveDiagonally() {
         Game game = new Game(white, black);
 
-        assertFalse("Could move P2b diagonally", game.makeMove(game.getBoard().buildMove("b2-a3", white)));
-        assertFalse("Could move P7b diagonally", game.makeMove(game.getBoard().buildMove("b7-a6", black)));
+        assertFalse("Could move P2b diagonally", game.makeMove(game.getBoard().buildMove("b2-a3", white)).isPresent());
+        assertFalse("Could move P7b diagonally", game.makeMove(game.getBoard().buildMove("b7-a6", black)).isPresent());
 
         game = new Game(white, black);
 
-        assertTrue("Couldn't move P3a forward", game.makeMove(game.getBoard().buildMove("a2-a4", white)));
-        assertTrue("Couldn't move P7a forward", game.makeMove(game.getBoard().buildMove("c7-c5", black)));
-        assertTrue("Couldn't move P3a forward", game.makeMove(game.getBoard().buildMove("a4-a5", white)));
-        assertTrue("Couldn't move P7a forward", game.makeMove(game.getBoard().buildMove("c5-c4", black)));
-        assertTrue("Couldn't move P3a forward", game.makeMove(game.getBoard().buildMove("a5-a6", white)));
-        assertTrue("Couldn't move P7a forward", game.makeMove(game.getBoard().buildMove("c4-c3", black)));
-        assertTrue("Couldn't move P2b diagonally", game.makeMove(game.getBoard().buildMove("b2-c3", white)));
-        assertTrue("Couldn't move P7b diagonally", game.makeMove(game.getBoard().buildMove("b7-a6", black)));
+        assertTrue("Couldn't move P3a forward", game.makeMove(game.getBoard().buildMove("a2-a4", white)).isPresent());
+        assertTrue("Couldn't move P7a forward", game.makeMove(game.getBoard().buildMove("c7-c5", black)).isPresent());
+        assertTrue("Couldn't move P3a forward", game.makeMove(game.getBoard().buildMove("a4-a5", white)).isPresent());
+        assertTrue("Couldn't move P7a forward", game.makeMove(game.getBoard().buildMove("c5-c4", black)).isPresent());
+        assertTrue("Couldn't move P3a forward", game.makeMove(game.getBoard().buildMove("a5-a6", white)).isPresent());
+        assertTrue("Couldn't move P7a forward", game.makeMove(game.getBoard().buildMove("c4-c3", black)).isPresent());
+        assertTrue("Couldn't move P2b diagonally", game.makeMove(game.getBoard().buildMove("b2-c3", white)).isPresent());
+        assertTrue("Couldn't move P7b diagonally", game.makeMove(game.getBoard().buildMove("b7-a6", black)).isPresent());
 
         game = new Game(white, black);
 
-        assertFalse("Could move P2b diagonally", game.makeMove(game.getBoard().buildMove("b2-c3", white)));
-        assertFalse("Could move P7b diagonally", game.makeMove(game.getBoard().buildMove("b7-c6", black)));
+        assertFalse("Could move P2b diagonally", game.makeMove(game.getBoard().buildMove("b2-c3", white)).isPresent());
+        assertFalse("Could move P7b diagonally", game.makeMove(game.getBoard().buildMove("b7-c6", black)).isPresent());
     }
 
     @Test
     public void moveBackwards() {
         Game game = new Game(white, black);
 
-        assertTrue("Could not move P2a two squares forward", game.makeMove(game.getBoard().buildMove("a2-a4", white)));
-        assertTrue("Could not move P7a two squares forward", game.makeMove(game.getBoard().buildMove("a7-a6", black)));
+        assertTrue("Could not move P2a two squares forward", game.makeMove(game.getBoard().buildMove("a2-a4", white)).isPresent());
+        assertTrue("Could not move P7a two squares forward", game.makeMove(game.getBoard().buildMove("a7-a6", black)).isPresent());
 
-        assertFalse("Could move P2b backwards", game.makeMove(game.getBoard().buildMove("a4-a3", white)));
-        assertFalse("Could move P7b backwards", game.makeMove(game.getBoard().buildMove("a6-a7", black)));
+        assertFalse("Could move P2b backwards", game.makeMove(game.getBoard().buildMove("a4-a3", white)).isPresent());
+        assertFalse("Could move P7b backwards", game.makeMove(game.getBoard().buildMove("a6-a7", black)).isPresent());
     }
 }

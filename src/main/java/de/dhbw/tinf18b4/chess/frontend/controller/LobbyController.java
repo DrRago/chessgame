@@ -5,6 +5,7 @@ import de.dhbw.tinf18b4.chess.backend.lobby.Lobby;
 import de.dhbw.tinf18b4.chess.backend.lobby.LobbyManager;
 import de.dhbw.tinf18b4.chess.backend.lobby.LobbyStatus;
 import de.dhbw.tinf18b4.chess.backend.user.User;
+import de.dhbw.tinf18b4.chess.frontend.SessionManager;
 import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.ServletException;
@@ -37,7 +38,12 @@ public class LobbyController extends HttpServlet {
     protected void doGet(@NotNull HttpServletRequest req, @NotNull HttpServletResponse resp) throws IOException, ServletException {
         // validate that the user is authenticated
         User user = (User) req.getSession().getAttribute("user");
-        if (user == null || !user.validateLogin()) {
+        if (user == null) {
+            user = new User("guest", "", req.getSession().getId());
+            req.getSession().setAttribute("user", user);
+            SessionManager.addSession(req.getSession());
+        } else if (!user.validateLogin()) {
+            req.getSession().setAttribute("user", null);
             resp.sendRedirect("/login.jsp");
             return;
         }
@@ -62,6 +68,7 @@ public class LobbyController extends HttpServlet {
             if (lobby != null) {
                 // lobby exists
                 // user may not join if he already joined the lobby under another name
+                //noinspection ConstantConditions
                 if (lobby.hasUser(user) && lobby.getPlayerByUser(user).getUser().getID().equals(user.getID())) {
                     // check whether the game has already started and redirect in that case
                     if (lobby.getStatus() == LobbyStatus.GAME_STARTED) {
@@ -74,10 +81,11 @@ public class LobbyController extends HttpServlet {
                     Player player = lobby.join(user);
                     if (player == null) {
                         resp.sendRedirect("/lobby/?error=lobby_full");
-                    }
+                    } else {
 
-                    // forward to lobby
-                    req.getRequestDispatcher("/lobby.jsp?id=" + lobbyID).forward(req, resp);
+                        // forward to lobby
+                        req.getRequestDispatcher("/lobby.jsp?id=" + lobbyID).forward(req, resp);
+                    }
                 } else {
                     resp.sendRedirect("/lobby/?error=already_in_lobby");
                 }
