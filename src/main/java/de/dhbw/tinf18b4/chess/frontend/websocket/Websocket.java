@@ -13,6 +13,7 @@ import de.dhbw.tinf18b4.chess.backend.position.Position;
 import de.dhbw.tinf18b4.chess.backend.user.User;
 import de.dhbw.tinf18b4.chess.frontend.JSON.JSONHandler;
 import de.dhbw.tinf18b4.chess.frontend.SessionManager;
+import de.dhbw.tinf18b4.chess.states.GameState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONArray;
@@ -192,16 +193,25 @@ public class Websocket extends HttpServlet {
                     if (game == null) return;
                     Move move = game.getBoard().buildMove(moveString, currentPlayer);
 
-                    if (!game.makeMove(move)) {
+                    Optional<GameState> gameState = game.makeMove(move);
+                    if (gameState.isEmpty()) {
                         logger.info("Invalid move");
+                        sendToLobby(playerLobby, getMoveResponse(playerLobby));
                     } else {
                         JSONObject answer = buildAnswerTemplate();
                         answer.put("content", "logs");
                         answer.put("value", moveToJSON(move));
-
                         sendToLobby(playerLobby, answer);
                     }
-                    sendToLobby(playerLobby, getMoveResponse(playerLobby));
+                    if (gameState.isPresent()) {
+                        GameState state = gameState.get();
+                        sendToLobby(playerLobby, getMoveResponse(playerLobby));
+                        if (state.isWon()) {
+                            sendToLobby(playerLobby, "gameState", "WON");
+                        } else if (state.isDraw()) {
+                            sendToLobby(playerLobby, "gameState", "DRAW");
+                        }
+                    }
                 } catch (IllegalArgumentException e) {
                     sendErrorMessageToClient(e.getMessage(), session, "error");
                 }
@@ -236,6 +246,10 @@ public class Websocket extends HttpServlet {
                         if (Arrays.stream(playerLobby.getPlayers()).allMatch(Objects::isNull)) {
                             LobbyManager.removeLobby(playerLobby);
                         }
+                        break;
+                    case "backToLobby":
+                        sendToLobby(playerLobby, "redirect", "/lobby/" + lobbyID);
+                        playerLobby.endGame();
                         break;
                 }
                 break;
@@ -303,29 +317,30 @@ public class Websocket extends HttpServlet {
         answerValue.put("turn", game.whoseTurn().isWhite() ? "white" : "black"); // the color whose turn it is
 
         // get all possible moves for all pieces identified by it's position on the board
-        List<Map<Piece, Stream<Position>>> allMoves = lobby.getGame().getBoard().getAllPossibleMoves();
-        Map<Piece, Stream<Position>> moveMap = allMoves.get(0);
-        Map<Piece, Stream<Position>> captureMoveMap = allMoves.get(1);
-
-
         JSONArray possibilitiesArray = new JSONArray();
+        if (lobby.getGame().evaluateGame().isOngoing()) {
+            List<Map<Piece, Stream<Position>>> allMoves = lobby.getGame().getBoard().getAllPossibleMoves();
+            Map<Piece, Stream<Position>> moveMap = allMoves.get(0);
+            Map<Piece, Stream<Position>> captureMoveMap = allMoves.get(1);
 
-        moveMap.forEach((key, value) -> {
-            JSONObject positionObject = new JSONObject();
-            JSONArray positionArray = new JSONArray();
-            positionArray.addAll(value.map(Position::toString).collect(Collectors.toList()));
 
-            JSONArray captureArray = new JSONArray();
-            captureArray.addAll(captureMoveMap.get(key).map(Position::toString).collect(Collectors.toList()));
+            moveMap.forEach((key, value) -> {
+                JSONObject positionObject = new JSONObject();
+                JSONArray positionArray = new JSONArray();
+                positionArray.addAll(value.map(Position::toString).collect(Collectors.toList()));
 
-            positionObject.put("piece", key.getPosition().toString());
-            positionObject.put("color", key.isWhite() ? "white" : "black");
+                JSONArray captureArray = new JSONArray();
+                captureArray.addAll(captureMoveMap.get(key).map(Position::toString).collect(Collectors.toList()));
 
-            positionObject.put("possibilities", positionArray);
-            positionObject.put("capturePossibilities", captureArray);
+                positionObject.put("piece", key.getPosition().toString());
+                positionObject.put("color", key.isWhite() ? "white" : "black");
 
-            possibilitiesArray.add(positionObject);
-        });
+                positionObject.put("possibilities", positionArray);
+                positionObject.put("capturePossibilities", captureArray);
+
+                possibilitiesArray.add(positionObject);
+            });
+        }
 
         answerValue.put("possibilities", possibilitiesArray); // the possible moves
         moveAnswer.put("content", "move");
