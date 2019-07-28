@@ -22,16 +22,16 @@ public class EnPassantMove extends Move {
             throw new IllegalStateException("Attempted to create en passant move without pawn");
         }
 
+        this.capturedPawn = (Pawn) pawn;
+
         // Prevent en passant from capturing own pieces
         if (getCapturedPawn().isOwnedBySamePlayer(player)) {
             throw new IllegalArgumentException("Attempted to capture own pawn with en passant move");
         }
 
-        if (getCapturingPawn().getValidCaptureMoves(board).noneMatch(position -> position.equals(capturePosition))) {
+        if (getCapturingPawn().getValidCaptureMoves(board).noneMatch(position -> position.equals(destination))) {
             throw new IllegalArgumentException("Attempted to create en passant move when not possible");
         }
-
-        this.capturedPawn = (Pawn) pawn;
     }
 
     private static @NotNull Pawn findPawn(@NotNull Player player, @NotNull Position origin, @NotNull Position destination, @NotNull Board board) {

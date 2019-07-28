@@ -380,6 +380,29 @@ public class Board {
     }
 
     /**
+     * Build the {@link Move} according to a valid {@link Move} format defined in {@link #checkMoveFormat(String)}
+     *
+     * @param player the player who performed the move
+     * @return the move
+     */
+    @NotNull
+    public Move buildMove(@NotNull Player player, @NotNull Position origin, @NotNull Position destination) {
+        try {
+            return new CastlingMove(player, origin, destination, this);
+        } catch (Exception ignored) {
+
+        }
+
+        try {
+            return new EnPassantMove(player, origin, destination, this);
+        } catch (Exception ignored) {
+
+        }
+
+        return new Move(player, origin, destination, this);
+    }
+
+    /**
      * Get all possible moves and capture moves in a list with two maps,
      * the first is always the map with the moves and the second is
      * always the map with the capture moves.

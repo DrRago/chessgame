@@ -1,5 +1,6 @@
 package de.dhbw.tinf18b4.chess.backend;
 
+import de.dhbw.tinf18b4.chess.backend.moves.Move;
 import de.dhbw.tinf18b4.chess.backend.piece.*;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 import de.dhbw.tinf18b4.chess.backend.user.User;
@@ -214,7 +215,7 @@ public class GameTest {
         }
 
         public static void main(String[] args) {
-            String GameWithCastling = "[Event \"F/S Return Match\"]\n" +
+            String gameWithCastling = "[Event \"F/S Return Match\"]\n" +
                     "[Site \"Belgrade, Serbia JUG\"]\n" +
                     "[Date \"1992.11.04\"]\n" +
                     "[Round \"29\"]\n" +
@@ -359,7 +360,6 @@ public class GameTest {
             String pawnPromotion = matcher.group(6);
             String checkMateCheck = matcher.group(7);
 
-            Piece piece;
             Position origin;
             Position destination;
             try {
@@ -395,17 +395,15 @@ public class GameTest {
                         throw new WrongImplementationException(message);
                     }
 
-                    piece = pieceList.get(0);
-                    origin = piece.getPosition();
+                    origin = pieceList.get(0).getPosition();
                 } else {
                     origin = new Position(originFile + originRank);
-                    piece = Objects.requireNonNull(game.getBoard().findPieceByPosition(origin));
                 }
             } catch (IllegalArgumentException e) {
                 throw new ErroneousInputException(e);
             }
 
-            Move move = new Move(player1.isWhite() == white ? player1 : player2, origin, destination, piece);
+            Move move = game.getBoard().buildMove(player1.isWhite() == white ? player1 : player2, origin, destination);
             game.makeMove(move);
             return move;
         }

@@ -29,27 +29,30 @@ public class CastlingMove extends Move {
         Position rookDestination = kingDestination;
         String initialPosition;
 
-        int rankDistance = kingOrigin.getFile() - kingDestination.getFile();
-        boolean leftRook = Math.abs(rankDistance) == rankDistance;
+        int distance = kingDestination.getFile() - kingOrigin.getFile();
 
-        if (player.isWhite()) {
-            // right rook
-            if (leftRook) {
+        if (distance == 2) {
+            if (player.isWhite()) {
+                // queenside castling
                 rookDestination = rookDestination.rightNeighbor();
                 initialPosition = "a1";
             } else {
-                rookDestination = rookDestination.leftNeighbor();
-                initialPosition = "h1";
-            }
-        } else {
-            // left rook
-            if (leftRook) {
-                rookDestination = rookDestination.rightNeighbor();
-                initialPosition = "a8";
-            } else {
+                // kingside castling
                 rookDestination = rookDestination.leftNeighbor();
                 initialPosition = "h8";
             }
+        } else if (distance == -2) {
+            if (player.isWhite()) {
+                // kingside castling
+                rookDestination = rookDestination.leftNeighbor();
+                initialPosition = "h1";
+            } else {
+                // queenside castling
+                rookDestination = rookDestination.rightNeighbor();
+                initialPosition = "a8";
+            }
+        } else {
+            throw new IllegalStateException("Attempted to create castling move but king isn't moving exactly two square file-wise");
         }
 
         Position rookOrigin = new Position(initialPosition);
