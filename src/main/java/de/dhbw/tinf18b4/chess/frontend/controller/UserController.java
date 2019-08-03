@@ -19,12 +19,10 @@ import java.nio.charset.StandardCharsets;
 public class UserController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws UnsupportedEncodingException {
-        System.out.println(req.getContextPath());
-        System.out.println(req.getQueryString());
         User user = (User) req.getSession().getAttribute("user");
         if (user == null) return;
         String newName = req.getParameter("name");
-        newName = URLDecoder.decode(newName, StandardCharsets.UTF_8.toString());
+        newName = URLDecoder.decode(req.getQueryString(), StandardCharsets.UTF_8.toString());
         if (newName == null) return;
         System.out.println(newName);
 
