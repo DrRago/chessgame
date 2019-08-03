@@ -7,6 +7,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Helper class to allow a user to change it's username. <br>
@@ -15,11 +16,13 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/user/changeName")
 public class UserController extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws UnsupportedEncodingException {
+        req.setCharacterEncoding("UTF-8");
         User user = (User) req.getSession().getAttribute("user");
         if (user == null) return;
         String newName = req.getParameter("name");
         if (newName == null) return;
+        System.out.println(newName);
 
         user.setDisplayName(newName);
         UserUtility.updateDisplayName(user.getID(), newName);
