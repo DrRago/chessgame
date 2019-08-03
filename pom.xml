@@ -150,6 +150,10 @@
                     <uriEncoding>utf-8</uriEncoding>
                     <path>/</path>
                     <port>9091</port>
+
+                    <httpsPort>9092</httpsPort>
+                    <keystoreFile>/etc/letsencrypt/live/gahr.dev/bundle.pfx</keystoreFile>
+                    <keystorePass>apassword</keystorePass>
                 </configuration>
             </plugin>
         </plugins>
