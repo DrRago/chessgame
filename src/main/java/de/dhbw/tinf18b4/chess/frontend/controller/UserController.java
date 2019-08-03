@@ -21,10 +21,10 @@ public class UserController extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws UnsupportedEncodingException {
         User user = (User) req.getSession().getAttribute("user");
         if (user == null) return;
-        String newName = req.getParameter("name");
-        newName = URLDecoder.decode(req.getQueryString(), StandardCharsets.UTF_8.toString());
-        if (newName == null) return;
-        System.out.println(newName);
+
+        // due to a bug in HttpServlet implementation we need to parse the url parameter by ourselves
+        String encodedURL = URLDecoder.decode(req.getQueryString(), StandardCharsets.UTF_8.toString());
+        String newName = encodedURL.replace("name=", "");
 
         user.setDisplayName(newName);
         UserUtility.updateDisplayName(user.getID(), newName);
