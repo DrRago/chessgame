@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Helper class to allow a user to change it's username. <br>
@@ -19,10 +21,10 @@ public class UserController extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws UnsupportedEncodingException {
         System.out.println(req.getContextPath());
         System.out.println(req.getQueryString());
-        req.setCharacterEncoding("UTF-8");
         User user = (User) req.getSession().getAttribute("user");
         if (user == null) return;
         String newName = req.getParameter("name");
+        newName = URLDecoder.decode(newName, StandardCharsets.UTF_8.toString());
         if (newName == null) return;
         System.out.println(newName);
 
