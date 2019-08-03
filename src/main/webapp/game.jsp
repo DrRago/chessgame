@@ -1,7 +1,5 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
-
-<%-- validate that the user is logged in--%>
-<%@ include file="scripts/check_login.jsp" %>
 
 <html lang="en">
 <head>
@@ -18,7 +16,7 @@
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/chessboard-1.0.0.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/lobby.css">
-    <link rel="stylesheet" href="/assets/css/toggle-switch.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/toggle-switch.css">
 
     <script src="${pageContext.request.contextPath}/assets/js/chessboard-1.0.0.min.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/game.js"></script>

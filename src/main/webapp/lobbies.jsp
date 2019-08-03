@@ -2,9 +2,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
-<%-- validate that the user is logged in--%>
-<%@ include file="scripts/check_login.jsp" %>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -12,6 +9,8 @@
 
     <%@include file='parts/styles.jsp' %>
     <%@include file='parts/javascript.jsp' %>
+
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/dataTable.css">
 
 </head>
 <body>
@@ -21,26 +20,53 @@
 <%@include file="parts/nav.jsp" %>
 <div class="container mt-2 pt-5">
     <%@include file="parts/errors.jsp" %>
-    <table class="table table-bordered table-striped table-hover">
+    <a href="${pageContext.request.contextPath}/lobby/create" class="btn btn-outline-success" id="create_lobby">Create Lobby</a>
+    <table id="lobbyTable" class="table table-bordered table-striped table-hover">
         <thead>
         <tr>
-            <th>ID</th>
+            <th scope="col" class="col-1">#</th>
+            <th scope="col">ID</th>
+            <th scope="col">Owner</th>
         </tr>
         </thead>
         <tbody>
-        <c:forEach items="${lobbies.lobbyNames}" var="lobby">
+        <c:forEach items="${lobbies.lobbyNames}" var="lobby" varStatus="loop">
             <tr>
-                <td><a href='/lobby/<c:out value="${lobby}"/>'><c:out value="${lobby}"/></a></td>
+                <th scope="row" class="col-1"></th>
+                <td><a href='/lobby/<c:out value="${lobby.ID}"/>'><c:out value="${lobby.ID}"/></a></td>
+                <td>${lobby.lobby.ownerName}<a  href='/lobby/<c:out value="${lobby.ID}"/>' class="btn btn-success btn-sm float-right"><i class="fas fa-sign-in-alt"></i> Join</a> </td>
             </tr>
         </c:forEach>
-        <c:if test="${fn:length(lobbies.lobbyNames) eq 0}">
-            <tr>
-                <td>No public lobbies</td>
-            </tr>
-        </c:if>
         </tbody>
     </table>
-    <a href="${pageContext.request.contextPath}/lobby/create" class="btn btn-outline-success">Create Lobby</a>
 </div>
+
+<script src="${pageContext.request.contextPath}/assets/js/dataTable.js"></script>
+<script>
+    $("#lobbyTable tbody tr").each((index, row) => {
+        $(row).find("th").text(index + 1);
+    });
+
+    const table = $("#lobbyTable").DataTable({
+        "pageLength": 10,
+        "bLengthChange": false,
+        "language": {
+            "emptyTable": "No public lobby found"
+        },
+        buttons:[{
+            dom:{
+                button:{
+                    tag:"button",
+                    className:"btn btn-secondary"
+                },
+                buttonLiner: {
+                    tag: null
+                }
+            }
+        }]
+    });
+
+    $("#create_lobby").appendTo($("#lobbyTable_wrapper > .row:first-child > :first-child"))
+</script>
 </body>
 </html>

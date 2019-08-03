@@ -78,6 +78,10 @@ const makeMove = move => {
 
 
 $(() => {
+    window.onbeforeunload = function () {
+        return "If you reload the lobby will be removed, in case you are the only participant.\nAre you sure?";
+    };
+
     webSocket = new WebSocket(`ws://${location.host}/websocketendpoint/${parseLobbyID()}/${websocketID}`);
 
     /**

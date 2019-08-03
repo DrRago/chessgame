@@ -8,18 +8,15 @@ import org.jetbrains.annotations.NotNull;
  */
 public class LobbyHelper {
     /**
-     * class variable that is not really used for anything but necessary for jsp to call the getter
-     */
-    @SuppressWarnings("unused")
-    private String[] lobbyNames;
-
-    /**
-     * Generate a list of all lobby ids
+     * Generate a list of all lobbies
      *
-     * @return the array of lobby ids
+     * @return the array of lobbies
      */
     @NotNull
-    public String[] getLobbyNames() {
-        return LobbyManager.getPublicNotFullLobbies().keySet().toArray(new String[0]);
+    public LobbyPair[] getLobbyNames() {
+        return LobbyManager.getPublicNotFullLobbies().entrySet().stream().map(entry -> new LobbyPair(entry.getKey(), entry.getValue())).toArray(LobbyPair[]::new);
     }
+
+
 }
+

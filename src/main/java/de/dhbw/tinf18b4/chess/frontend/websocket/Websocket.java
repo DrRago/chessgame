@@ -136,6 +136,7 @@ public class Websocket extends HttpServlet {
         // leave the lobby if the game hasn't started yet
         if (lobby != null && lobby.getStatus() != LobbyStatus.GAME_STARTED && lobby.getGame() == null) {
             lobby.leave(player.getUser());
+            if (Arrays.stream(lobby.getPlayers()).allMatch(Objects::isNull)) LobbyManager.removeLobby(lobby);
             sendToLobby(lobby, getPlayerNames(lobby));
         }
     }
