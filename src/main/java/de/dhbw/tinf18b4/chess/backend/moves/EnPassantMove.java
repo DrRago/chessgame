@@ -29,7 +29,9 @@ public class EnPassantMove extends Move {
             throw new IllegalArgumentException("Attempted to capture own pawn with en passant move");
         }
 
-        if (getCapturingPawn().getValidCaptureMoves(board).noneMatch(position -> position.equals(destination))) {
+        // Prevent en passant when it is not possible
+        Position enPassantPosition = getCapturingPawn().calculateEnPassantPossibility(board);
+        if (!destination.equals(enPassantPosition)) {
             throw new IllegalArgumentException("Attempted to create en passant move when not possible");
         }
     }
