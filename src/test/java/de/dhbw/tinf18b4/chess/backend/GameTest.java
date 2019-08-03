@@ -151,6 +151,9 @@ public class GameTest {
                     System.out.print("Successful.");
                 } catch (PgnParser.CastlingNotImplementedException ignored) {
                     System.out.print("Aborting test due to castling.");
+                } catch (PgnParser.PawnPromotionException e) {
+                    System.out.println("Aborting test due to unsupported pawn promotion.");
+                    ;
                 } catch (PgnParser.ErroneousInputException e) {
                     System.out.print("Invalid PGN.");
                 } catch (PgnParser.WrongImplementationException e) {
@@ -281,7 +284,7 @@ public class GameTest {
          * @throws ErroneousInputException         a parsing error occurred
          */
         @NotNull
-        Stream<Move> parseMoves() throws CastlingNotImplementedException, ErroneousInputException, WrongImplementationException {
+        Stream<Move> parseMoves() throws CastlingNotImplementedException, ErroneousInputException, WrongImplementationException, PawnPromotionException {
             reset();
 
             String beginMarker = "]\n\n1.";
@@ -336,7 +339,7 @@ public class GameTest {
          * @throws ErroneousInputException         if the move is not recognized
          */
         @NotNull
-        private Move parseMove(String moveToken, boolean white) throws CastlingNotImplementedException, ErroneousInputException, WrongImplementationException {
+        private Move parseMove(String moveToken, boolean white) throws CastlingNotImplementedException, ErroneousInputException, WrongImplementationException, PawnPromotionException {
             boolean isCapture = moveToken.contains("x");
             String token = moveToken.replaceAll("x", "");
 
@@ -359,6 +362,10 @@ public class GameTest {
             String destinationRank = matcher.group(5);
             String pawnPromotion = matcher.group(6);
             String checkMateCheck = matcher.group(7);
+
+            if (pawnPromotion != null && !pawnPromotion.equals("=Q")) {
+                throw new PawnPromotionException("pawn promotion only supported for promotion to queen");
+            }
 
             Position origin;
             Position destination;
@@ -426,6 +433,12 @@ public class GameTest {
 
         static class WrongImplementationException extends Throwable {
             WrongImplementationException(String s) {
+                super(s);
+            }
+        }
+
+        static class PawnPromotionException extends Throwable {
+            PawnPromotionException(String s) {
                 super(s);
             }
         }
