@@ -17,6 +17,8 @@ import java.io.UnsupportedEncodingException;
 public class UserController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws UnsupportedEncodingException {
+        System.out.println(req.getContextPath());
+        System.out.println(req.getQueryString());
         req.setCharacterEncoding("UTF-8");
         User user = (User) req.getSession().getAttribute("user");
         if (user == null) return;
