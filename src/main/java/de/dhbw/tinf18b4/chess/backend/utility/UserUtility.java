@@ -61,7 +61,7 @@ public class UserUtility {
      */
     public static String getDisplayName(String sessionID) {
         try {
-            ResultSet result = MySQLUtility.executeQuery("SELECT * FROM sessions WHERE ID=?", sessionID);
+            ResultSet result = MySQLUtility.executeQuery("SELECT * FROM session WHERE ID=?", sessionID);
             if (result == null || !result.next()) {
                 return "guest";
             } else {
