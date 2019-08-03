@@ -1,7 +1,5 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
-
-<%-- validate that the user is logged in--%>
-<%@ include file="scripts/check_login.jsp" %>
 
 <html lang="en">
 <head>
@@ -18,6 +16,7 @@
 
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/chessboard-1.0.0.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/lobby.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/toggle-switch.css">
 
     <script src="${pageContext.request.contextPath}/assets/js/chessboard-1.0.0.min.js"></script>
     <script src="${pageContext.request.contextPath}/assets/js/game.js"></script>
@@ -47,13 +46,16 @@
                 <div class="card-header">
                     <div>
                         <h4 class="float-left">Chess</h4>
-                        <div class="btn-group float-right">
-                            <label>
-                                Autochess
-                                <input type="checkbox" id="autochess">
-                            </label>
-                            <a href="javascript:backToLobby()" class="btn btn-outline-warning ">Back to Lobby</a>
-                            <a href="javascript:leaveLobby()" class="btn btn-outline-danger">Leave</a>
+                        <div class="float-right">
+                            <label>Autoplay</label>
+                            <button type="button" class="btn btn-sm btn-toggle" id="autochess" data-toggle="button"
+                                    aria-pressed="false" autocomplete="off">
+                                <div class="handle"></div>
+                            </button>
+                            <div class="btn-group">
+                                <a href="javascript:backToLobby()" class="btn btn-outline-warning ">Back to Lobby</a>
+                                <a href="javascript:leaveLobby()" class="btn btn-outline-danger">Leave</a>
+                            </div>
                         </div>
                     </div>
                 </div>

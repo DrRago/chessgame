@@ -22,6 +22,10 @@ import java.util.Objects;
  * </ul>
  */
 public class Lobby {
+    /**
+     * THe owner of the {@link Lobby}
+     */
+    private User owner;
 
     /**
      * Whether the {@link Lobby} is public
@@ -48,10 +52,11 @@ public class Lobby {
      */
     @NotNull
     @Getter
+    @Setter
     private LobbyStatus status = LobbyStatus.WAITING_FOR_START;
 
     public Lobby(@NotNull User creator) {
-        this.players[0] = new Player(true, creator);
+        this.owner = creator;
     }
 
     @NotNull
@@ -100,6 +105,11 @@ public class Lobby {
             }
         }
 
+        // the lobby should be deleted if the last player left it
+        if (Arrays.stream(players).allMatch(Objects::isNull)) {
+            LobbyManager.removeLobby(this);
+        }
+
         // stop the game if it was active
         if (status == LobbyStatus.GAME_STARTED) {
             status = LobbyStatus.WAITING_FOR_START;
@@ -141,5 +151,9 @@ public class Lobby {
     @Override
     public String toString() {
         return String.format("Lobby (%d/%d) - %s", Arrays.stream(players).filter(Objects::isNull).count(), 2, status);
+    }
+
+    public String getOwnerName() {
+        return owner.getDisplayName();
     }
 }

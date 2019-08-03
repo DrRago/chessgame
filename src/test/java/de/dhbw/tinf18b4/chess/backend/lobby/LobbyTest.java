@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
  */
 public class LobbyTest {
     @NotNull
-    private User me = new User("me", "123", "123");
+    private User me = new User("me");
 
     @Test
     public void joinLeaveLobbyTest() {
@@ -22,7 +22,7 @@ public class LobbyTest {
         assertNotNull(lobby);
         assertEquals("Lobby status should be waiting", LobbyStatus.WAITING_FOR_START, lobby.getStatus());
 
-        User second = new User("second", "123", "122");
+        User second = new User("second");
         lobby.join(second);
         assertTrue("Player should be in lobby", lobby.hasUser(second));
 
@@ -33,11 +33,12 @@ public class LobbyTest {
     @Test
     public void startGameTest() {
         Lobby lobby = new Lobby(me);
+        lobby.join(me);
 
         assertNotNull(lobby);
         assertEquals("Lobby shouldn't be starting", LobbyStatus.NOT_ENOUGH_PLAYERS, lobby.startGame());
 
-        User second = new User("second", "123", "122");
+        User second = new User("second");
         lobby.join(second);
         assertEquals("Lobby should be starting", LobbyStatus.GAME_STARTED, lobby.startGame());
 

@@ -78,6 +78,10 @@ const makeMove = move => {
 
 
 $(() => {
+    window.onbeforeunload = function () {
+        return "If you reload the lobby will be removed, in case you are the only participant.\nAre you sure?";
+    };
+
     webSocket = new WebSocket(`ws://${location.host}/websocketendpoint/${parseLobbyID()}/${websocketID}`);
 
     /**
@@ -134,7 +138,17 @@ $(() => {
                 $("#settingsTable #privacy > input").prop("checked", msgObj.value === "true")
                 break;
             case "gameState":
-                alert(msgObj.value);
+                switch (msgObj.value) {
+                    case "KING_VS_KING":
+                    case "KING_VS_BISHOP":
+                    case "KING_BISHOP_VS_KING":
+                    case "KING_KNIGHT_VS_KING":
+                    case "KING_BISHOP_VS_KING_BISHOP":
+                        alert("DRAW");
+                        break;
+                    default:
+                        alert(msgObj.value);
+                }
                 finished = true;
                 break;
         }

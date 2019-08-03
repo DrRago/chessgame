@@ -16,9 +16,9 @@ import static org.junit.Assert.assertTrue;
 
 public class QueenTest {
     @NotNull
-    private User user1 = new User("player1", "", "");
+    private User user1 = new User("player1");
     @NotNull
-    private User user2 = new User("player2", "", "");
+    private User user2 = new User("player2");
     @NotNull
     private Player white = new Player(true, user1);
     @NotNull

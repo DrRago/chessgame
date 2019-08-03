@@ -16,9 +16,9 @@ import static org.junit.Assert.*;
  */
 public class GameTest {
     @NotNull
-    private User user1 = new User("user1", "", "");
+    private User user1 = new User("user1");
     @NotNull
-    private User user2 = new User("user2", "", "");
+    private User user2 = new User("user2");
 
     @NotNull
     private Player white = new Player(true, user1);

@@ -13,13 +13,14 @@ import static org.junit.Assert.*;
  */
 public class LobbyManagerTest {
     @NotNull
-    private static User me = new User("test", "123", "123");
+    private static User me = new User("test");
 
 
     @Test
     public void createRemoveLobbyTest() {
         String lobbyID = LobbyManager.createLobby(me);
         Lobby lobby = LobbyManager.lobbies.get(lobbyID);
+        lobby.join(me);
 
         assertNotNull(lobbyID);
         assertNotNull(lobby);
@@ -35,6 +36,7 @@ public class LobbyManagerTest {
     public void getPublicLobbiesTest() {
         String lobbyID = LobbyManager.createLobby(me);
         Lobby lobby = LobbyManager.lobbies.get(lobbyID);
+        lobby.join(me);
 
         assertEquals("Expected list size to be 1", 1, LobbyManager.getPublicLobbies().size());
         lobby.setPublicLobby(false);
