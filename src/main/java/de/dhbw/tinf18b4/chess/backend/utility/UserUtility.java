@@ -65,7 +65,6 @@ public class UserUtility {
             if (result == null || !result.next()) {
                 return "guest";
             } else {
-                System.out.println(result);
                 return result.getString(1);
             }
         } catch (SQLException e) {

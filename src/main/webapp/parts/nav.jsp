@@ -44,7 +44,7 @@
                                         });
                                         return false;
                                     }
-                                    $.ajax(`/user/changeName?name=${"${name}"}`);
+                                    $.ajax(`/user/changeName?name=${"${encodeURIComponent(name)}"}`);
                                     $('#edit_name').contents().first()[0].textContent = name
                                 }
                             },
