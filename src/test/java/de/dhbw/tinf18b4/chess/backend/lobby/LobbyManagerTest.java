@@ -13,7 +13,7 @@ import static org.junit.Assert.*;
  */
 public class LobbyManagerTest {
     @NotNull
-    private static User me = new User("test", "123", "123");
+    private static User me = new User("test");
 
 
     @Test
