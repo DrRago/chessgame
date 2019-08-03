@@ -26,36 +26,38 @@ public class CastlingMove extends Move {
     public CastlingMove(@NotNull Player player, @NotNull Position kingOrigin, @NotNull Position kingDestination, @NotNull Board board) {
         super(player, kingOrigin, kingDestination, findKing(player, kingOrigin, kingDestination, board));
 
-        Position rookDestination = kingDestination;
-        String initialPosition;
+        String rookDestination;
+        String initialRookPosition;
 
         int distance = kingDestination.getFile() - kingOrigin.getFile();
 
-        if (distance == 2) {
-            if (player.isWhite()) {
-                // queenside castling
-                rookDestination = rookDestination.rightNeighbor();
-                initialPosition = "a1";
-            } else {
+        if (player.isWhite()) {
+            if (distance == 2) {
                 // kingside castling
-                rookDestination = rookDestination.leftNeighbor();
-                initialPosition = "h8";
-            }
-        } else if (distance == -2) {
-            if (player.isWhite()) {
-                // kingside castling
-                rookDestination = rookDestination.leftNeighbor();
-                initialPosition = "h1";
-            } else {
+                rookDestination = "f1";
+                initialRookPosition = "h1";
+            } else if (distance == -2) {
                 // queenside castling
-                rookDestination = rookDestination.rightNeighbor();
-                initialPosition = "a8";
+                rookDestination = "d1";
+                initialRookPosition = "a1";
+            } else {
+                throw new IllegalStateException("Attempted to create castling move but king isn't moving exactly two square file-wise");
             }
         } else {
-            throw new IllegalStateException("Attempted to create castling move but king isn't moving exactly two square file-wise");
+            if (distance == 2) {
+                // kingside castling
+                rookDestination = "f8";
+                initialRookPosition = "h8";
+            } else if (distance == -2) {
+                // queenside castling
+                rookDestination = "d8";
+                initialRookPosition = "a8";
+            } else {
+                throw new IllegalStateException("Attempted to create castling move but king isn't moving exactly two square file-wise");
+            }
         }
 
-        Position rookOrigin = new Position(initialPosition);
+        Position rookOrigin = new Position(initialRookPosition);
         Piece rook = board.findPieceByPosition(rookOrigin);
 
         if (!(rook instanceof Rook)) {
@@ -63,7 +65,7 @@ public class CastlingMove extends Move {
         }
 
         this.rook = (Rook) rook;
-        this.rookDestination = rookDestination;
+        this.rookDestination = new Position(rookDestination);
         this.rookOrigin = rookOrigin;
     }
 
