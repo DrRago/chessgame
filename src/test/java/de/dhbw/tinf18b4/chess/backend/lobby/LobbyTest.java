@@ -33,6 +33,7 @@ public class LobbyTest {
     @Test
     public void startGameTest() {
         Lobby lobby = new Lobby(me);
+        lobby.join(me);
 
         assertNotNull(lobby);
         assertEquals("Lobby shouldn't be starting", LobbyStatus.NOT_ENOUGH_PLAYERS, lobby.startGame());

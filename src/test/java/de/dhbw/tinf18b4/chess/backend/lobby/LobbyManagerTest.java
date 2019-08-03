@@ -20,6 +20,7 @@ public class LobbyManagerTest {
     public void createRemoveLobbyTest() {
         String lobbyID = LobbyManager.createLobby(me);
         Lobby lobby = LobbyManager.lobbies.get(lobbyID);
+        lobby.join(me);
 
         assertNotNull(lobbyID);
         assertNotNull(lobby);
@@ -35,6 +36,7 @@ public class LobbyManagerTest {
     public void getPublicLobbiesTest() {
         String lobbyID = LobbyManager.createLobby(me);
         Lobby lobby = LobbyManager.lobbies.get(lobbyID);
+        lobby.join(me);
 
         assertEquals("Expected list size to be 1", 1, LobbyManager.getPublicLobbies().size());
         lobby.setPublicLobby(false);
