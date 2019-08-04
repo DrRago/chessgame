@@ -8,7 +8,7 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-0">
                 <li class="nav-item">
-                    <a class="nav-link" href="${pageContext.request.contextPath}/imprint.jsp">Imprint</a>
+                    <a class="nav-link" href="${pageContext.request.contextPath}/imprint">Imprint</a>
                 </li>
             </ul>
             <h3 class="mx-auto"><c:out value="${pageTitle}"/></h3>
