@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.MatchResult;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -137,64 +138,34 @@ public class GameTest {
     @Test
     public void completeMatchesTest() {
         File kingbase2019E60E90 = Paths.get("src/test/resources/KingBase2019-A80-A99.pgn").toFile();
+        int testBatchSize = 500;
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(kingbase2019E60E90))) {
-            for (String match : readAllMatches(reader)) {
-                PgnParser pgnParser = new PgnParser(match);
-                Map<String, String> headers = pgnParser.parseHeader();
-                System.out.print(headers.get("Site") + " " + headers.get("White") + " vs " + headers.get("Black") + ", Result: " + headers.get("Result") + ": ");
-                try {
-                    pgnParser.parseMoves().forEach(move -> {
-                        System.out.print(move);
-                        System.out.print(". ");
-                    });
-                    System.out.print("Successful.");
-                } catch (PgnParser.CastlingNotImplementedException ignored) {
-                    System.out.print("Aborting test due to castling.");
-                } catch (PgnParser.PawnPromotionException e) {
-                    System.out.println("Aborting test due to unsupported pawn promotion.");
-                    ;
-                } catch (PgnParser.ErroneousInputException e) {
-                    System.out.print("Invalid PGN.");
-                } catch (PgnParser.WrongImplementationException e) {
-                    fail(e.getMessage());
-                }
-                System.out.println();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private List<String> readAllMatches(BufferedReader reader) {
-        return Stream.generate(() -> readNextDocument(reader))
-                .takeWhile(Objects::nonNull)
+        List<String> matches = PgnParser.readAllMatches(kingbase2019E60E90);
+        matches = ThreadLocalRandom.current().ints(testBatchSize, 0, matches.size())
+                .mapToObj(matches::get)
                 .collect(Collectors.toList());
-    }
 
-    private String readNextDocument(BufferedReader reader) {
-        StringBuilder stringBuilder = new StringBuilder();
-        try {
-            for (int i = 0; i < 2; i++) {
-                while (true) {
-                    String line = reader.readLine();
-
-                    if (line == null) {
-                        return null;
-                    }
-
-                    stringBuilder.append(line).append("\n");
-                    if (line.isEmpty()) {
-                        break;
-                    }
-                }
+        int i = 0;
+        for (String match : matches) {
+            PgnParser pgnParser = new PgnParser(match);
+            Map<String, String> headers = pgnParser.parseHeader();
+            System.out.print("Test match " + ++i + " of " + testBatchSize + ": ");
+            System.out.print(headers.get("Site") + " " + headers.get("White") + " vs " + headers.get("Black") + ", Result: " + headers.get("Result") + ": ");
+            try {
+                pgnParser.parseMoves().forEach(move -> {
+                    System.out.print(move);
+                    System.out.print(". ");
+                });
+                System.out.print("Successful.");
+            } catch (PgnParser.PawnPromotionException e) {
+                System.out.print("Aborting test due to unsupported pawn promotion.");
+            } catch (PgnParser.ErroneousInputException e) {
+                System.out.print("Invalid PGN.");
+            } catch (PgnParser.WrongImplementationException e) {
+                fail(e.getMessage());
             }
-
-        } catch (IOException e) {
-            return null;
+            System.out.println();
         }
-
-        return stringBuilder.toString();
     }
 
     static class PgnParser {
@@ -217,63 +188,44 @@ public class GameTest {
             this.document = document;
         }
 
-        public static void main(String[] args) {
-            String gameWithCastling = "[Event \"F/S Return Match\"]\n" +
-                    "[Site \"Belgrade, Serbia JUG\"]\n" +
-                    "[Date \"1992.11.04\"]\n" +
-                    "[Round \"29\"]\n" +
-                    "[White \"Fischer, Robert J.\"]\n" +
-                    "[Black \"Spassky, Boris V.\"]\n" +
-                    "[Result \"1/2-1/2\"]\n" +
-                    "\n" +
-                    "1. e4 e5 2. Nf3 Nc6 3. Bb5 a6 {This opening is called the Ruy Lopez.}\n" +
-                    "4. Ba4 Nf6 5. O-O Be7 6. Re1 b5 7. Bb3 d6 8. c3 O-O 9. h3 Nb8 10. d4 Nbd7\n" +
-                    "11. c4 c6 12. cxb5 axb5 13. Nc3 Bb7 14. Bg5 b4 15. Nb1 h6 16. Bh4 c5 17. dxe5\n" +
-                    "Nxe4 18. Bxe7 Qxe7 19. exd6 Qf6 20. Nbd2 Nxd6 21. Nc4 Nxc4 22. Bxc4 Nb6\n" +
-                    "23. Ne5 Rae8 24. Bxf7+ Rxf7 25. Nxf7 Rxe1+ 26. Qxe1 Kxf7 27. Qe3 Qg5 28. Qxg5\n" +
-                    "hxg5 29. b3 Ke6 30. a3 Kd6 31. axb4 cxb4 32. Ra5 Nd5 33. f3 Bc8 34. Kf2 Bf5\n" +
-                    "35. Ra7 g6 36. Ra6+ Kc5 37. Ke1 Nf4 38. g3 Nxh3 39. Kd2 Kb5 40. Rd6 Kc5 41. Ra6\n" +
-                    "Nf2 42. g4 Bd3 43. Re6 1/2-1/2";
-
-            String gameWithoutCastling = "[Event \"12. Agzamov Mem 2018\"]\n" +
-                    "[Site \"Tashkent UZB\"]\n" +
-                    "[Date \"2018.04.27\"]\n" +
-                    "[Round \"5.3\"]\n" +
-                    "[White \"Yakubboev, Nodirbek\"]\n" +
-                    "[Black \"Duzhakov, Ilya\"]\n" +
-                    "[Result \"1-0\"]\n" +
-                    "[WhiteElo \"2482\"]\n" +
-                    "[BlackElo \"2421\"]\n" +
-                    "[ECO \"E60\"]\n" +
-                    "[EventDate \"2018.04.23\"]\n" +
-                    "\n" +
-                    "1.d4 Nf6 2.c4 g6 3.f3 e6 4.e4 d5 5.cxd5 exd5 6.e5 Nh5 7.Be3 c5 8.dxc5 Qh4+\n" +
-                    "9.Bf2 Qb4+ 10.Nc3 Nc6 11.a3 Qxb2 12.Nge2 Nxe5 13.Bd4 Nd3+ 14.Qxd3 Qxa1+ \n" +
-                    "15.Nd1 Qa2 16.Nc1 1-0";
-
-            String game = "[Event \"World Senior Teams +50\"]\n" +
-                    "[Site \"Radebeul GER\"]\n" +
-                    "[Date \"2016.07.03\"]\n" +
-                    "[Round \"8.3\"]\n" +
-                    "[White \"Nehmert, Ulrich\"]\n" +
-                    "[Black \"Miednikova, Swietlana\"]\n" +
-                    "[Result \"1/2-1/2\"]\n" +
-                    "[WhiteElo \"2324\"]\n" +
-                    "[BlackElo \"2180\"]\n" +
-                    "[ECO \"A90\"]\n" +
-                    "[EventDate \"2016.06.26\"]\n" +
-                    "\n" +
-                    "1.Nf3 f5 2.g3 Nf6 3.Bg2 e6 4.c4 d5 5.O-O Bd6 6.d4 c6 7.Qc2 O-O 8.Bf4 Bxf4 \n" +
-                    "9.gxf4 dxc4 10.Qxc4 Nd5 11.Qc1 Bd7 12.Nc3 Be8 13.Nxd5 exd5 14.a4 Bh5 15.\n" +
-                    "Ra3 a5 16.Qc2 Bxf3 17.Rxf3 Nd7 18.Ra1 Qf6 19.Qd2 Nb6 20.b3 Nc8 21.Re3 Nd6 \n" +
-                    "22.Re5 Nf7 23.Re3 Nd6 24.Re5 Nf7 25.Re3 Qd6 26.Rg3 Nd8 27.Bh3 Ne6 28.e3 g6\n" +
-                    "29.Kh1 Kh8 30.Rgg1 Nc7 31.Rab1 Na6 32.Bf1 Qb4 33.Ra1 -- 34.Rg5 1/2-1/2";
-
-            try {
-                new PgnParser(game).parseMoves().forEach(System.out::println);
-            } catch (CastlingNotImplementedException | ErroneousInputException | WrongImplementationException | PawnPromotionException e) {
+        private static List<String> readAllMatches(File file) {
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                return Stream.generate(() -> readNextDocument(reader))
+                        .takeWhile(Objects::nonNull)
+                        .collect(Collectors.toList());
+            } catch (IOException e) {
                 e.printStackTrace();
             }
+
+            return List.of();
+        }
+
+        private static String readNextDocument(BufferedReader reader) {
+            StringBuilder stringBuilder = new StringBuilder();
+            try {
+                // The header and body of a match in PGN are separated by '\n'.
+                // The matches in a PGN file are also separated by '\n'.
+                // This means we have to grab two sections of lines and concatenate them to a match.
+                for (int i = 0; i < 2; i++) {
+                    while (true) {
+                        String line = reader.readLine();
+
+                        if (line == null) {
+                            return null;
+                        }
+
+                        stringBuilder.append(line).append("\n");
+                        if (line.isEmpty()) {
+                            break;
+                        }
+                    }
+                }
+
+            } catch (IOException e) {
+                return null;
+            }
+
+            return stringBuilder.toString();
         }
 
         private void reset() {
@@ -299,11 +251,12 @@ public class GameTest {
          * Parses the input document and creates moves contained in the document movetext
          *
          * @return a stream of moves
-         * @throws CastlingNotImplementedException castling is not yet supported
-         * @throws ErroneousInputException         a parsing error occurred
+         * @throws ErroneousInputException      if the move is not recognized
+         * @throws WrongImplementationException if the move is not recognized
+         * @throws PawnPromotionException       if the move is not recognized
          */
         @NotNull
-        Stream<Move> parseMoves() throws CastlingNotImplementedException, ErroneousInputException, WrongImplementationException, PawnPromotionException {
+        Stream<Move> parseMoves() throws ErroneousInputException, WrongImplementationException, PawnPromotionException {
             reset();
 
             String beginMarker = "]\n\n1.";
@@ -361,11 +314,12 @@ public class GameTest {
          * @param moveToken a move of a single player from the movetext
          * @param white     the player color
          * @return the parsed move
-         * @throws CastlingNotImplementedException castling is not yet supported
-         * @throws ErroneousInputException         if the move is not recognized
+         * @throws ErroneousInputException      if the move is not recognized
+         * @throws WrongImplementationException if the move is not recognized
+         * @throws PawnPromotionException       if the move is not recognized
          */
         @NotNull
-        private Move parseMove(String moveToken, boolean white) throws CastlingNotImplementedException, ErroneousInputException, WrongImplementationException, PawnPromotionException {
+        private Move parseMove(String moveToken, boolean white) throws ErroneousInputException, WrongImplementationException, PawnPromotionException {
             boolean isCapture = moveToken.contains("x");
             String token = moveToken.replaceAll("x", "");
 
@@ -382,7 +336,7 @@ public class GameTest {
                         .filter(position -> Math.abs(position.getFile() - king.getPosition().getFile()) == 2)
                         .filter(position -> position.getFile() == castlingDestinationFile)
                         .findFirst()
-                        .orElseThrow(() -> new CastlingNotImplementedException("castling support not working"));
+                        .orElseThrow();
                 Move move = game.getBoard().buildMove(player, king.getPosition(), castlingDestination);
                 game.makeMove(move);
                 return move;
@@ -450,6 +404,10 @@ public class GameTest {
             return move;
         }
 
+        /**
+         * An exception which indicates that the probable cause for a parsing failure
+         * is invalid syntax or misleading/contradictory information in the PGN input source.
+         */
         static class ErroneousInputException extends Throwable {
             ErroneousInputException(String s) {
                 super(s);
@@ -460,18 +418,20 @@ public class GameTest {
             }
         }
 
-        static class CastlingNotImplementedException extends Throwable {
-            CastlingNotImplementedException(String s) {
-                super(s);
-            }
-        }
-
+        /**
+         * An exception which indicates that the probable cause for a parsing failure
+         * is an error in the chess game implementation.
+         */
         static class WrongImplementationException extends Throwable {
             WrongImplementationException(String s) {
                 super(s);
             }
         }
 
+        /**
+         * An exception which indicates that the PGN contained a pawn
+         * promotion to a piece other than the queen. Currently, these are unsupported.
+         */
         static class PawnPromotionException extends Throwable {
             PawnPromotionException(String s) {
                 super(s);
