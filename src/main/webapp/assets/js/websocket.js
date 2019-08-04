@@ -74,7 +74,7 @@ $(() => {
         return confirmationMessage;
     });
 
-    webSocket = new WebSocket(`wss://${location.host}/websocketendpoint/${parseLobbyID()}/${websocketID}`);
+    webSocket = new WebSocket(`ws://${location.host}/websocketendpoint/${parseLobbyID()}/${websocketID}`);
 
     /**
      * receive a message from the server
