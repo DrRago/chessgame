@@ -48,4 +48,16 @@
     <welcome-file-list>
         <welcome-file>lobby</welcome-file>
     </welcome-file-list>
+
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>blockJSPDirectAccess</web-resource-name>
+            <description>to block JSP direct access</description>
+            <url-pattern>*.jsp</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <description>Block all direct JSP access</description>
+            <role-name>DefinitelyNotARule</role-name>
+        </auth-constraint>
+    </security-constraint>
 </web-app>
