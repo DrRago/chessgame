@@ -250,9 +250,28 @@ public class GameTest {
                     "1.d4 Nf6 2.c4 g6 3.f3 e6 4.e4 d5 5.cxd5 exd5 6.e5 Nh5 7.Be3 c5 8.dxc5 Qh4+\n" +
                     "9.Bf2 Qb4+ 10.Nc3 Nc6 11.a3 Qxb2 12.Nge2 Nxe5 13.Bd4 Nd3+ 14.Qxd3 Qxa1+ \n" +
                     "15.Nd1 Qa2 16.Nc1 1-0";
+
+            String game = "[Event \"World Senior Teams +50\"]\n" +
+                    "[Site \"Radebeul GER\"]\n" +
+                    "[Date \"2016.07.03\"]\n" +
+                    "[Round \"8.3\"]\n" +
+                    "[White \"Nehmert, Ulrich\"]\n" +
+                    "[Black \"Miednikova, Swietlana\"]\n" +
+                    "[Result \"1/2-1/2\"]\n" +
+                    "[WhiteElo \"2324\"]\n" +
+                    "[BlackElo \"2180\"]\n" +
+                    "[ECO \"A90\"]\n" +
+                    "[EventDate \"2016.06.26\"]\n" +
+                    "\n" +
+                    "1.Nf3 f5 2.g3 Nf6 3.Bg2 e6 4.c4 d5 5.O-O Bd6 6.d4 c6 7.Qc2 O-O 8.Bf4 Bxf4 \n" +
+                    "9.gxf4 dxc4 10.Qxc4 Nd5 11.Qc1 Bd7 12.Nc3 Be8 13.Nxd5 exd5 14.a4 Bh5 15.\n" +
+                    "Ra3 a5 16.Qc2 Bxf3 17.Rxf3 Nd7 18.Ra1 Qf6 19.Qd2 Nb6 20.b3 Nc8 21.Re3 Nd6 \n" +
+                    "22.Re5 Nf7 23.Re3 Nd6 24.Re5 Nf7 25.Re3 Qd6 26.Rg3 Nd8 27.Bh3 Ne6 28.e3 g6\n" +
+                    "29.Kh1 Kh8 30.Rgg1 Nc7 31.Rab1 Na6 32.Bf1 Qb4 33.Ra1 -- 34.Rg5 1/2-1/2";
+
             try {
-                new PgnParser(gameWithoutCastling).parseMoves().forEach(System.out::println);
-            } catch (CastlingNotImplementedException | ErroneousInputException | WrongImplementationException e) {
+                new PgnParser(game).parseMoves().forEach(System.out::println);
+            } catch (CastlingNotImplementedException | ErroneousInputException | WrongImplementationException | PawnPromotionException e) {
                 e.printStackTrace();
             }
         }
@@ -300,6 +319,9 @@ public class GameTest {
 
             String headerMatchResult = parseHeader().get("Result");
 
+            if (headerMatchResult == null) {
+                throw new ErroneousInputException("match result in header could not be parsed");
+            }
 
             List<MatchResult> matchResults = matcher.results().collect(Collectors.toList());
             Stream.Builder<Move> builder = Stream.builder();
@@ -314,6 +336,10 @@ public class GameTest {
                 // if white wins black cannot make a move
                 // because the game ended
                 if (blackMoveToken == null) {
+                    if (bodyMatchResult == null) {
+                        throw new ErroneousInputException("match result in movetext could not be parsed");
+                    }
+
                     if (!bodyMatchResult.equals(headerMatchResult)) {
                         throw new ErroneousInputException("match result in movetext is not equal to the match result found in the header");
                     }
