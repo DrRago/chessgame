@@ -343,14 +343,23 @@ public class GameTest {
             boolean isCapture = moveToken.contains("x");
             String token = moveToken.replaceAll("x", "");
 
-            if (token.contains("O-O")) { // kingside castling
+            boolean isCastlingKingSide = token.contains("O-O");
+            boolean isCastlingQueenSide = token.contains("O-O-O");
+            int castlingDestinationFile = isCastlingQueenSide ? 'c' : (isCastlingKingSide ? 'g' : 0);
+            if (isCastlingKingSide || isCastlingQueenSide) {
                 int rookFile = white ? 1 : 8;
                 Position rookPosition = new Position(rookFile, 'h');
-                throw new CastlingNotImplementedException("castling support not implemented");
-            } else if (token.contains("O-O-O")) { // queenside castling
-                int rookFile = white ? 1 : 8;
-                Position rookPosition = new Position(rookFile, 'a');
-                throw new CastlingNotImplementedException("castling support not implemented");
+
+                Player player = white ? player1 : player2;
+                King king = white ? game.getBoard().whiteKing : game.getBoard().blackKing;
+                Position castlingDestination = Objects.requireNonNull(king).getValidMoves(game.getBoard())
+                        .filter(position -> Math.abs(position.getFile() - king.getPosition().getFile()) == 2)
+                        .filter(position -> position.getFile() == castlingDestinationFile)
+                        .findFirst()
+                        .orElseThrow(() -> new CastlingNotImplementedException("castling support not working"));
+                Move move = game.getBoard().buildMove(player, king.getPosition(), castlingDestination);
+                game.makeMove(move);
+                return move;
             }
 
             MatchResult matcher = Pattern.compile(movePattern).matcher(token)
