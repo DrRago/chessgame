@@ -8,7 +8,7 @@ test:
   stage: test
   script: mvn test --batch-mode
   except:
-    - testing
+    - refactor
 
 pages:
   stage: deploy
