@@ -1,4 +1,4 @@
-package de.dhbw.tinf18b4.chess.frontend.websocket;
+package de.dhbw.tinf18b4.chess.frontend;
 
 
 import de.dhbw.tinf18b4.chess.backend.Board;
@@ -11,8 +11,6 @@ import de.dhbw.tinf18b4.chess.backend.lobby.LobbyStatus;
 import de.dhbw.tinf18b4.chess.backend.piece.Piece;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 import de.dhbw.tinf18b4.chess.backend.user.User;
-import de.dhbw.tinf18b4.chess.frontend.JSON.JSONHandler;
-import de.dhbw.tinf18b4.chess.frontend.SessionManager;
 import de.dhbw.tinf18b4.chess.states.GameState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,8 +30,8 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static de.dhbw.tinf18b4.chess.frontend.JSON.JSONHandler.buildAnswerTemplate;
-import static de.dhbw.tinf18b4.chess.frontend.JSON.JSONHandler.parseMessage;
+import static de.dhbw.tinf18b4.chess.frontend.JSONHandler.buildAnswerTemplate;
+import static de.dhbw.tinf18b4.chess.frontend.JSONHandler.parseMessage;
 import static javax.websocket.CloseReason.CloseCodes.CANNOT_ACCEPT;
 
 /**
@@ -137,7 +135,8 @@ public class Websocket extends HttpServlet {
             sendToLobby(lobby, getPlayerNames(lobby));
         }
         // leave the lobby if the game hasn't started yet
-        if (lobby != null && lobby.getStatus() != LobbyStatus.GAME_STARTED && lobby.getGame() == null) {
+        if (lobby != null && ((lobby.getStatus() != LobbyStatus.GAME_STARTED && lobby.getGame() == null) ||
+                (lobby.getGame() != null && !lobby.getGame().evaluateGame().isOngoing()))) {
             lobby.leave(player.getUser());
             if (Arrays.stream(lobby.getPlayers()).allMatch(Objects::isNull)) LobbyManager.removeLobby(lobby);
             sendToLobby(lobby, getPlayerNames(lobby));

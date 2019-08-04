@@ -60,7 +60,7 @@ const makeMove = move => {
 
 
 $(() => {
-    let shouldWarn = location.href.indexOf("game") >= 0;
+    let shouldWarn = location.href.indexOf("game") < 0;
 
     window.addEventListener("beforeunload", function (e) {
         if (!shouldWarn) {
