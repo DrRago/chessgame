@@ -71,8 +71,8 @@ public class LobbyController extends HttpServlet {
                         resp.sendRedirect("/lobby" + reqPath + "/game");
                         return;
                     }
-                    // forward to lobby list - user has already joined this lobby
-                    resp.sendRedirect("/lobby/?error=already_in_lobby");
+                    // user already is in lobby
+                    req.getRequestDispatcher("/lobby.jsp?id=" + lobbyID).forward(req, resp);
                 } else if (!lobby.hasUser(user)) {
                     Player player = lobby.join(user);
                     if (player == null) {

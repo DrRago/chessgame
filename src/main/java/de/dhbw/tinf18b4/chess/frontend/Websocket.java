@@ -1,4 +1,4 @@
-package de.dhbw.tinf18b4.chess.frontend.websocket;
+package de.dhbw.tinf18b4.chess.frontend;
 
 
 import de.dhbw.tinf18b4.chess.backend.Board;
@@ -11,8 +11,6 @@ import de.dhbw.tinf18b4.chess.backend.lobby.LobbyStatus;
 import de.dhbw.tinf18b4.chess.backend.piece.Piece;
 import de.dhbw.tinf18b4.chess.backend.position.Position;
 import de.dhbw.tinf18b4.chess.backend.user.User;
-import de.dhbw.tinf18b4.chess.frontend.JSON.JSONHandler;
-import de.dhbw.tinf18b4.chess.frontend.SessionManager;
 import de.dhbw.tinf18b4.chess.states.GameState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,8 +30,8 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static de.dhbw.tinf18b4.chess.frontend.JSON.JSONHandler.buildAnswerTemplate;
-import static de.dhbw.tinf18b4.chess.frontend.JSON.JSONHandler.parseMessage;
+import static de.dhbw.tinf18b4.chess.frontend.JSONHandler.buildAnswerTemplate;
+import static de.dhbw.tinf18b4.chess.frontend.JSONHandler.parseMessage;
 import static javax.websocket.CloseReason.CloseCodes.CANNOT_ACCEPT;
 
 /**
@@ -105,10 +103,13 @@ public class Websocket extends HttpServlet {
 
         if (playerLobby.getStatus().equals(LobbyStatus.GAME_STARTED)) {
             // send color to session
-            sendToLobby(playerLobby, "connect", currentPlayer.getUser().getDisplayName());
             sendToSession(session, "initGame", currentPlayer.isWhite() ? "white" : "black");
+            //noinspection ConstantConditions
             sendToSession(session, getCompleteLogHistory(playerLobby.getGame()));
             sendToLobby(playerLobby, getMoveResponse(playerLobby));
+        } else {
+            // send current options to client
+            sendToSession(session, "lobbyPrivacy", String.valueOf(!playerLobby.isPublicLobby()));
         }
     }
 
@@ -131,10 +132,11 @@ public class Websocket extends HttpServlet {
 
         if (lobby != null && lobby.getStatus() == LobbyStatus.GAME_STARTED) {
             // send other clients the disconnect message
-            sendToLobby(lobby, "disconnect", player.getUser().getDisplayName());
+            sendToLobby(lobby, getPlayerNames(lobby));
         }
         // leave the lobby if the game hasn't started yet
-        if (lobby != null && lobby.getStatus() != LobbyStatus.GAME_STARTED && lobby.getGame() == null) {
+        if (lobby != null && ((lobby.getStatus() != LobbyStatus.GAME_STARTED && lobby.getGame() == null) ||
+                (lobby.getGame() != null && !lobby.getGame().evaluateGame().isOngoing()))) {
             lobby.leave(player.getUser());
             if (Arrays.stream(lobby.getPlayers()).allMatch(Objects::isNull)) LobbyManager.removeLobby(lobby);
             sendToLobby(lobby, getPlayerNames(lobby));
@@ -246,12 +248,19 @@ public class Websocket extends HttpServlet {
 
                         if (playerLobby.leave(currentPlayer.getUser())) {
                             sendToLobby(playerLobby, "redirect", "/lobby/" + lobbyID);
+                            LobbyManager.getLobbies().put(lobbyID, new Lobby(Arrays.stream(playerLobby.getPlayers()).filter(p -> !currentPlayer.equals(p)).findAny().orElseThrow().getUser()));
                         } else {
                             // send new player list to to complete lobby
                             sendToLobby(playerLobby, getPlayerNames(playerLobby));
                         }
 
-                        sendToSession(session, "redirect", "/");
+                        // leave for all sessions the player has in that lobby
+                        for (Map.Entry<Session, Player> e : sessionToPlayer.entrySet()) {
+                            if (e.getValue().equals(currentPlayer)) {
+                                sendToSession(e.getKey(), "redirect", "/");
+                            }
+                        }
+
                         // lobby empty check
                         if (Arrays.stream(playerLobby.getPlayers()).allMatch(Objects::isNull)) {
                             LobbyManager.removeLobby(playerLobby);
@@ -309,7 +318,7 @@ public class Websocket extends HttpServlet {
     }
 
     /**
-     * Build the response for the clients in order to what moves are possible and whose turn it is
+     * Build the response for the clients in order to what moves are possible and whose turn it is and the full board
      *
      * @param lobby the lobby to build the answer for
      * @return the json response object
@@ -324,6 +333,10 @@ public class Websocket extends HttpServlet {
         if (game == null) return moveAnswer;
 
         answerValue.put("fen", game.asFen()); // the fen string of the board
+        Move lastMove = game.getHistory().lastMove();
+        if (lastMove != null) {
+            answerValue.put("lastMove", lastMove.toFenMove()); // the last move of the board
+        }
         answerValue.put("turn", game.whoseTurn().isWhite() ? "white" : "black"); // the color whose turn it is
 
         // get all possible moves for all pieces identified by it's position on the board
@@ -375,6 +388,8 @@ public class Websocket extends HttpServlet {
                 .forEach(player -> {
                     JSONObject name = new JSONObject();
                     name.put("color", player.isWhite() ? "white" : "black");
+                    name.put("id", player.getUser().getID().hashCode());
+                    name.put("isActive", sessionToPlayer.entrySet().stream().anyMatch(e -> e.getValue().equals(player)));
                     name.put("name", player.getUser().getDisplayName());
                     nameArray.add(name);
                 });

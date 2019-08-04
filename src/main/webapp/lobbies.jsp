@@ -20,7 +20,34 @@
 <%@include file="parts/nav.jsp" %>
 <div class="container mt-2 pt-5">
     <%@include file="parts/errors.jsp" %>
-    <a href="${pageContext.request.contextPath}/lobby/create" class="btn btn-outline-success" id="create_lobby">Create Lobby</a>
+
+    <c:if test="${fn:length(lobbies.getCurrentLobbies(sessionScope.user)) ne 0}">
+        <h3>Your current games</h3>
+        <table id="currentTable" class="table table-bordered table-striped table-hover my-3">
+            <thead>
+            <tr>
+                <th scope="col" class="col-1">#</th>
+                <th scope="col">ID</th>
+                <th scope="col">Owner</th>
+            </tr>
+            </thead>
+            <tbody>
+            <c:forEach items="${lobbies.getCurrentLobbies(sessionScope.user)}" var="lobby" varStatus="loop">
+                <tr>
+                    <th scope="row" class="col-1">${loop.index + 1}</th>
+                    <td><a href='/lobby/<c:out value="${lobby.ID}"/>'><c:out value="${lobby.ID}"/></a></td>
+                    <td>${lobby.lobby.ownerName}<a href='/lobby/<c:out value="${lobby.ID}"/>'
+                                                   class="btn btn-success btn-sm float-right"><i
+                            class="fas fa-sign-in-alt"></i> Join</a></td>
+                </tr>
+            </c:forEach>
+            </tbody>
+        </table>
+    </c:if>
+
+    <h3>All public lobbies</h3>
+    <a href="${pageContext.request.contextPath}/lobby/create" class="btn btn-outline-success" id="create_lobby">Create
+        Lobby</a>
     <table id="lobbyTable" class="table table-bordered table-striped table-hover">
         <thead>
         <tr>
@@ -30,11 +57,13 @@
         </tr>
         </thead>
         <tbody>
-        <c:forEach items="${lobbies.lobbyNames}" var="lobby" varStatus="loop">
+        <c:forEach items="${lobbies.lobbies}" var="lobby" varStatus="loop">
             <tr>
-                <th scope="row" class="col-1"></th>
+                <th scope="row" class="col-1">${loop.index + 1}</th>
                 <td><a href='/lobby/<c:out value="${lobby.ID}"/>'><c:out value="${lobby.ID}"/></a></td>
-                <td>${lobby.lobby.ownerName}<a  href='/lobby/<c:out value="${lobby.ID}"/>' class="btn btn-success btn-sm float-right"><i class="fas fa-sign-in-alt"></i> Join</a> </td>
+                <td>${lobby.lobby.ownerName}<a href='/lobby/<c:out value="${lobby.ID}"/>'
+                                               class="btn btn-success btn-sm float-right"><i
+                        class="fas fa-sign-in-alt"></i> Join</a></td>
             </tr>
         </c:forEach>
         </tbody>
@@ -43,21 +72,17 @@
 
 <script src="${pageContext.request.contextPath}/assets/js/dataTable.js"></script>
 <script>
-    $("#lobbyTable tbody tr").each((index, row) => {
-        $(row).find("th").text(index + 1);
-    });
-
     const table = $("#lobbyTable").DataTable({
         "pageLength": 10,
         "bLengthChange": false,
         "language": {
             "emptyTable": "No public lobby found"
         },
-        buttons:[{
-            dom:{
-                button:{
-                    tag:"button",
-                    className:"btn btn-secondary"
+        buttons: [{
+            dom: {
+                button: {
+                    tag: "button",
+                    className: "btn btn-secondary"
                 },
                 buttonLiner: {
                     tag: null
