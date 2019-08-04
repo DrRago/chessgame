@@ -7,6 +7,8 @@ build:
 test:
   stage: test
   script: mvn test --batch-mode
+  except:
+    - testing
 
 pages:
   stage: deploy
