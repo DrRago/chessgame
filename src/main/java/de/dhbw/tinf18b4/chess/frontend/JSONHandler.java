@@ -1,4 +1,4 @@
-package de.dhbw.tinf18b4.chess.frontend.JSON;
+package de.dhbw.tinf18b4.chess.frontend;
 
 import org.jetbrains.annotations.NotNull;
 import org.json.simple.JSONObject;
@@ -8,7 +8,7 @@ import org.json.simple.parser.ParseException;
 /**
  * Handles some basic functionality for the JSON communication with the client via the websocket
  */
-public class JSONHandler {
+class JSONHandler {
 
     /**
      * build the template string according to the template
@@ -19,7 +19,7 @@ public class JSONHandler {
      */
     @SuppressWarnings("unchecked")
     @NotNull
-    public static JSONObject buildAnswerTemplate() {
+    static JSONObject buildAnswerTemplate() {
         JSONObject template = new JSONObject();
 
         template.put("content", "");
@@ -36,7 +36,7 @@ public class JSONHandler {
      * @throws ParseException on invalid format
      */
     @NotNull
-    public static JSONObject parseMessage(@NotNull String message) throws ParseException {
+    static JSONObject parseMessage(@NotNull String message) throws ParseException {
         JSONParser parser = new JSONParser();
         return (JSONObject) parser.parse(message);
     }

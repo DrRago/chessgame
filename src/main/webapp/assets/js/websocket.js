@@ -26,24 +26,6 @@ let messageTemplate = {
     "value": ""
 };
 
-const playerDisconnect = playerName => {
-    $("#playerList li").each((index, player) => {
-        player = $(player);
-        if (player.text() === playerName) {
-            player.addClass("disconnect")
-        }
-    });
-};
-
-const playerConnect = playerName => {
-    $("#playerList li").each((index, player) => {
-        player = $(player);
-        if (player.text() === playerName) {
-            player.remove("disconnect")
-        }
-    });
-};
-
 const sendToSocket = (content, value) => {
     let message = {...messageTemplate};
     message.content = content;
@@ -78,18 +60,21 @@ const makeMove = move => {
 
 
 $(() => {
-    window.onbeforeunload = function () {
-        return "If you reload the lobby will be removed, in case you are the only participant.\nAre you sure?";
-    };
+    let shouldWarn = location.href.indexOf("game") < 0;
 
-    webSocket = new WebSocket(`wss://${location.host}/websocketendpoint/${parseLobbyID()}/${websocketID}`);
+    window.addEventListener("beforeunload", function (e) {
+        if (!shouldWarn) {
+            return undefined;
+        }
 
-    /**
-     * handler on successful connect to server
-     */
-    webSocket.onopen = () => {
+        const confirmationMessage = 'It looks like you have been editing something. '
+            + 'If you leave before saving, your changes will be lost.';
 
-    };
+        (e || window.event).returnValue = confirmationMessage;
+        return confirmationMessage;
+    });
+
+    webSocket = new WebSocket(`ws://${location.host}/websocketendpoint/${parseLobbyID()}/${websocketID}`);
 
     /**
      * receive a message from the server
@@ -117,6 +102,7 @@ $(() => {
                 updateUserList(msgObj.value);
                 break;
             case "redirect":
+                shouldWarn = false;
                 location.href = msgObj.value;
                 break;
             case "initGame":
@@ -127,12 +113,6 @@ $(() => {
                 break;
             case "logs":
                 addLog(msgObj.value);
-                break;
-            case "disconnect":
-                playerDisconnect(msgObj.value);
-                break;
-            case "connect":
-                playerConnect(msgObj.value);
                 break;
             case "lobbyPrivacy":
                 $("#settingsTable #privacy > input").prop("checked", msgObj.value === "true")
@@ -158,7 +138,6 @@ $(() => {
      * page should be left if the connection is closed
      */
     webSocket.onclose = event => {
-        console.log(event);
         // on abnormal close reason, alert and redirect to lobby overview
         if (event.code === 1000 || event.code === 1001) {
         } else {
@@ -186,7 +165,7 @@ const updateUserList = (playerData) => {
         player.remove();
     });
     playerData.forEach(player => {
-        players.append($(`<li class="list-group-item chess-${player.color}"><i class="fas fa-chess-queen"></i>${player.name}</li>`))
+        players.append($(`<li class="list-group-item chess-${player.color} ${player.isActive ? "" : "disconnect"}" id="${player.id}"><i class="fas fa-chess-queen"></i>${player.name}</li>`))
     })
 };
 

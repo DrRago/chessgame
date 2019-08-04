@@ -92,6 +92,15 @@ public class Move {
         return piece;
     }
 
+    /**
+     * Get the move as fen string
+     * @return the move fen string
+     */
+    @NotNull
+    public String toFenMove() {
+        return String.format("%s-%s", origin, destination);
+    }
+
     @Override
     public String toString() {
         return String.format("%s moved %s from %s to %s", player.getUser().getDisplayName(), piece.getClass().getSimpleName(), origin, destination);

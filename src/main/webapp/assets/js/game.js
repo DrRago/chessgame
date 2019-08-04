@@ -93,8 +93,17 @@ const initGame = color => {
 
 const handleMove = message => {
     const fen = message.fen;
+    const move = message.lastMove;
     isTurn = message.turn === myColor;
-    board.position(fen);
+
+    if (move) {
+        board.move(move);
+    } else {
+        board.position(fen);
+    }
+    if (board.fen() !== fen) {
+        board.position(fen);
+    }
 
     possibilities = message.possibilities;
 

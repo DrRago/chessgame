@@ -48,6 +48,20 @@ public class LobbyManager {
     }
 
     /**
+     * Get all lobbies of a {@link User} with a started {@link de.dhbw.tinf18b4.chess.backend.Game}
+     *
+     * @param user the {@link User}
+     * @return the lobbies the {@link User} is in
+     */
+    @NotNull
+    public static Map<String, Lobby> getLobbiesByUser(@NotNull User user) {
+        return lobbies.entrySet().stream()
+                .filter(entry -> entry.getValue().hasUser(user))
+                .filter(entry -> entry.getValue().getStatus() == LobbyStatus.GAME_STARTED)
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    /**
      * Get a {@link Map} of all public lobbies
      *
      * @return the {@link Map} of all public lobbies
