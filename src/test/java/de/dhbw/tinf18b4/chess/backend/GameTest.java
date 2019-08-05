@@ -229,8 +229,8 @@ public class GameTest {
         }
 
         private void reset() {
-            player1 = new Player(true, new User("user1", "", ""));
-            player2 = new Player(false, new User("user2", "", ""));
+            player1 = new Player(true, new User("user1"));
+            player2 = new Player(false, new User("user2"));
             game = new Game(player1, player2);
         }
 
