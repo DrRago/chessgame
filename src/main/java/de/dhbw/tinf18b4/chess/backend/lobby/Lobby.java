@@ -25,7 +25,7 @@ public class Lobby {
     /**
      * THe owner of the {@link Lobby}
      */
-    private User owner;
+    private final User owner;
 
     /**
      * Whether the {@link Lobby} is public
@@ -38,7 +38,7 @@ public class Lobby {
      * the players in this {@link Lobby}
      */
     @Getter
-    private Player[] players = new Player[2];
+    private final Player[] players = new Player[2];
 
     /**
      * The {@link Game} that will be played
@@ -141,11 +141,6 @@ public class Lobby {
                 .filter(Objects::nonNull)
                 .filter(player -> player.getUser().equals(user))
                 .findFirst().orElse(null);
-    }
-
-    public void endGame() {
-        game = null;
-        status = LobbyStatus.WAITING_FOR_START;
     }
 
     @Override

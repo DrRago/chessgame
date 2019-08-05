@@ -17,12 +17,12 @@ public class Player {
      * Whether tha player plays white or not
      */
     @Getter
-    private boolean white;
+    private final boolean white;
     /**
      * The {@link User} who plays this player
      */
     @Getter
-    private User user;
+    private final User user;
 
     /**
      * Create a new player instance

@@ -278,6 +278,7 @@ public class Game {
     Player isCheckmate() {
         Player currentPlayer = whoseTurn();
         King playersKing = currentPlayer.isWhite() ? getBoard().getWhiteKing() : getBoard().getBlackKing();
+        assert playersKing != null;
 
         long possibleMoves = getBoard().getAllPossibleMoves().stream().mapToLong(map -> map.values().stream().mapToLong(Stream::count).sum()).sum();
 

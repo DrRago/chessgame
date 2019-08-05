@@ -39,10 +39,6 @@ public interface Piece {
     @NotNull
     Stream<Position> getValidMoves(@NotNull Board board);
 
-    default boolean canMakeValidMove(@NotNull Board board) {
-        return getValidMoves(board).count() > 0;
-    }
-
     /**
      * Get a list of all possible capture options
      *
@@ -51,10 +47,6 @@ public interface Piece {
      */
     @NotNull
     Stream<Position> getValidCaptureMoves(@NotNull Board board);
-
-    default boolean canMakeValidCaptureMove(@NotNull Board board) {
-        return getValidCaptureMoves(board).count() > 0;
-    }
 
     /**
      * Get the color of the piece
@@ -93,13 +85,9 @@ public interface Piece {
     /**
      * Check whether this piece and another are owned by the same player
      *
-     * @param piece the piece to test against
+     * @param player the player to test against
      * @return true is this piece and the other are owned by the same player
      */
-    default boolean isOwnedBySamePlayer(@NotNull Piece piece) {
-        return isWhite() == piece.isWhite();
-    }
-
     default boolean isOwnedBySamePlayer(@NotNull Player player) {
         return isWhite() == player.isWhite();
     }
@@ -112,10 +100,6 @@ public interface Piece {
      */
     default boolean isOwnedByEnemy(@NotNull Piece piece) {
         return isBlack() == piece.isWhite();
-    }
-
-    default boolean isOwnedByEnemy(@NotNull Player player) {
-        return isWhite() != player.isWhite();
     }
 
     /**

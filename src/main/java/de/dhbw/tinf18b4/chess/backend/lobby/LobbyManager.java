@@ -24,7 +24,7 @@ public class LobbyManager {
      */
     @NotNull
     @Getter
-    static Map<String, Lobby> lobbies = new HashMap<>();
+    static final Map<String, Lobby> lobbies = new HashMap<>();
 
     /**
      * Create a new {@link Lobby} with a random ID and a {@link User} as creator

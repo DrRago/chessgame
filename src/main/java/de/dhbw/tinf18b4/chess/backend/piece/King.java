@@ -109,13 +109,11 @@ public class King implements Piece {
         }
 
         // count how many pieces are left of the king including the king
-        long piecesLeft = Stream.iterate(position, Position::leftNeighbor)
-                .takeWhile(position -> position.getFile() != 'a')
+        long piecesLeft = Stream.iterate(position, position -> position.getFile() != 'a', Position::leftNeighbor)
                 .filter(position -> board.findPieceByPosition(position) != null)
                 .count();
         // count how many pieces are right of the king including the king
-        long piecesRight = Stream.iterate(position, Position::rightNeighbor)
-                .takeWhile(position -> position.getFile() != 'h')
+        long piecesRight = Stream.iterate(position, position -> position.getFile() != 'h', Position::rightNeighbor)
                 .filter(position -> board.findPieceByPosition(position) != null)
                 .count();
 
@@ -135,11 +133,9 @@ public class King implements Piece {
                 .map(piece -> piece.getValidCaptureMoves(board))
                 .flatMap(s -> s);
 
-        boolean hasToPassThroughAnAttackedSquareLeft = Stream.iterate(position, Position::leftNeighbor)
-                .takeWhile(position -> position.getFile() != 'a')
+        boolean hasToPassThroughAnAttackedSquareLeft = Stream.iterate(position, position -> position.getFile() != 'a', Position::leftNeighbor)
                 .anyMatch(position -> capturePositions.get().anyMatch(position::equals));
-        boolean hasToPassThroughAnAttackedSquareRight = Stream.iterate(position, Position::rightNeighbor)
-                .takeWhile(position -> position.getFile() != 'h')
+        boolean hasToPassThroughAnAttackedSquareRight = Stream.iterate(position, position -> position.getFile() != 'h', Position::rightNeighbor)
                 .anyMatch(position -> capturePositions.get().anyMatch(position::equals));
 
         if (hasToPassThroughAnAttackedSquareLeft) {
