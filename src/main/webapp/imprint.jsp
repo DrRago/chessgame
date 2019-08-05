@@ -14,16 +14,16 @@
 
 <c:set var="pageTitle" value="Imprint"/>
 <%@include file="parts/nav.jsp" %>
-<div class="container mt-5 pt-5">
-    <div class="bs-docs-section mb-4">
-        <h1 id="kontakt">Contact</h1>
-        <strong>Leonhard Gahr</strong><br>
+<div class="container mt-2 pt-5">
+    <div class="mb-4">
+        <h3>Contact</h3>
+        <strong>The ChessGame Group</strong><br>
         <abbr title="email-address">Email</abbr> <a
-            href="mailto:leonhard.gahr@gmail.com">leonhard.gahr@gmail.com</a>
+            href="mailto:leonhard.gahr@gmail.com"> leonhard.gahr@gmail.com</a>
     </div>
 
-    <div class="bs-docs-section text-justify">
-        <h1 id="disclaimer">Disclaimer</h1>
+    <div class="text-justify">
+        <h1>Disclaimer</h1>
         <h4>Limitation of liability for internal content</h4>
         <p>The content of our website has been compiled with meticulous care and to the best of our knowledge.
             However, we cannot assume any liability for the up-to-dateness, completeness or accuracy of any of the

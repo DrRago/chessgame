@@ -278,6 +278,8 @@ public class Websocket extends HttpServlet {
                 playerLobby.setPublicLobby(!(boolean) parsedMessage.get("value"));
                 sendToLobby(playerLobby, "lobbyPrivacy", String.valueOf(parsedMessage.get("value")));
                 break;
+            case "ping":
+                break;
             default:
                 sendErrorMessageToClient("Operation " + contentType + " not found", session, "error");
                 break;

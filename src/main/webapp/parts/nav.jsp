@@ -7,7 +7,10 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-0">
-                <li class="nav-item">
+                <li class="nav-item <%=request.getRequestURI().equals("/manual.jsp") ? "active" : "" %>">
+                    <a class="nav-link" href="${pageContext.request.contextPath}/manual">Manual</a>
+                </li>
+                <li class="nav-item <%=request.getRequestURI().equals("/imprint.jsp") ? "active" : "" %>">
                     <a class="nav-link" href="${pageContext.request.contextPath}/imprint">Imprint</a>
                 </li>
             </ul>

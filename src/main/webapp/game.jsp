@@ -69,7 +69,7 @@
                                  aria-controls="collapseExample"
                                  onclick="$('#collapseExample').collapse('toggle');$(this).find('.fas').toggleClass('rotate-180')">
                                 <h4 class="float-left">Logs</h4>
-                                <span class="ml-2 align-middle" id="lastLog">(no move s)</span>
+                                <span class="ml-2 align-middle" id="lastLog">(no move yet)</span>
                                 <i class="fas fa-angle-double-down fa-2x float-right"></i>
                             </div>
                             <div class="collapse" id="collapseExample">
