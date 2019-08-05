@@ -1,6 +1,7 @@
 package de.dhbw.tinf18b4.chess.backend;
 
 
+import de.dhbw.tinf18b4.chess.backend.moves.Move;
 import de.dhbw.tinf18b4.chess.backend.piece.Bishop;
 import de.dhbw.tinf18b4.chess.backend.piece.King;
 import de.dhbw.tinf18b4.chess.backend.piece.Knight;
