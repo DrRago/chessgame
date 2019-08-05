@@ -76,6 +76,16 @@ $(() => {
 
     webSocket = new WebSocket(`${'https:' === location.protocol ? 'wss' : 'ws'}://${location.host}/websocketendpoint/${parseLobbyID()}/${websocketID}`);
 
+    webSocket.onopen = () => {
+        // send ping every 30 seconds to prevent websocket session timeout
+        const ping = () => {
+            if (webSocket.readyState === WebSocket.OPEN) {
+                sendToSocket("ping", "ping");
+                setTimeout(ping, 30000)
+            }
+        }
+    };
+
     /**
      * receive a message from the server
      * the message types are predefined and statically valuated
@@ -91,9 +101,6 @@ $(() => {
         switch (msgObj.content) {
             case "fatal":
                 alert(`Error from server: ${msgObj.value}`);
-                break;
-            case "ACK":
-                acknowledge = msgObj.value === "OK";
                 break;
             case "error":
                 alert(`Server responded with with error: ${msgObj.value}`);
@@ -142,6 +149,7 @@ $(() => {
         if (event.code === 1000 || event.code === 1001) {
         } else {
             alert(`Connection closed! Reason: ${event.reason}`);
+            shouldWarn = false;
             location.href = `${location.protocol}//${location.host}/lobby`;
         }
     };
