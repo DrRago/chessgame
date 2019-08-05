@@ -134,12 +134,14 @@ public class Websocket extends HttpServlet {
             // send other clients the disconnect message
             sendToLobby(lobby, getPlayerNames(lobby));
         }
-        // leave the lobby if the game hasn't started yet
+        // leave the lobby if the game hasn't started yet or if it has finished
         if (lobby != null && ((lobby.getStatus() != LobbyStatus.GAME_STARTED && lobby.getGame() == null) ||
                 (lobby.getGame() != null && !lobby.getGame().evaluateGame().isOngoing()))) {
-            lobby.leave(player.getUser());
-            if (Arrays.stream(lobby.getPlayers()).allMatch(Objects::isNull)) LobbyManager.removeLobby(lobby);
-            sendToLobby(lobby, getPlayerNames(lobby));
+            // and if the user has no other connection to this game running
+            if (sessionToPlayer.values().stream().noneMatch(p -> p == player)) {
+                lobby.leave(player.getUser());
+                sendToLobby(lobby, getPlayerNames(lobby));
+            }
         }
     }
 
