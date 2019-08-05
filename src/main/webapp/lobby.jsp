@@ -1,7 +1,5 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" %>
-
-<%-- validate that the user is logged in--%>
-<%@ include file="scripts/check_login.jsp" %>
 
 <html lang="en">
 <head>

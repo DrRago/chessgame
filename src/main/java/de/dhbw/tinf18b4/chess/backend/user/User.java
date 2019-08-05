@@ -8,28 +8,19 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * A object holding a user, who wants to login or is logged in.<br>
- * Performs functions like validate the 
+ * Performs functions like validate the
  */
 @Getter
 @Setter
 public class User {
-    private String username; // login name
+    @NotNull
     private String displayName; // a display name
-    private String password; // login password
     @NotNull
     private final String ID; // session ID
-    private Permission permission; // the permission level
 
-    public User(@NotNull String username, @NotNull String password, @NotNull String ID) {
-        this(username, password, ID, Permission.USER);
-    }
-
-    private User(@NotNull String username, @NotNull String password, @NotNull String ID, @NotNull Permission permission) {
-        this.username = username;
-        this.displayName = username; // TODO change this
-        this.password = password;
+    public User(@NotNull String ID) {
+        this.displayName = UserUtility.getDisplayName(ID);
         this.ID = ID;
-        this.permission = permission;
     }
 
     /**
@@ -49,28 +40,16 @@ public class User {
     public boolean equals(@Nullable Object obj) {
         if (obj instanceof User) {
             User user2 = (User) obj;
-            if (user2.username.equalsIgnoreCase("guest") ||
-                    this.username.equalsIgnoreCase("guest")) {
+            if (user2.displayName.equalsIgnoreCase(this.displayName)) {
                 return user2.ID.equals(this.ID);
             }
-            return user2.username.equalsIgnoreCase(this.username);
+            return user2.displayName.equalsIgnoreCase(this.displayName);
         }
         return false;
     }
 
-    /**
-     * Check whether the {@link User} credentials are correct
-     * and the {@link User} exists with that password combination
-     *
-     * @return the validity check (true for valid, false for invalid)
-     */
-    public boolean validateLogin() {
-        if (username.equalsIgnoreCase("guest")) return true;
-        return UserUtility.login(this.username, this.password);
-    }
-
     @Override
     public String toString() {
-        return String.format("User '%s' - %s", username, permission);
+        return String.format("User '%s'", displayName);
     }
 }

@@ -50,6 +50,6 @@ public class Player {
 
     @Override
     public String toString() {
-        return String.format("%s (%s)", user.getUsername(), white ? "W" : "B");
+        return String.format("%s (%s)", user.getDisplayName(), white ? "W" : "B");
     }
 }

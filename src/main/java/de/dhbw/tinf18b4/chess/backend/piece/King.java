@@ -93,15 +93,18 @@ public class King implements Piece {
 
         if (left == null && right == null) {
             return Stream.empty();
-        } else if (!(left instanceof Rook)) {
+        }
+        if (!(left instanceof Rook)) {
             left = null;
-        } else if (!(right instanceof Rook)) {
+        }
+        if (!(right instanceof Rook)) {
             right = null;
         }
 
         if (left != null && left.hasEverMoved(board.getGame())) {
             left = null;
-        } else if (right != null && right.hasEverMoved(board.getGame())) {
+        }
+        if (right != null && right.hasEverMoved(board.getGame())) {
             right = null;
         }
 
@@ -118,7 +121,8 @@ public class King implements Piece {
 
         if (piecesLeft > 1) {
             left = null;
-        } else if (piecesRight > 1) {
+        }
+        if (piecesRight > 1) {
             right = null;
         }
 
@@ -140,7 +144,8 @@ public class King implements Piece {
 
         if (hasToPassThroughAnAttackedSquareLeft) {
             left = null;
-        } else if (hasToPassThroughAnAttackedSquareRight) {
+        }
+        if (hasToPassThroughAnAttackedSquareRight) {
             right = null;
         }
 

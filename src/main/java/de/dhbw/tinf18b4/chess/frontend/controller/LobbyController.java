@@ -36,16 +36,12 @@ public class LobbyController extends HttpServlet {
      */
     @Override
     protected void doGet(@NotNull HttpServletRequest req, @NotNull HttpServletResponse resp) throws IOException, ServletException {
-        // validate that the user is authenticated
+        // validate that the user is created, otherwise create him
         User user = (User) req.getSession().getAttribute("user");
         if (user == null) {
-            user = new User("guest", "", req.getSession().getId());
+            user = new User(req.getSession().getId());
             req.getSession().setAttribute("user", user);
             SessionManager.addSession(req.getSession());
-        } else if (!user.validateLogin()) {
-            req.getSession().setAttribute("user", null);
-            resp.sendRedirect("/login.jsp");
-            return;
         }
 
 
@@ -75,9 +71,9 @@ public class LobbyController extends HttpServlet {
                         resp.sendRedirect("/lobby" + reqPath + "/game");
                         return;
                     }
-                    // forward to lobby
+                    // user already is in lobby
                     req.getRequestDispatcher("/lobby.jsp?id=" + lobbyID).forward(req, resp);
-                } else if (!lobby.hasUser(user)){
+                } else if (!lobby.hasUser(user)) {
                     Player player = lobby.join(user);
                     if (player == null) {
                         resp.sendRedirect("/lobby/?error=lobby_full");
@@ -87,11 +83,12 @@ public class LobbyController extends HttpServlet {
                         req.getRequestDispatcher("/lobby.jsp?id=" + lobbyID).forward(req, resp);
                     }
                 } else {
+                    // user already joined the lobby with another session
                     resp.sendRedirect("/lobby/?error=already_in_lobby");
                 }
             } else {
                 // lobby not found
-                req.getRequestDispatcher("/error/404.jsp").forward(req, resp);
+                resp.sendRedirect("/lobby/?error=lobby_no_found");
             }
         }
     }

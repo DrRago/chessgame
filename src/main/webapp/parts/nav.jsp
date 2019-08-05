@@ -6,29 +6,64 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
+            <ul class="navbar-nav mr-0">
                 <li class="nav-item">
-                    <a class="nav-link" href="${pageContext.request.contextPath}/imprint.jsp">Imprint</a>
+                    <a class="nav-link" href="${pageContext.request.contextPath}/imprint">Imprint</a>
                 </li>
             </ul>
             <h3 class="mx-auto"><c:out value="${pageTitle}"/></h3>
-            <c:if test="${sessionScope.user.getUsername() == 'guest'}">
-                <form class="form-inline my-2 my-lg-0" action="${pageContext.request.contextPath}/DoLoginOrRegister" method="post">
-                    <input class="form-control mr-sm-2" type="text" name="username" placeholder="Username" aria-label="Username">
-                    <input class="form-control mr-sm-2" type="password" name="password" placeholder="Password" aria-label="Password">
-                    <button class="btn btn-outline-success my-2 my-sm-0" name="function" value="login" type="submit">Login</button>
-                </form>
-            </c:if>
-            <c:if test="${sessionScope.user.getUsername() ne 'guest'}">
-                <div class="row ml-auto">
-                    <div class="my-2 my-lg-0">
-                        <a class="btn btn-outline-danger my-sm-0 my-2" title="logout"
-                           href="${pageContext.request.contextPath}/logout.jsp">
-                            <i class="fas fa-sign-out-alt"></i>
-                        </a>
-                    </div>
-                </div>
-            </c:if>
+            <div class="col-sm-2">
+                <button id="edit_name" type="button" onclick=""
+                        class="btn btn-outline-info">${sessionScope.user.displayName}
+                    <i class="fas fa-edit ml-1"></i>
+                </button>
+            </div>
+            <script>
+                $('#edit_name').on('click', function () {
+                    $.confirm({
+                        escapeKey: 'cancel',
+                        theme: 'bootstrap',
+                        title: 'Change Name',
+                        content: '' +
+                            '<form action="" class="formName">' +
+                            '<div class="form-group">' +
+                            '<label>Please enter your new name (ESC to cancel)</label>' +
+                            '<input type="text" autofocus placeholder="Your name" class="name form-control" required />' +
+                            '</div>' +
+                            '</form>',
+                        buttons: {
+                            formSubmit: {
+                                text: 'Submit',
+                                btnClass: 'btn-blue',
+                                action: function () {
+                                    const name = this.$content.find('.name').val();
+                                    if (!name) {
+                                        $.alert({
+                                            theme: "bootstrap",
+                                            content: 'provide a valid name'
+                                        });
+                                        return false;
+                                    }
+                                    $.ajax(`/user/changeName?name=${"${encodeURIComponent(name)}"}`);
+                                    $('#edit_name').contents().first()[0].textContent = name
+                                }
+                            },
+                            cancel: function () {
+                                //close
+                            },
+                        },
+                        onContentReady: function () {
+                            // bind to events
+                            var jc = this;
+                            this.$content.find('form').on('submit', function (e) {
+                                // if the user submits the form by pressing enter in the field.
+                                e.preventDefault();
+                                jc.$$formSubmit.trigger('click'); // reference the button and click it
+                            });
+                        }
+                    });
+                });
+            </script>
         </div>
     </div>
 </nav>

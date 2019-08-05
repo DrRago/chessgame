@@ -92,6 +92,9 @@
                 <plugin>
                     <artifactId>maven-resources-plugin</artifactId>
                     <version>3.0.2</version>
+                    <configuration>
+                        <encoding>UTF-8</encoding>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <artifactId>maven-compiler-plugin</artifactId>
@@ -144,8 +147,12 @@
                 <artifactId>tomcat7-maven-plugin</artifactId>
                 <version>2.2</version>
                 <configuration>
+                    <uriEncoding>utf-8</uriEncoding>
                     <path>/</path>
-                    <port>9091</port>
+                    <port>8002</port>
+                    <httpsPort>8003</httpsPort>
+                    <keystoreFile>/etc/letsencrypt/live/gahr.dev/bundle.pfx</keystoreFile>
+                    <keystorePass>apassword</keystorePass>
                 </configuration>
             </plugin>
         </plugins>
