@@ -34,20 +34,10 @@ public class UserUtility {
      * @param displayName the new display name
      */
     public static void updateDisplayName(String sessionID, String displayName) {
-        displayName = escapeHTML(displayName);
         try {
             MySQLUtility.executeQuery("INSERT INTO session VALUES(?, ?) ON DUPLICATE KEY UPDATE displayName=?", sessionID, displayName, displayName);
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     * Escape html characters to disallow xss
-     * @param s the string to escape
-     * @return the html-free string
-     */
-    private static String escapeHTML(String s) {
-        return s.replaceAll("[<>]", "");
     }
 }

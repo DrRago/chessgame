@@ -25,6 +25,7 @@ public class UserController extends HttpServlet {
         // due to a bug in HttpServlet implementation we need to parse the url parameter by ourselves
         String encodedURL = URLDecoder.decode(req.getQueryString(), StandardCharsets.UTF_8.toString());
         String newName = encodedURL.replace("name=", "");
+        if (newName.contains("<") || newName.contains(">")) return;
 
         user.setDisplayName(newName);
         UserUtility.updateDisplayName(user.getID(), newName);
