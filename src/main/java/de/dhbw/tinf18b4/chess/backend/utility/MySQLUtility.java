@@ -50,7 +50,7 @@ class MySQLUtility {
      */
     static @Nullable ResultSet executeQuery(@NotNull String query, @NotNull Object... parameters) throws SQLException {
         Connection con = createConnection();
-        PreparedStatement stmt = con.prepareStatement(escapeHTML(query));
+        PreparedStatement stmt = con.prepareStatement(query);
 
         // set the parameters, if there are some
         for (int i = 0; i < parameters.length; i++) {
@@ -61,15 +61,5 @@ class MySQLUtility {
             return stmt.getResultSet();
         }
         return null;
-    }
-
-    /**
-     * Escape html characters to disallow xss
-     *
-     * @param s the string to escape
-     * @return the html-free string
-     */
-    private static String escapeHTML(String s) {
-        return s.replaceAll("<", "").replaceAll(">", "");
     }
 }
