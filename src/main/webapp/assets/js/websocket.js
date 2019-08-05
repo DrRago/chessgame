@@ -122,7 +122,7 @@ $(() => {
                 addLog(msgObj.value);
                 break;
             case "lobbyPrivacy":
-                $("#settingsTable #privacy > input").prop("checked", msgObj.value === "true")
+                $("#settingsTable #privacy > input").prop("checked", msgObj.value === "true");
                 break;
             case "gameState":
                 switch (msgObj.value) {
